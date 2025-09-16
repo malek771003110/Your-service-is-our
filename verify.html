@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحقق من حالة الطلب - خدمات منزلية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .back-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        /* Search Form */
+        .search-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .search-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .search-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        .results {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .status-card {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-card.pending {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .status-card.approved {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .status-card.rejected {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .status-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .user-details {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-details h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            color: #7f8c8d;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-state {
+            background: rgba(231, 76, 60, 0.1);
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .error-state .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .info-list {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-list li {
+            margin-bottom: 8px;
+            padding-right: 15px;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .contact-section p {
+            line-height: 1.6;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .back-btn {
+                position: static;
+                display: inline-block;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container > * {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="index.html" class="back-btn">← العودة للرئيسية</a>
+            <h1>🔍 تحقق من حالة الطلب</h1>
+            <p>أدخل الرقم الوطني للتحقق من حالة طلب التسجيل</p>
+        </div>
+
+        <!-- Search Form -->
+        <div class="search-form">
+            <div class="form-group">
+                <label for="nationalId">الرقم الوطني</label>
+                <input type="text" id="nationalId" class="form-control" placeholder="أدخل الرقم الوطني (10 أرقام)" maxlength="10">
+                <div class="form-help">الرقم الوطني الذي تم استخدامه عند التسجيل</div>
+            </div>
+            <button class="search-btn" onclick="checkStatus()">🔍 تحقق من الحالة</button>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <!-- Results will be populated here -->
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h3>📝 معلومات مهمة</h3>
+            <ul class="info-list">
+                <li>⏰ يتم مراجعة الطلبات خلال 24-48 ساعة من وقت التقديم</li>
+                <li>📱 ستحصل على إشعار عبر الهاتف عند الموافقة على طلبك</li>
+                <li>✅ الطلبات المقبولة تظهر فوراً في دليل المهنيين</li>
+                <li>🔄 يمكنك التحقق من حالة طلبك في أي وقت</li>
+            </ul>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <h3>📞 هل تحتاج مساعدة؟</h3>
+            <p><strong>هاتف:</strong> 0771003110</p>
+            <p><strong>بريد إلكتروني:</strong> himour.mk@gmail.com</p>
+            <p><strong>خدمة العملاء:</strong> متوفرة 24/7</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
+            authDomain: "home-services-app-a9c5e.firebaseapp.com",
+            projectId: "home-services-app-a9c5e",
+            storageBucket: "home-services-app-a9c5e.appspot.com",
+            messagingSenderId: "287028219636",
+            appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'غير محدد';
+            
+            let date;
+            if (timestamp.toDate) {
+                date = timestamp.toDate();
+            } else if (timestamp instanceof Date) {
+                date = timestamp;
+            } else {
+                date = new Date(timestamp);
+            }
+            
+            return date.toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        window.checkStatus = async function() {
+            const nationalIdInput = document.getElementById('nationalId');
+            const nationalId = nationalIdInput.value.trim();
+            const resultsDiv = document.getElementById('results');
+            const searchBtn = document.querySelector('.search-btn');
+
+            if (!nationalId) {
+                alert('يرجى إدخال الرقم الوطني');
+                nationalIdInput.focus();
+                return;
+            }
+
+            if (!/^[0-9]{10}$/.test(nationalId)) {
+                alert('يجب أن يتكون الرقم الوطني من 10 أرقام');
+                nationalIdInput.focus();
+                return;
+            }
+
+            // Show loading state
+            searchBtn.disabled = true;
+            searchBtn.textContent = 'جاري البحث...';
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <h3>جاري البحث عن طلبك...</h3>
+                    <p>يرجى الانتظار</p>
+                </div>
+            `;
+            resultsDiv.style.display = 'block';
+
+            try {
+                // Check in pending users
+                const pendingDoc = await getDoc(doc(db, "pendingUsers", nationalId));
+                if (pendingDoc.exists()) {
+                    displayResult(pendingDoc.data(), 'pending');
+                    return;
+                }
+
+                // Check in approved users
+                const approvedDoc = await getDoc(doc(db, "approvedUsers", nationalId));
+                if (approvedDoc.exists()) {
+                    displayResult(approvedDoc.data(), 'approved');
+                    return;
+                }
+
+                // Check in rejected users
+                const rejectedDoc = await getDoc(doc(db, "rejectedUsers", nationalId));
+                if (rejectedDoc.exists()) {
+                    displayResult(rejectedDoc.data(), 'rejected');
+                    return;
+                }
+
+                // Not found
+                displayNotFound();
+
+            } catch (error) {
+                console.error("Error checking status:", error);
+                displayError();
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.textContent = '🔍 تحقق من الحالة';
+            }
+        }
+
+        function displayResult(userData, status) {
+            const resultsDiv = document.getElementById('results');
+            
+            let statusCard = '';
+            
+            if (status === 'pending') {
+                statusCard = `
+                    <div class="status-card pending">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-title">طلبك قيد المراجعة</div>
+                        <div class="status-description">
+                            طلبك وصل بنجاح وهو الآن قيد المراجعة من قبل فريق الإدارة.<br>
+                            ستحصل على رد خلال 24-48 ساعة.
+                        </div>
+                    </div>
+                `;
+            } else if (status === 'approved') {
+                statusCard = `
+                    <div class="status-card approved">
+                        <div class="status-icon">✅</div>
+                        <div class="status-title">تم قبول طلبك!</div>
+                        <div class="status-description">
+                            مبروك! تم قبول طلبك وأنت الآن جزء من شبكتنا المهنية.<br>
+                            يمكن للعملاء الآن العثور عليك والتواصل معك.
+                        </div>
+                    </div>
+                `;
+            } else if (status === 'rejected') {
+                statusCard = `
+                    <div class="status-card rejected">
+                        <div class="status-icon">❌</div>
+                        <div class="status-title">تم رفض الطلب</div>
+                        <div class="status-description">
+                            نأسف، تم رفض طلبك.<br>
+                            السبب: ${userData.reason || 'لم يتم تحديد السبب'}<br>
+                            يمكنك التواصل معنا للمزيد من المعلومات.
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = `
+                ${statusCard}
+                <div class="user-details">
+                    <h3>📋 تفاصيل الطلب</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">الاسم الكامل</span>
+                            <span class="detail-value">${userData.name || 'غير محدد'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">المهنة</span>
+                            <span class="detail-value">${userData.job || 'غير محدد'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">المحافظة</span>
+                            <span class="detail-value">${userData.city || 'غير محدد'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">رقم الهاتف</span>
+                            <span class="detail-value">${userData.phone || 'غير محدد'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ التقديم</span>
+                            <span class="detail-value">${formatDate(userData.createdAt)}</span>
+                        </div>
+                        ${status === 'approved' ? `
+                            <div class="detail-item">
+                                <span class="detail-label">تاريخ القبول</span>
+                                <span class="detail-value">${formatDate(userData.approvedAt)}</span>
+                            </div>
+                        ` : ''}
+                        ${status === 'rejected' ? `
+                            <div class="detail-item">
+                                <span class="detail-label">تاريخ الرفض</span>
+                                <span class="detail-value">${formatDate(userData.rejectedAt)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayNotFound() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="error-state">
+                    <div class="icon">🔍</div>
+                    <h3>لم يتم العثور على طلب</h3>
+                    <p>لا يوجد طلب مسجل بهذا الرقم الوطني.<br>
+                    تأكد من صحة الرقم أو قم بتسجيل طلب جديد.</p>
+                </div>
+            `;
+        }
+
+        function displayError() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="error-state">
+                    <div class="icon">⚠️</div>
+                    <h3>حدث خطأ في النظام</h3>
+                    <p>نعتذر، حدث خطأ أثناء البحث.<br>
+                    يرجى المحاولة مرة أخرى أو التواصل مع الدعم الفني.</p>
+                </div>
+            `;
+        }
+
+        // Allow Enter key to search
+        document.getElementById('nationalId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkStatus();
+            }
+        });
+
+        // Format input to numbers only
+        document.getElementById('nationalId').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+</body>
+</html>

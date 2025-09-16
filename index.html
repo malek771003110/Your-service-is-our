@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خدمات منزلية - دليل المهنيين</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        /* User Status Bar */
+        .user-status {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .user-status.guest {
+            background: linear-gradient(45deg, #f39c12, #e65022);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .login-btn, .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .login-btn:hover, .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 50px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .form-control {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .clear-btn {
+            background: transparent;
+            color: #7f8c8d;
+            border: 2px solid #ecf0f1;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .results-count {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #667eea;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Professional Cards */
+        .professionals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .professional-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .professional-card:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .professional-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .professional-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .professional-info h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .professional-info .profession {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .professional-info .location {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+        }
+
+        /* Enhanced Rating System */
+        .rating-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #ddd;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .star.filled {
+            color: #ffd700;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+
+        .rating-count {
+            color: #7f8c8d;
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status.available {
+            background: #d5f5d7;
+            color: #249b06;
+        }
+
+        .status.busy {
+            background: #ffeaa7;
+            color: #e60b0b;
+        }
+
+        .professional-description {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        /* Contact Details with Partial Masking */
+        .contact-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .detail-label {
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+        }
+
+        .masked-info {
+            color: #667eea;
+            font-size: 11px;
+            font-style: italic;
+        }
+
+        .professional-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-rate {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-call {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(45deg, #25d366, #128c7e);
+            color: white;
+        }
+
+        .btn-login {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Rating Modal */
+        .rating-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .rating-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .rating-modal h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .rating-input {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        /* Enhanced Rating Stars - WHITE to GOLD */
+        .rating-input .star {
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #e0e0e0; /* لون أبيض في البداية */
+            border: 3px solid transparent;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rating-input .star:hover {
+            color: #ffd700; /* ذهبي عند hover */
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #ffd700;
+            transform: scale(1.1);
+        }
+
+        .rating-input .star.selected {
+            color: #ffd700; /* ذهبي عند التحديد */
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .rating-comment {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 15px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+            margin: 15px 0;
+        }
+
+        .rating-comment:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .rating-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #ecf0f1;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #95a5a6;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px;
+            border: 2px solid #ecf0f1;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-link:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .contact-info {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .contact-info strong {
+            color: #2c3e50;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .search-form {
+                display: grid;
+                grid-template-columns: 1fr 1fr auto auto;
+                gap: 15px;
+                align-items: end;
+            }
+
+            .footer-links {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .form-control {
+                min-width: auto;
+            }
+
+            .results-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .professionals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-details {
+                grid-template-columns: 1fr;
+            }
+
+            .user-status {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .rating-input .star {
+                font-size: 2.5rem;
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container > * {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .professional-card {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏠 خدمات منزلية</h1>
+            <p>أفضل المهنيين في منطقتك - جودة مضمونة وخدمة موثوقة</p>
+
+            <!-- User Status Bar -->
+            <div class="user-status guest" id="userStatus">
+                <div class="user-info">
+                    <span id="userWelcome">🔒 زائر - يمكنك التصفح فقط</span>
+                </div>
+                <a href="customer-auth-page.html" class="login-btn" id="userAction">تسجيل الدخول</a>
+            </div>
+
+            <div class="action-buttons">
+                <a href="register.html" class="btn btn-primary">
+                    ✨ سجل مهنتك الآن
+                </a>
+                <a href="#search" class="btn btn-secondary">
+                    🔍 ابحث عن مهني
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section" id="search">
+            <h2>🔍 دليل المهنيين</h2>
+            
+            <div class="search-form">
+                <input type="text" class="form-control" id="professionSearch" placeholder="مثال: نجار، كهربائي، سباك...">
+                
+                <select class="form-control" id="governorateSelect">
+                    <option value="">جميع المحافظات</option>
+                    <option value="عمان">عمان</option>
+                    <option value="الزرقاء">الزرقاء</option>
+                    <option value="إربد">إربد</option>
+                    <option value="البلقاء">البلقاء</option>
+                    <option value="المفرق">المفرق</option>
+                    <option value="الكرك">الكرك</option>
+                    <option value="معان">معان</option>
+                    <option value="الطفيلة">الطفيلة</option>
+                    <option value="العقبة">العقبة</option>
+                    <option value="السلط">السلط</option>
+                    <option value="مادبا">مادبا</option>
+                </select>
+                
+                <button class="search-btn" onclick="searchProfessionals()">🔍 ابدأ البحث</button>
+                <button class="clear-btn" onclick="clearFilters()">مسح الفلاتر</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">جاري التحميل...</div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState">
+                <div class="loading-spinner"></div>
+                <h3>جاري تحميل المهنيين...</h3>
+                <p>يرجى الانتظار</p>
+            </div>
+
+            <!-- Professionals Grid -->
+            <div class="professionals-grid" id="professionalsGrid">
+                <!-- سيتم ملء البيانات هنا من Firebase -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="icon">🔍</div>
+                <h3>لا توجد نتائج</h3>
+                <p>لم نجد مهنيين يطابقون بحثك.<br>جرب تعديل معايير البحث أو مسح الفلاتر</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="register.html" class="footer-link">💼 انضم إلى شبكتنا المهنية</a>
+                <a href="verify.html" class="footer-link">📋 تحقق من حالة طلبك</a>
+                <a href="login.html" class="footer-link">🔐 تسجيل دخول للملف الشخصي</a>
+            </div>
+            
+            <div class="contact-info">
+                <p><strong>للاستفسارات والشكاوى</strong></p>
+                <p>📞 <strong>0771003110</strong></p>
+                <p>📧 <strong>himour.mk@gmail.com</strong></p>
+                <p>🕐 <strong>24/7 خدمة العملاء</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div class="rating-modal" id="ratingModal">
+        <div class="rating-modal-content">
+            <h3>تقييم المهني</h3>
+            <p id="ratingProfessionalName">اسم المهني</p>
+            
+            <div class="rating-input" id="ratingStars">
+                <span class="star" data-rating="1">⭐</span>
+                <span class="star" data-rating="2">⭐</span>
+                <span class="star" data-rating="3">⭐</span>
+                <span class="star" data-rating="4">⭐</span>
+                <span class="star" data-rating="5">⭐</span>
+            </div>
+            
+            <textarea class="rating-comment" id="ratingComment" placeholder="اكتب تعليقك عن جودة الخدمة (اختياري)..."></textarea>
+            
+            <div class="rating-actions">
+                <button class="modal-btn secondary" onclick="closeRatingModal()">إلغاء</button>
+                <button class="modal-btn primary" onclick="submitRating()">إرسال التقييم</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            doc,
+            getDoc,
+            setDoc,
+            query, 
+            where,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
+            authDomain: "home-services-app-a9c5e.firebaseapp.com",
+            projectId: "home-services-app-a9c5e",
+            storageBucket: "home-services-app-a9c5e.appspot.com",
+            messagingSenderId: "287028219636",
+            appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allProfessionals = [];
+        let filteredProfessionals = [];
+        let currentUser = null;
+        let currentRatingProfessional = null;
+        let selectedRating = 0;
+
+        // DOM Elements
+        const elements = {
+            loadingState: document.getElementById('loadingState'),
+            professionalsGrid: document.getElementById('professionalsGrid'),
+            emptyState: document.getElementById('emptyState'),
+            resultsCount: document.getElementById('resultsCount'),
+            professionSearch: document.getElementById('professionSearch'),
+            governorateSelect: document.getElementById('governorateSelect'),
+            userStatus: document.getElementById('userStatus'),
+            userWelcome: document.getElementById('userWelcome'),
+            userAction: document.getElementById('userAction'),
+            ratingModal: document.getElementById('ratingModal'),
+            ratingStars: document.getElementById('ratingStars'),
+            ratingComment: document.getElementById('ratingComment'),
+            ratingProfessionalName: document.getElementById('ratingProfessionalName')
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 تحميل الصفحة الرئيسية...');
+            checkUserLogin();
+            await loadProfessionals();
+            setupEventListeners();
+        });
+
+        function checkUserLogin() {
+            const isLoggedIn = sessionStorage.getItem('customerLoggedIn');
+            const customerName = sessionStorage.getItem('customerName');
+            const customerPhone = sessionStorage.getItem('customerPhone');
+
+            if (isLoggedIn === 'true' && customerName && customerPhone) {
+                currentUser = { name: customerName, phone: customerPhone };
+                updateUserStatus(true, customerName);
+            } else {
+                currentUser = null;
+                updateUserStatus(false);
+            }
+        }
+
+        function updateUserStatus(isLoggedIn, userName = '') {
+            if (isLoggedIn) {
+                elements.userStatus.classList.remove('guest');
+                elements.userWelcome.textContent = `🔓 أهلاً ${userName} - يمكنك الآن تقييم المهنيين`;
+                elements.userAction.textContent = 'تسجيل خروج';
+                elements.userAction.onclick = logout;
+                elements.userAction.removeAttribute('href');
+            } else {
+                elements.userStatus.classList.add('guest');
+                elements.userWelcome.textContent = '🔒 زائر - يمكنك التصفح فقط';
+                elements.userAction.textContent = 'تسجيل الدخول';
+                elements.userAction.onclick = null;
+                elements.userAction.href = 'customer-auth-page.html';
+            }
+        }
+
+        function setupEventListeners() {
+            elements.professionSearch.addEventListener('input', debounce(searchProfessionals, 300));
+            elements.governorateSelect.addEventListener('change', searchProfessionals);
+            
+            // Rating modal events
+            elements.ratingStars.addEventListener('click', handleStarClick);
+            elements.ratingModal.addEventListener('click', function(e) {
+                if (e.target === this) closeRatingModal();
+            });
+        }
+
+        async function loadProfessionals() {
+            try {
+                console.log('🔥 جاري تحميل المهنيين من Firebase...');
+                showLoading(true);
+
+                const approvedSnapshot = await getDocs(collection(db, "approvedUsers"));
+                
+                allProfessionals = [];
+                for (const docSnap of approvedSnapshot.docs) {
+                    const data = docSnap.data();
+                   const professional = {
+    id: docSnap.id,
+    name: data.name || 'غير محدد',
+    job: data.job || 'غير محدد',
+    city: data.city || 'غير محدد',
+    phone: data.phone || 'غير محدد',
+    bio: data.bio || 'لا يوجد وصف',
+    status: data.status || 'available',
+    createdAt: data.createdAt,
+    approvedAt: data.approvedAt,
+
+    // الحقول الجديدة
+    workStartTime: data.workStartTime || 'غير محدد',
+    workEndTime: data.workEndTime || 'غير محدد',
+    hourlyPrice: data.hourlyPrice || 'غير محدد',
+    experienceYears: data.experienceYears || 'غير محدد'
+};
+
+
+                    // Load ratings for this professional
+                    professional.ratings = await loadProfessionalRatings(docSnap.id);
+                    allProfessionals.push(professional);
+                }
+
+                filteredProfessionals = [...allProfessionals];
+                
+                console.log(`✅ تم تحميل ${allProfessionals.length} مهني`);
+                
+                renderProfessionals();
+                updateResultsCount();
+
+            } catch (error) {
+                console.error('❌ خطأ في تحميل المهنيين:', error);
+                showError('فشل في تحميل البيانات');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadProfessionalRatings(professionalId) {
+            try {
+                const ratingsSnapshot = await getDocs(
+                    query(
+                        collection(db, "ratings"),
+                        where("professionalId", "==", professionalId)
+                    )
+                );
+                
+                const ratings = [];
+                let totalRating = 0;
+                
+                ratingsSnapshot.forEach((doc) => {
+                    const rating = doc.data();
+                    ratings.push(rating);
+                    totalRating += rating.rating;
+                });
+
+                return {
+                    ratings: ratings,
+                    averageRating: ratings.length > 0 ? (totalRating / ratings.length) : 0,
+                    totalCount: ratings.length
+                };
+            } catch (error) {
+                console.error('خطأ في تحميل التقييمات:', error);
+                return { ratings: [], averageRating: 0, totalCount: 0 };
+            }
+        }
+
+        function renderProfessionals() {
+            const grid = elements.professionalsGrid;
+            grid.innerHTML = '';
+
+            if (filteredProfessionals.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            hideEmptyState();
+
+            filteredProfessionals.forEach(professional => {
+                const card = createProfessionalCard(professional);
+                grid.appendChild(card);
+            });
+        }
+
+        function createProfessionalCard(professional) {
+            const card = document.createElement('div');
+            card.className = 'professional-card';
+            
+            const avatarLetter = professional.name.charAt(0).toUpperCase();
+            const isLoggedIn = currentUser !== null;
+            
+            // إخفاء جزئي لرقم الهاتف للزوار
+            const displayPhone = isLoggedIn ? professional.phone : maskPhone(professional.phone);
+            
+            // Generate stars display
+            const starsDisplay = generateStarsDisplay(professional.ratings.averageRating);
+            
+             card.innerHTML = `
+        <div class="professional-header">
+            <div class="professional-avatar">${avatarLetter}</div>
+            <div class="professional-info">
+                <h3>${professional.name}</h3>
+                <div class="profession">${professional.job}</div>
+                <div class="location">📍 ${professional.city}</div>
+            </div>
+        </div>
+        
+        <div class="rating-section">
+            <div class="rating-display">
+                <div class="stars">${starsDisplay}</div>
+                <span>${professional.ratings && professional.ratings.averageRating ? professional.ratings.averageRating.toFixed(1) : "0.0"}</span>
+                <span class="rating-count">(${professional.ratings && professional.ratings.totalCount ? professional.ratings.totalCount : 0} تقييم)</span>
+            </div>
+            <div class="status ${professional.status === 'available' ? 'available' : 'busy'}">
+                ${professional.status === 'available' ? 'متاح الآن' : 'مشغول'}
+            </div>
+        </div>
+        
+        <div class="professional-description">
+            ${professional.bio || 'لا يوجد وصف متاح'}
+        </div>
+        
+        <div class="contact-details">
+            <div class="detail-item">
+                <span class="detail-label">رقم الهاتف</span>
+                <span class="detail-value">
+                    ${displayPhone}
+                    ${!isLoggedIn ? '<div class="masked-info">سجل دخولك للرقم الكامل</div>' : ''}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">ساعات العمل</span>
+                <span class="detail-value">${professional.workStartTime || "غير محدد"} - ${professional.workEndTime || "غير محدد"}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">السعر المبدئي</span>
+                <span class="detail-value">${professional.hourlyPrice ? professional.hourlyPrice + " د.أ / ساعة" : "غير محدد"}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">سنوات الخبرة</span>
+                <span class="detail-value">${professional.experienceYears || "غير محدد"} سنوات</span>
+            </div>
+        </div>
+        
+        <div class="professional-actions">
+            ${isLoggedIn ? `
+                <button class="action-btn btn-rate" onclick="openRatingModal('${professional.id}', '${professional.name}')">⭐ تقييم</button>
+                <button class="action-btn btn-call" onclick="callProfessional('${professional.phone}')">📞 اتصال</button>
+                <button class="action-btn btn-whatsapp" onclick="whatsappProfessional('${professional.phone}')">💬 واتساب</button>
+            ` : `
+                <a href="customer-auth-page.html" class="action-btn btn-login">🔐 سجل دخولك للتواصل والتقييم</a>
+            `}
+        </div>
+    `;
+
+    return card;
+}
+        // دالة لإخفاء جزء من رقم الهاتف
+        function maskPhone(phone) {
+            if (!phone || phone.length < 10) return phone;
+            // 0797612345 -> 0797xxxxxx
+            return phone.substring(0, 4) + 'x'.repeat(phone.length - 4);
+        }
+
+        function generateStarsDisplay(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating - fullStars >= 0.5;
+            
+            for (let i = 0; i < 5; i++) {
+                if (i < fullStars) {
+                    stars += '<span class="star filled">⭐</span>';
+                } else if (i === fullStars && hasHalfStar) {
+                    stars += '<span class="star filled">⭐</span>';
+                } else {
+                    stars += '<span class="star">⭐</span>';
+                }
+            }
+            
+            return stars;
+        }
+
+        function searchProfessionals() {
+            const professionSearch = elements.professionSearch.value.toLowerCase().trim();
+            const governorateFilter = elements.governorateSelect.value;
+
+            filteredProfessionals = allProfessionals.filter(professional => {
+                const matchesProfession = !professionSearch || 
+                    professional.job.toLowerCase().includes(professionSearch) ||
+                    professional.name.toLowerCase().includes(professionSearch);
+                
+                const matchesGovernorate = !governorateFilter || professional.city === governorateFilter;
+
+                return matchesProfession && matchesGovernorate;
+            });
+
+            renderProfessionals();
+            updateResultsCount();
+        }
+
+        function clearFilters() {
+            elements.professionSearch.value = '';
+            elements.governorateSelect.value = '';
+            filteredProfessionals = [...allProfessionals];
+            renderProfessionals();
+            updateResultsCount();
+        }
+
+        function updateResultsCount() {
+            elements.resultsCount.textContent = `عدد النتائج: ${filteredProfessionals.length}`;
+        }
+
+        function showLoading(show) {
+            elements.loadingState.style.display = show ? 'block' : 'none';
+            elements.professionalsGrid.style.display = show ? 'none' : 'grid';
+        }
+
+        function showEmptyState() {
+            elements.emptyState.style.display = 'block';
+            elements.professionalsGrid.style.display = 'none';
+        }
+
+        function hideEmptyState() {
+            elements.emptyState.style.display = 'none';
+            elements.professionalsGrid.style.display = 'grid';
+        }
+
+        function showError(message) {
+            elements.professionalsGrid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #e74c3c;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
+                    <h3>خطأ في التحميل</h3>
+                    <p>${message}</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 20px; cursor: pointer;">إعادة المحاولة</button>
+                </div>
+            `;
+        }
+
+        // Rating System Functions
+        function openRatingModal(professionalId, professionalName) {
+            if (!currentUser) {
+                alert('يجب تسجيل الدخول أولاً لإضافة تقييم');
+                return;
+            }
+
+            currentRatingProfessional = professionalId;
+            selectedRating = 0;
+            elements.ratingProfessionalName.textContent = professionalName;
+            elements.ratingComment.value = '';
+            
+            // Reset stars to white
+            const stars = elements.ratingStars.querySelectorAll('.star');
+            stars.forEach(star => star.classList.remove('selected'));
+            
+            elements.ratingModal.style.display = 'flex';
+        }
+
+        function closeRatingModal() {
+            elements.ratingModal.style.display = 'none';
+            currentRatingProfessional = null;
+            selectedRating = 0;
+        }
+
+        function handleStarClick(e) {
+            if (e.target.classList.contains('star')) {
+                const rating = parseInt(e.target.dataset.rating);
+                selectedRating = rating;
+                updateStarDisplay(rating);
+            }
+        }
+
+        function updateStarDisplay(rating) {
+            const stars = elements.ratingStars.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                star.classList.remove('selected');
+                if (index < rating) {
+                    star.classList.add('selected');
+                }
+            });
+        }
+
+        async function submitRating() {
+            if (!currentUser || !currentRatingProfessional) {
+                alert('خطأ في النظام');
+                return;
+            }
+
+            if (selectedRating === 0) {
+                alert('يرجى اختيار تقييم بالنجوم');
+                return;
+            }
+
+            const comment = elements.ratingComment.value.trim();
+
+            try {
+                // Check if user already rated this professional
+                const existingRatingQuery = query(
+                    collection(db, "ratings"),
+                    where("professionalId", "==", currentRatingProfessional),
+                    where("customerPhone", "==", currentUser.phone)
+                );
+                
+                const existingRatings = await getDocs(existingRatingQuery);
+                
+                if (!existingRatings.empty) {
+                    alert('لقد قمت بتقييم هذا المهني مسبقاً');
+                    closeRatingModal();
+                    return;
+                }
+
+                // Create new rating
+                const ratingId = `${currentRatingProfessional}_${currentUser.phone}_${Date.now()}`;
+                const ratingData = {
+                    id: ratingId,
+                    professionalId: currentRatingProfessional,
+                    customerName: currentUser.name,
+                    customerPhone: currentUser.phone,
+                    rating: selectedRating,
+                    comment: comment,
+                    createdAt: serverTimestamp()
+                };
+
+                await setDoc(doc(db, "ratings", ratingId), ratingData);
+
+                alert('تم إرسال تقييمك بنجاح! شكراً لك');
+                closeRatingModal();
+                
+                // Reload professionals to show updated ratings
+                await loadProfessionals();
+
+            } catch (error) {
+                console.error('خطأ في إرسال التقييم:', error);
+                alert('حدث خطأ في إرسال التقييم');
+            }
+        }
+
+        // Professional Actions
+        function callProfessional(phone) {
+            if (!currentUser) {
+                alert('يجب تسجيل الدخول أولاً للاتصال');
+                return;
+            }
+            
+            if (confirm('هل تريد الاتصال بهذا المهني الآن؟')) {
+                window.open(`tel:${phone}`, '_self');
+            }
+        }
+
+        function whatsappProfessional(phone) {
+            if (!currentUser) {
+                alert('يجب تسجيل الدخول أولاً للتواصل عبر واتساب');
+                return;
+            }
+
+            const message = encodeURIComponent('مرحباً، وجدت معلوماتك في دليل المهنيين وأريد الاستفسار عن خدماتك.');
+            const formattedPhone = '962' + phone.substring(1);
+            window.open(`https://wa.me/${formattedPhone}?text=${message}`, '_blank');
+        }
+
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                sessionStorage.removeItem('customerLoggedIn');
+                sessionStorage.removeItem('customerName');
+                sessionStorage.removeItem('customerPhone');
+                sessionStorage.removeItem('loginTime');
+                currentUser = null;
+                updateUserStatus(false);
+                
+                // إعادة رسم البطاقات لإخفاء التفاصيل
+                renderProfessionals();
+                
+                alert('تم تسجيل الخروج بنجاح');
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Global Functions
+        window.searchProfessionals = searchProfessionals;
+        window.clearFilters = clearFilters;
+        window.openRatingModal = openRatingModal;
+        window.closeRatingModal = closeRatingModal;
+        window.submitRating = submitRating;
+        window.callProfessional = callProfessional;
+        window.whatsappProfessional = whatsappProfessional;
+        window.logout = logout;
+
+        // Auto-refresh data every 60 seconds
+        setInterval(async () => {
+            try {
+                console.log('🔄 تحديث تلقائي للبيانات...');
+                await loadProfessionals();
+            } catch (error) {
+                console.error('خطأ في التحديث التلقائي:', error);
+            }
+        }, 60000);
+
+        console.log('✅ الصفحة الرئيسية جاهزة مع نظام التقييم المحسن');
+    </script>
+</body>
+</html>
