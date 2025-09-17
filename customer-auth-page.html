@@ -1,944 +1,1265 @@
-<!DOCTYPE html>
-
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل دخول العملاء - عرض المهنيين</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  direction: rtl;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.back-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 25px;
-  text-decoration: none;
-  font-size: 14px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-}
-
-.container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 25px;
-  padding: 40px;
-  box-shadow: 0 20px 60px rgba(31, 38, 135, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 100%;
-  max-width: 450px;
-  animation: slideIn 0.8s ease-out;
-}
-
-@keyframes slideIn {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.logo {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  color: white;
-  margin: 0 auto 20px;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-}
-
-.header h1 {
-  color: #2c3e50;
-  font-size: 28px;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.header p {
-  color: #7f8c8d;
-  font-size: 16px;
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-
-.features-list {
-  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-  border-radius: 15px;
-  padding: 15px;
-  margin-bottom: 25px;
-}
-
-.features-list h4 {
-  color: #495057;
-  margin-bottom: 10px;
-  font-size: 14px;
-  text-align: center;
-}
-
-.features-list ul {
-  list-style: none;
-  color: #6c757d;
-  font-size: 13px;
-}
-
-.features-list li {
-  margin-bottom: 5px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.features-list li:before {
-  content: "✅";
-  font-size: 12px;
-}
-
-.tabs {
-  display: flex;
-  background: #f8f9fa;
-  border-radius: 25px;
-  padding: 5px;
-  margin-bottom: 25px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.tab {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  background: transparent;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #666;
-}
-
-.tab.active {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.form-content {
-  display: none;
-}
-
-.form-content.active {
-  display: block;
-  animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  color: #2c3e50;
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-.input-wrapper {
-  position: relative;
-}
-
-.form-input {
-  width: 100%;
-  padding: 16px 20px;
-  border: 2px solid #e9ecef;
-  border-radius: 15px;
-  font-size: 16px;
-  background: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.form-input:focus {
-  border-color: #667eea;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  transform: translateY(-2px);
-}
-
-.form-input.error {
-  border-color: #dc3545;
-  background: #fff5f5;
-}
-
-.form-input.success {
-  border-color: #28a745;
-  background: #f8fff9;
-}
-
-.input-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #adb5bd;
-  font-size: 18px;
-}
-
-.password-toggle {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #667eea;
-  cursor: pointer;
-  font-size: 20px;
-  padding: 5px;
-  border-radius: 5px;
-  transition: all 0.2s ease;
-}
-
-.password-toggle:hover {
-  background: rgba(102, 126, 234, 0.1);
-}
-
-.form-help {
-  font-size: 12px;
-  color: #6c757d;
-  margin-top: 5px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.validation-message {
-  font-size: 12px;
-  margin-top: 5px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  display: none;
-}
-
-.validation-message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-.validation-message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.submit-btn {
-  width: 100%;
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 18px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
-  margin-top: 10px;
-  position: relative;
-  overflow: hidden;
-}
-
-.submit-btn:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 35px rgba(102, 126, 234, 0.6);
-}
-
-.submit-btn:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-text, .btn-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.btn-loading {
-  display: none;
-}
-
-.loading-spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.alert {
-  padding: 15px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  text-align: center;
-  display: none;
-  animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-  from { transform: translateY(-20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.alert.success {
-  background: rgba(40, 167, 69, 0.1);
-  color: #155724;
-  border: 2px solid #28a745;
-}
-
-.alert.error {
-  background: rgba(220, 53, 69, 0.1);
-  color: #721c24;
-  border: 2px solid #dc3545;
-}
-
-.alert.info {
-  background: rgba(23, 162, 184, 0.1);
-  color: #0c5460;
-  border: 2px solid #17a2b8;
-}
-
-.divider {
-  text-align: center;
-  margin: 25px 0;
-  position: relative;
-  color: #adb5bd;
-  font-size: 14px;
-}
-
-.divider:before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #dee2e6, transparent);
-}
-
-.divider span {
-  background: white;
-  padding: 0 15px;
-  position: relative;
-}
-
-.guest-access {
-  background: linear-gradient(45deg, #ffc107, #fd7e14);
-  color: white;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-  margin-top: 15px;
-}
-
-.guest-access h5 {
-  margin-bottom: 8px;
-  font-size: 16px;
-}
-
-.guest-access p {
-  font-size: 13px;
-  opacity: 0.9;
-  margin-bottom: 12px;
-}
-
-.guest-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 10px 20px;
-  border-radius: 20px;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  display: inline-block;
-}
-
-.guest-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-}
-
-/* Mobile Responsive */
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-
-  .back-btn {
-    top: 10px;
-    right: 10px;
-    font-size: 12px;
-    padding: 8px 15px;
-  }
-
-  .container {
-    padding: 30px 25px;
-    margin: 10px 0;
-  }
-
-  .logo {
-    width: 70px;
-    height: 70px;
-    font-size: 2rem;
-  }
-
-  .header h1 {
-    font-size: 24px;
-  }
-
-  .header p {
-    font-size: 14px;
-  }
-
-  .form-input {
-    padding: 14px 18px;
-  }
-}
-
-  </style>
-</head>
-<body>
-
-<a href="index.html" class="back-btn">← العودة للرئيسية</a>
-
-  <div class="container">
-    <div class="header">
-      <div class="logo">👥</div>
-      <h1>دخول العملاء</h1>
-      <p>سجل دخولك لرؤية تفاصيل المهنيين كاملة والتواصل معهم مباشرة</p>
-
-  <div class="features-list">
-    <h4>مميزات الحساب المسجل:</h4>
-    <ul>
-      <li>عرض أرقام هواتف المهنيين</li>
-      <li>إضافة تقييمات وتعليقات</li>
-      <li>التواصل المباشر عبر الهاتف والواتساب</li>
-      <li>حفظ المهنيين المفضلين</li>
-    </ul>
-  </div>
-</div>
-
-<div id="alertMessage" class="alert"></div>
-
-<div class="tabs">
-  <button class="tab active" onclick="showTab('login')">تسجيل الدخول</button>
-  <button class="tab" onclick="showTab('register')">إنشاء حساب جديد</button>
-</div>
-
-<!-- Login Form -->
-<form class="form-content active" id="loginForm" data-tab="login">
-  <div class="form-group">
-    <label for="loginPhone">رقم الهاتف</label>
-    <div class="input-wrapper">
-      <span class="input-icon">📱</span>
-      <input type="tel" id="loginPhone" class="form-input" placeholder="07XXXXXXXX" required>
-    </div>
-    <div class="form-help">
-      <span>💡</span>
-      <span>أدخل رقم هاتفك المسجل مسبقاً</span>
-    </div>
-    <div id="loginPhoneValidation" class="validation-message"></div>
-  </div>
-
-  <div class="form-group">
-    <label for="loginPassword">كلمة المرور</label>
-    <div class="input-wrapper">
-      <span class="input-icon">🔒</span>
-      <input type="password" id="loginPassword" class="form-input" placeholder="أدخل كلمة المرور" required>
-      <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁</button>
-    </div>
-    <div id="loginPasswordValidation" class="validation-message"></div>
-  </div>
-
-  <button type="submit" class="submit-btn" id="loginBtn">
-    <span class="btn-text">🔓 تسجيل الدخول</span>
-    <div class="btn-loading">
-      <div class="loading-spinner"></div>
-      <span>جاري التحقق...</span>
-    </div>
-  </button>
-</form>
-
-<!-- Register Form -->
-<form class="form-content" id="registerForm" data-tab="register">
-  <div class="form-group">
-    <label for="registerName">الاسم الكامل</label>
-    <div class="input-wrapper">
-      <span class="input-icon">👤</span>
-      <input type="text" id="registerName" class="form-input" placeholder="أدخل اسمك الكامل" required>
-    </div>
-    <div class="form-help">
-      <span>💡</span>
-      <span>سيظهر هذا الاسم في تقييماتك</span>
-    </div>
-    <div id="registerNameValidation" class="validation-message"></div>
-  </div>
-
-  <div class="form-group">
-    <label for="registerPhone">رقم الهاتف</label>
-    <div class="input-wrapper">
-      <span class="input-icon">📱</span>
-      <input type="tel" id="registerPhone" class="form-input" placeholder="07XXXXXXXX" required>
-    </div>
-    <div class="form-help">
-      <span>💡</span>
-      <span>سيكون هذا اسم المستخدم الخاص بك</span>
-    </div>
-    <div id="registerPhoneValidation" class="validation-message"></div>
-  </div>
-
-  <div class="form-group">
-    <label for="registerPassword">كلمة المرور</label>
-    <div class="input-wrapper">
-      <span class="input-icon">🔒</span>
-      <input type="password" id="registerPassword" class="form-input" placeholder="اختر كلمة مرور قوية" required minlength="6">
-      <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">👁</button>
-    </div>
-    <div class="form-help">
-      <span>💡</span>
-      <span>يجب أن تحتوي على 6 أحرف على الأقل</span>
-    </div>
-    <div id="registerPasswordValidation" class="validation-message"></div>
-  </div>
-
-  <div class="form-group">
-    <label for="confirmPassword">تأكيد كلمة المرور</label>
-    <div class="input-wrapper">
-      <span class="input-icon">🔒</span>
-      <input type="password" id="confirmPassword" class="form-input" placeholder="أعد كتابة كلمة المرور" required>
-      <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁</button>
-    </div>
-    <div id="confirmPasswordValidation" class="validation-message"></div>
-  </div>
-
-  <button type="submit" class="submit-btn" id="registerBtn">
-    <span class="btn-text">✨ إنشاء الحساب</span>
-    <div class="btn-loading">
-      <div class="loading-spinner"></div>
-      <span>جاري الإنشاء...</span>
-    </div>
-  </button>
-</form>
-
-<div class="divider">
-  <span>أو</span>
-</div>
-
-<div class="guest-access">
-  <h5>🔍 تصفح كزائر</h5>
-  <p>يمكنك تصفح المهنيين لكن لن تتمكن من رؤية تفاصيل الاتصال أو إضافة تقييمات</p>
-  <a href="index.html" class="guest-btn">متابعة كزائر</a>
-</div>
-
-  </div>
-
-  <!-- Firebase Scripts -->
-
-  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
-
-  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>
-
-  <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
-      authDomain: "home-services-app-a9c5e.firebaseapp.com",
-      projectId: "home-services-app-a9c5e",
-      storageBucket: "home-services-app-a9c5e.appspot.com",
-      messagingSenderId: "287028219636",
-      appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // Form validation patterns
-    const phonePattern = /^07\d{8}$/;
-    const namePattern = /^[\u0600-\u06FFa-zA-Z\s]{2,50}$/;
-
-    // Global functions
-    function showTab(tabName) {
-      // Update tab buttons
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      event.target.classList.add('active');
-
-      // Update form content
-      document.querySelectorAll('.form-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-
-      hideAlert();
-      autoFocusFirstInput(tabName);
-    }
-
-    function togglePassword(inputId) {
-      const input = document.getElementById(inputId);
-      const button = input.parentElement.querySelector('.password-toggle');
-      
-      if (input.type === 'password') {
-        input.type = 'text';
-        button.textContent = '🙈';
-      } else {
-        input.type = 'password';
-        button.textContent = '👁';
-      }
-    }
-
-    function formatAndValidatePhone(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value.length > 0 && !value.startsWith('07')) {
-        if (value.startsWith('7')) value = '0' + value;
-      }
-      if (value.length > 10) value = value.substring(0, 10);
-      e.target.value = value;
-
-      const validationElement = document.getElementById(e.target.id + 'Validation');
-      if (value.length === 0) {
-        clearValidation(e.target, validationElement);
-      } else if (phonePattern.test(value)) {
-        showValidation(e.target, validationElement, 'رقم هاتف صحيح ✅', 'success');
-      } else {
-        showValidation(e.target, validationElement, 'يجب أن يبدأ بـ 07 ويتكون من 10 أرقام', 'error');
-      }
-    }
-
-    function validateName(e) {
-      const value = e.target.value.trim();
-      const validationElement = document.getElementById('registerNameValidation');
-      
-      if (value.length === 0) {
-        clearValidation(e.target, validationElement);
-      } else if (namePattern.test(value)) {
-        showValidation(e.target, validationElement, 'اسم صحيح ✅', 'success');
-      } else {
-        showValidation(e.target, validationElement, 'يجب أن يحتوي على حروف فقط (2-50 حرف)', 'error');
-      }
-    }
-
-    function validatePassword(e) {
-      const value = e.target.value;
-      const validationElement = document.getElementById('registerPasswordValidation');
-      
-      if (value.length === 0) {
-        clearValidation(e.target, validationElement);
-      } else if (value.length >= 6) {
-        showValidation(e.target, validationElement, 'كلمة مرور قوية ✅', 'success');
-      } else {
-        showValidation(e.target, validationElement, `يجب إدخال ${6 - value.length} أحرف إضافية على الأقل`, 'error');
-      }
-
-      // Re-validate confirm password if it has value
-      const confirmPassword = document.getElementById('confirmPassword');
-      if (confirmPassword.value) {
-        validateConfirmPassword({ target: confirmPassword });
-      }
-    }
-
-    function validateConfirmPassword(e) {
-      const value = e.target.value;
-      const password = document.getElementById('registerPassword').value;
-      const validationElement = document.getElementById('confirmPasswordValidation');
-      
-      if (value.length === 0) {
-        clearValidation(e.target, validationElement);
-      } else if (value === password) {
-        showValidation(e.target, validationElement, 'كلمات المرور متطابقة ✅', 'success');
-      } else {
-        showValidation(e.target, validationElement, 'كلمات المرور غير متطابقة', 'error');
-      }
-    }
-
-    function showValidation(input, validationElement, message, type) {
-      input.classList.remove('error', 'success');
-      input.classList.add(type);
-      
-      validationElement.textContent = message;
-      validationElement.className = `validation-message ${type}`;
-      validationElement.style.display = 'block';
-    }
-
-    function clearValidation(input, validationElement) {
-      input.classList.remove('error', 'success');
-      validationElement.style.display = 'none';
-    }
-
-    function showAlert(message, type) {
-      const alertMessage = document.getElementById('alertMessage');
-      alertMessage.textContent = message;
-      alertMessage.className = `alert ${type}`;
-      alertMessage.style.display = 'block';
-      
-      // Auto hide success messages
-      if (type === 'success') {
-        setTimeout(hideAlert, 5000);
-      }
-    }
-
-    function hideAlert() {
-      const alertMessage = document.getElementById('alertMessage');
-      alertMessage.style.display = 'none';
-    }
-
-    function showLoading(form, show) {
-      const btn = form.querySelector('.submit-btn');
-      const btnText = btn.querySelector('.btn-text');
-      const btnLoading = btn.querySelector('.btn-loading');
-      
-      btn.disabled = show;
-      btnText.style.display = show ? 'none' : 'flex';
-      btnLoading.style.display = show ? 'flex' : 'none';
-    }
-
-    function autoFocusFirstInput(tabName) {
-      setTimeout(() => {
-        const activeForm = document.querySelector(`[data-tab="${tabName}"]`);
-        if (activeForm) {
-          const firstInput = activeForm.querySelector('.form-input');
-          if (firstInput) firstInput.focus();
-        }
-      }, 300);
-    }
-
-    // Handle login form submission
-    async function handleLogin(e) {
-      e.preventDefault();
-      hideAlert();
-
-      const phone = document.getElementById('loginPhone').value.trim();
-      const password = document.getElementById('loginPassword').value;
-
-      if (!phone || !password) {
-        showAlert('يرجى إدخال جميع البيانات المطلوبة', 'error');
-        return;
-      }
-
-      if (!phonePattern.test(phone)) {
-        showAlert('رقم الهاتف غير صحيح', 'error');
-        document.getElementById('loginPhone').focus();
-        return;
-      }
-
-      showLoading(document.getElementById('loginForm'), true);
-
-      try {
-        const customerDoc = await db.collection("customers").doc(phone).get();
+<!DOCTYPE html>  
+  
+<html lang="ar" dir="rtl">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>تسجيل دخول العملاء - عرض المهنيين</title>  
+  <style>  
+    * {  
+      margin: 0;  
+      padding: 0;  
+      box-sizing: border-box;  
+    }  
+  
+body {  
+font-family: ‘Segoe UI’, Tahoma, Geneva, Verdana, sans-serif;  
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  
+min-height: 100vh;  
+direction: rtl;  
+display: flex;  
+align-items: center;  
+justify-content: center;  
+padding: 20px;  
+}  
+  
+.back-btn {  
+position: absolute;  
+top: 20px;  
+right: 20px;  
+background: rgba(255, 255, 255, 0.2);  
+color: white;  
+padding: 10px 20px;  
+border-radius: 25px;  
+text-decoration: none;  
+font-size: 14px;  
+backdrop-filter: blur(10px);  
+border: 1px solid rgba(255, 255, 255, 0.3);  
+transition: all 0.3s ease;  
+}  
+  
+.back-btn:hover {  
+background: rgba(255, 255, 255, 0.3);  
+transform: translateY(-2px);  
+}  
+  
+.container {  
+background: rgba(255, 255, 255, 0.95);  
+backdrop-filter: blur(20px);  
+border-radius: 25px;  
+padding: 40px;  
+box-shadow: 0 20px 60px rgba(31, 38, 135, 0.2);  
+border: 1px solid rgba(255, 255, 255, 0.2);  
+width: 100%;  
+max-width: 450px;  
+animation: slideIn 0.8s ease-out;  
+}  
+  
+@keyframes slideIn {  
+from { transform: translateY(50px); opacity: 0; }  
+to { transform: translateY(0); opacity: 1; }  
+}  
+  
+.header {  
+text-align: center;  
+margin-bottom: 30px;  
+}  
+  
+.logo {  
+width: 80px;  
+height: 80px;  
+background: linear-gradient(45deg, #667eea, #764ba2);  
+border-radius: 50%;  
+display: flex;  
+align-items: center;  
+justify-content: center;  
+font-size: 2.5rem;  
+color: white;  
+margin: 0 auto 20px;  
+box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);  
+}  
+  
+.header h1 {  
+color: #2c3e50;  
+font-size: 28px;  
+margin-bottom: 10px;  
+font-weight: bold;  
+}  
+  
+.header p {  
+color: #7f8c8d;  
+font-size: 16px;  
+line-height: 1.5;  
+margin-bottom: 20px;  
+}  
+  
+.features-list {  
+background: linear-gradient(45deg, #f8f9fa, #e9ecef);  
+border-radius: 15px;  
+padding: 15px;  
+margin-bottom: 25px;  
+}  
+  
+.features-list h4 {  
+color: #495057;  
+margin-bottom: 10px;  
+font-size: 14px;  
+text-align: center;  
+}  
+  
+.features-list ul {  
+list-style: none;  
+color: #6c757d;  
+font-size: 13px;  
+}  
+  
+.features-list li {  
+margin-bottom: 5px;  
+display: flex;  
+align-items: center;  
+gap: 8px;  
+}  
+  
+.features-list li:before {  
+content: “✅”;  
+font-size: 12px;  
+}  
+  
+.tabs {  
+display: flex;  
+background: #f8f9fa;  
+border-radius: 25px;  
+padding: 5px;  
+margin-bottom: 25px;  
+box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);  
+}  
+  
+.tab {  
+flex: 1;  
+padding: 12px;  
+border: none;  
+background: transparent;  
+border-radius: 20px;  
+font-size: 14px;  
+font-weight: 600;  
+cursor: pointer;  
+transition: all 0.3s ease;  
+color: #666;  
+}  
+  
+.tab.active {  
+background: linear-gradient(45deg, #667eea, #764ba2);  
+color: white;  
+box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);  
+}  
+  
+.form-content {  
+display: none;  
+}  
+  
+.form-content.active {  
+display: block;  
+animation: fadeIn 0.5s ease-out;  
+}  
+  
+@keyframes fadeIn {  
+from { opacity: 0; transform: translateY(10px); }  
+to { opacity: 1; transform: translateY(0); }  
+}  
+  
+.form-group {  
+margin-bottom: 20px;  
+}  
+  
+.form-group label {  
+display: block;  
+color: #2c3e50;  
+font-weight: 600;  
+margin-bottom: 8px;  
+font-size: 14px;  
+}  
+  
+.input-wrapper {  
+position: relative;  
+}  
+  
+.form-input {  
+width: 100%;  
+padding: 16px 20px;  
+border: 2px solid #e9ecef;  
+border-radius: 15px;  
+font-size: 16px;  
+background: white;  
+transition: all 0.3s ease;  
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);  
+}  
+  
+.form-input:focus {  
+border-color: #667eea;  
+outline: none;  
+box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);  
+transform: translateY(-2px);  
+}  
+  
+.form-input.error {  
+border-color: #dc3545;  
+background: #fff5f5;  
+}  
+  
+.form-input.success {  
+border-color: #28a745;  
+background: #f8fff9;  
+}  
+  
+.input-icon {  
+position: absolute;  
+right: 15px;  
+top: 50%;  
+transform: translateY(-50%);  
+color: #adb5bd;  
+font-size: 18px;  
+}  
+  
+.password-toggle {  
+position: absolute;  
+left: 15px;  
+top: 50%;  
+transform: translateY(-50%);  
+background: none;  
+border: none;  
+color: #667eea;  
+cursor: pointer;  
+font-size: 20px;  
+padding: 5px;  
+border-radius: 5px;  
+transition: all 0.2s ease;  
+}  
+  
+.password-toggle:hover {  
+background: rgba(102, 126, 234, 0.1);  
+}  
+  
+.form-help {  
+font-size: 12px;  
+color: #6c757d;  
+margin-top: 5px;  
+display: flex;  
+align-items: center;  
+gap: 5px;  
+}  
+  
+.validation-message {  
+font-size: 12px;  
+margin-top: 5px;  
+padding: 8px 12px;  
+border-radius: 8px;  
+display: none;  
+}  
+  
+.validation-message.error {  
+background: #f8d7da;  
+color: #721c24;  
+border: 1px solid #f5c6cb;  
+}  
+  
+.validation-message.success {  
+background: #d4edda;  
+color: #155724;  
+border: 1px solid #c3e6cb;  
+}  
+  
+.submit-btn {  
+width: 100%;  
+background: linear-gradient(45deg, #667eea, #764ba2);  
+color: white;  
+border: none;  
+padding: 18px;  
+font-size: 16px;  
+font-weight: bold;  
+border-radius: 15px;  
+cursor: pointer;  
+transition: all 0.3s ease;  
+box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);  
+margin-top: 10px;  
+position: relative;  
+overflow: hidden;  
+}  
+  
+.submit-btn:hover:not(:disabled) {  
+transform: translateY(-3px);  
+box-shadow: 0 10px 35px rgba(102, 126, 234, 0.6);  
+}  
+  
+.submit-btn:disabled {  
+background: #6c757d;  
+cursor: not-allowed;  
+transform: none;  
+}  
+  
+.btn-text, .btn-loading {  
+display: flex;  
+align-items: center;  
+justify-content: center;  
+gap: 10px;  
+}  
+  
+.btn-loading {  
+display: none;  
+}  
+  
+.loading-spinner {  
+width: 20px;  
+height: 20px;  
+border: 3px solid rgba(255, 255, 255, 0.3);  
+border-radius: 50%;  
+border-top-color: white;  
+animation: spin 1s linear infinite;  
+}  
+  
+@keyframes spin {  
+to { transform: rotate(360deg); }  
+}  
+  
+.alert {  
+padding: 15px 20px;  
+border-radius: 12px;  
+margin-bottom: 20px;  
+font-size: 14px;  
+text-align: center;  
+display: none;  
+animation: slideDown 0.3s ease-out;  
+}  
+  
+@keyframes slideDown {  
+from { transform: translateY(-20px); opacity: 0; }  
+to { transform: translateY(0); opacity: 1; }  
+}  
+  
+.alert.success {  
+background: rgba(40, 167, 69, 0.1);  
+color: #155724;  
+border: 2px solid #28a745;  
+}  
+  
+.alert.error {  
+background: rgba(220, 53, 69, 0.1);  
+color: #721c24;  
+border: 2px solid #dc3545;  
+}  
+  
+.alert.info {  
+background: rgba(23, 162, 184, 0.1);  
+color: #0c5460;  
+border: 2px solid #17a2b8;  
+}  
+  
+.divider {  
+text-align: center;  
+margin: 25px 0;  
+position: relative;  
+color: #adb5bd;  
+font-size: 14px;  
+}  
+  
+.divider:before {  
+content: ‘’;  
+position: absolute;  
+top: 50%;  
+left: 0;  
+right: 0;  
+height: 1px;  
+background: linear-gradient(to right, transparent, #dee2e6, transparent);  
+}  
+  
+.divider span {  
+background: white;  
+padding: 0 15px;  
+position: relative;  
+}  
+  
+.guest-access {  
+background: linear-gradient(45deg, #ffc107, #fd7e14);  
+color: white;  
+padding: 15px;  
+border-radius: 12px;  
+text-align: center;  
+margin-top: 15px;  
+}  
+  
+.guest-access h5 {  
+margin-bottom: 8px;  
+font-size: 16px;  
+}  
+  
+.guest-access p {  
+font-size: 13px;  
+opacity: 0.9;  
+margin-bottom: 12px;  
+}  
+  
+.guest-btn {  
+background: rgba(255, 255, 255, 0.2);  
+color: white;  
+border: 1px solid rgba(255, 255, 255, 0.3);  
+padding: 10px 20px;  
+border-radius: 20px;  
+text-decoration: none;  
+font-size: 14px;  
+font-weight: 600;  
+transition: all 0.3s ease;  
+display: inline-block;  
+}  
+  
+.guest-btn:hover {  
+background: rgba(255, 255, 255, 0.3);  
+transform: translateY(-2px);  
+}  
+  
+/* SMS Verification Styles */  
+.sms-verification {  
+text-align: center;  
+background: linear-gradient(45deg, #28a745, #20c997);  
+color: white;  
+padding: 30px 25px;  
+border-radius: 20px;  
+margin-bottom: 25px;  
+box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);  
+}  
+  
+.sms-verification .phone-display {  
+font-size: 18px;  
+font-weight: bold;  
+background: rgba(255, 255, 255, 0.2);  
+padding: 10px 20px;  
+border-radius: 25px;  
+margin: 15px 0;  
+display: inline-block;  
+direction: ltr;  
+text-align: center;  
+}  
+  
+.verification-code-input {  
+width: 100%;  
+padding: 18px;  
+font-size: 24px;  
+text-align: center;  
+font-weight: bold;  
+letter-spacing: 8px;  
+border: 3px solid #28a745;  
+border-radius: 15px;  
+background: #f8fff9;  
+margin: 15px 0;  
+}  
+  
+.verification-code-input:focus {  
+border-color: #20c997;  
+box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);  
+outline: none;  
+}  
+  
+.resend-container {  
+margin-top: 20px;  
+padding-top: 20px;  
+border-top: 2px dashed rgba(108, 117, 125, 0.3);  
+}  
+  
+.resend-btn {  
+background: rgba(108, 117, 125, 0.1);  
+color: #6c757d;  
+border: 2px solid #6c757d;  
+padding: 12px 25px;  
+border-radius: 25px;  
+cursor: pointer;  
+font-size: 14px;  
+font-weight: 600;  
+transition: all 0.3s ease;  
+margin-top: 10px;  
+}  
+  
+.resend-btn:hover:not(:disabled) {  
+background: #6c757d;  
+color: white;  
+transform: translateY(-2px);  
+}  
+  
+.resend-btn:disabled {  
+opacity: 0.5;  
+cursor: not-allowed;  
+}  
+  
+.timer {  
+font-size: 14px;  
+color: #6c757d;  
+margin-top: 10px;  
+}  
+  
+.timer.active {  
+color: #dc3545;  
+font-weight: bold;  
+}  
+  
+/* Mobile Responsive */  
+@media (max-width: 480px) {  
+body {  
+padding: 10px;  
+}  
+  
+.back-btn {  
+top: 10px;  
+right: 10px;  
+font-size: 12px;  
+padding: 8px 15px;  
+}  
+  
+.container {  
+padding: 30px 25px;  
+margin: 10px 0;  
+}  
+  
+.logo {  
+width: 70px;  
+height: 70px;  
+font-size: 2rem;  
+}  
+  
+.header h1 {  
+font-size: 24px;  
+}  
+  
+.header p {  
+font-size: 14px;  
+}  
+  
+.form-input {  
+padding: 14px 18px;  
+}  
+  
+.verification-code-input {  
+font-size: 20px;  
+letter-spacing: 4px;  
+}  
+  
+.phone-display {  
+font-size: 16px !important;  
+}  
+}  
+  
+  </style>  
+</head>  
+<body>  
+  
+<a href="index.html" class="back-btn">← العودة للرئيسية</a>  
+  
+  <div class="container">  
+    <div class="header">  
+      <div class="logo">👥</div>  
+      <h1>دخول العملاء</h1>  
+      <p>سجل دخولك لرؤية تفاصيل المهنيين كاملة والتواصل معهم مباشرة</p>  
+  
+  <div class="features-list">  
+    <h4>مميزات الحساب المسجل:</h4>  
+    <ul>  
+      <li>عرض أرقام هواتف المهنيين</li>  
+      <li>إضافة تقييمات وتعليقات</li>  
+      <li>التواصل المباشر عبر الهاتف والواتساب</li>  
+      <li>حفظ المهنيين المفضلين</li>  
+    </ul>  
+  </div>  
+</div>  
+  
+<div id="alertMessage" class="alert"></div>  
+  
+<div class="tabs">  
+  <button class="tab active" onclick="showTab('login')">تسجيل الدخول</button>  
+  <button class="tab" onclick="showTab('register')">إنشاء حساب جديد</button>  
+</div>  
+  
+<!-- Login Form -->  
+  
+<form class="form-content active" id="loginForm" data-tab="login">  
+  <div class="form-group">  
+    <label for="loginPhone">رقم الهاتف</label>  
+    <div class="input-wrapper">  
+      <span class="input-icon">📱</span>  
+      <input type="tel" id="loginPhone" class="form-input" placeholder="07XXXXXXXX" required>  
+    </div>  
+    <div class="form-help">  
+      <span>💡</span>  
+      <span>أدخل رقم هاتفك المسجل مسبقاً</span>  
+    </div>  
+    <div id="loginPhoneValidation" class="validation-message"></div>  
+  </div>  
+  
+  <div class="form-group">  
+    <label for="loginPassword">كلمة المرور</label>  
+    <div class="input-wrapper">  
+      <span class="input-icon">🔒</span>  
+      <input type="password" id="loginPassword" class="form-input" placeholder="أدخل كلمة المرور" required>  
+      <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁</button>  
+    </div>  
+    <div id="loginPasswordValidation" class="validation-message"></div>  
+  </div>  
+  
+  <button type="submit" class="submit-btn" id="loginBtn">  
+    <span class="btn-text">🔓 تسجيل الدخول</span>  
+    <div class="btn-loading">  
+      <div class="loading-spinner"></div>  
+      <span>جاري التحقق...</span>  
+    </div>  
+  </button>  
+</form>  
+  
+<!-- Register Form -->  
+  
+<form class="form-content" id="registerForm" data-tab="register">  
+  <div class="form-group">  
+    <label for="registerName">الاسم الكامل</label>  
+    <div class="input-wrapper">  
+      <span class="input-icon">👤</span>  
+      <input type="text" id="registerName" class="form-input" placeholder="أدخل اسمك الكامل" required>  
+    </div>  
+    <div class="form-help">  
+      <span>💡</span>  
+      <span>سيظهر هذا الاسم في تقييماتك</span>  
+    </div>  
+    <div id="registerNameValidation" class="validation-message"></div>  
+  </div>  
+  
+  <div class="form-group">  
+    <label for="registerPhone">رقم الهاتف</label>  
+    <div class="input-wrapper">  
+      <span class="input-icon">📱</span>  
+      <input type="tel" id="registerPhone" class="form-input" placeholder="07XXXXXXXX" required>  
+    </div>  
+    <div class="form-help">  
+      <span>💡</span>  
+      <span>سيكون هذا اسم المستخدم الخاص بك</span>  
+    </div>  
+    <div id="registerPhoneValidation" class="validation-message"></div>  
+  </div>  
+  
+  <div class="form-group">  
+    <label for="registerPassword">كلمة المرور</label>  
+    <div class="input-wrapper">  
+      <span class="input-icon">🔒</span>  
+      <input type="password" id="registerPassword" class="form-input" placeholder="اختر كلمة مرور قوية" required minlength="6">  
+      <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">👁</button>  
+    </div>  
+    <div class="form-help">  
+      <span>💡</span>  
+      <span>يجب أن تحتوي على 6 أحرف على الأقل</span>  
+    </div>  
+    <div id="registerPasswordValidation" class="validation-message"></div>  
+  </div>  
+  
+  <div class="form-group">  
+    <label for="confirmPassword">تأكيد كلمة المرور</label>  
+    <div class="input-wrapper">  
+      <span class="input-icon">🔒</span>  
+      <input type="password" id="confirmPassword" class="form-input" placeholder="أعد كتابة كلمة المرور" required>  
+      <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁</button>  
+    </div>  
+    <div id="confirmPasswordValidation" class="validation-message"></div>  
+  </div>  
+  
+  <button type="submit" class="submit-btn" id="registerBtn">  
+    <span class="btn-text">✨ إنشاء الحساب</span>  
+    <div class="btn-loading">  
+      <div class="loading-spinner"></div>  
+      <span>جاري الإنشاء...</span>  
+    </div>  
+  </button>  
+</form>  
+  
+<!-- SMS Verification Form -->  
+  
+<form class="form-content" id="verificationForm" data-tab="verification">  
+  <div class="sms-verification">  
+    <h3>📱 تأكيد رقم الهاتف</h3>  
+    <p>تم إرسال رمز التحقق إلى:</p>  
+    <div class="phone-display" id="phoneDisplay"></div>  
+    <p>أدخل الرمز المكون من 6 أرقام:</p>  
+  </div>  
+  
+  <div class="form-group">  
+    <label for="verificationCode">رمز التحقق</label>  
+    <input type="text" id="verificationCode" class="form-input verification-code-input"   
+           placeholder="000000" maxlength="6" required   
+           pattern="\d{6}" inputmode="numeric">  
+    <div class="form-help">  
+      <span>📩</span>  
+      <span>تحقق من رسائل SMS في هاتفك</span>  
+    </div>  
+    <div id="verificationCodeValidation" class="validation-message"></div>  
+  </div>  
+  
+  <button type="submit" class="submit-btn" id="verifyBtn">  
+    <span class="btn-text">✅ تأكيد الرمز</span>  
+    <div class="btn-loading">  
+      <div class="loading-spinner"></div>  
+      <span>جاري التحقق...</span>  
+    </div>  
+  </button>  
+  
+  <div class="resend-container">  
+    <p>لم تستلم الرسالة؟</p>  
+    <button type="button" class="resend-btn" id="resendBtn" onclick="resendSMS()">  
+      🔄 إعادة إرسال الرمز  
+    </button>  
+    <div class="timer" id="resendTimer"></div>  
+  </div>  
+</form>  
+  
+<div class="divider">  
+  <span>أو</span>  
+</div>  
+  
+<div class="guest-access">  
+  <h5>🔍 تصفح كزائر</h5>  
+  <p>يمكنك تصفح المهنيين لكن لن تتمكن من رؤية تفاصيل الاتصال أو إضافة تقييمات</p>  
+  <a href="index.html" class="guest-btn">متابعة كزائر</a>  
+</div>  
+  
+  </div>  
+  
+  <!-- Firebase Scripts -->  
+  
+  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>  
+  
+  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>  
+  
+  <script>  
+    // Firebase configuration  
+    const firebaseConfig = {  
+      apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",  
+      authDomain: "home-services-app-a9c5e.firebaseapp.com",  
+      projectId: "home-services-app-a9c5e",  
+      storageBucket: "home-services-app-a9c5e.appspot.com",  
+      messagingSenderId: "287028219636",  
+      appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"  
+    };  
+  
+    // Initialize Firebase  
+    firebase.initializeApp(firebaseConfig);  
+    const db = firebase.firestore();  
+  
+    // Form validation patterns  
+    const phonePattern = /^07\d{8}$/;  
+    const namePattern = /^[\u0600-\u06FFa-zA-Z\s]{2,50}$/;  
+    const codePattern = /^\d{6}$/;  
+  
+    // Global variables  
+    let pendingCustomerData = null;  
+    let generatedCode = null;  
+    let resendTimer = null;  
+    let resendCountdown = 0;  
+  
+    // Global functions  
+    function showTab(tabName) {  
+      // Update tab buttons  
+      document.querySelectorAll('.tab').forEach(tab => {  
+        tab.classList.remove('active');  
+      });  
         
-        if (customerDoc.exists) {
-          const customerData = customerDoc.data();
+      // For verification tab, don't show tab button as active  
+      if (tabName !== 'verification') {  
+        event.target.classList.add('active');  
+      }  
+  
+      // Update form content  
+      document.querySelectorAll('.form-content').forEach(content => {  
+        content.classList.remove('active');  
+      });  
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');  
+  
+      hideAlert();  
+      autoFocusFirstInput(tabName);  
+    }  
+  
+    function togglePassword(inputId) {  
+      const input = document.getElementById(inputId);  
+      const button = input.parentElement.querySelector('.password-toggle');  
+        
+      if (input.type === 'password') {  
+        input.type = 'text';  
+        button.textContent = '🙈';  
+      } else {  
+        input.type = 'password';  
+        button.textContent = '👁';  
+      }  
+    }  
+  
+    function formatAndValidatePhone(e) {  
+      let value = e.target.value.replace(/\D/g, '');  
+      if (value.length > 0 && !value.startsWith('07')) {  
+        if (value.startsWith('7')) value = '0' + value;  
+      }  
+      if (value.length > 10) value = value.substring(0, 10);  
+      e.target.value = value;  
+  
+      const validationElement = document.getElementById(e.target.id + 'Validation');  
+      if (value.length === 0) {  
+        clearValidation(e.target, validationElement);  
+      } else if (phonePattern.test(value)) {  
+        showValidation(e.target, validationElement, 'رقم هاتف صحيح ✅', 'success');  
+      } else {  
+        showValidation(e.target, validationElement, 'يجب أن يبدأ بـ 07 ويتكون من 10 أرقام', 'error');  
+      }  
+    }  
+  
+    function validateName(e) {  
+      const value = e.target.value.trim();  
+      const validationElement = document.getElementById('registerNameValidation');  
+        
+      if (value.length === 0) {  
+        clearValidation(e.target, validationElement);  
+      } else if (namePattern.test(value)) {  
+        showValidation(e.target, validationElement, 'اسم صحيح ✅', 'success');  
+      } else {  
+        showValidation(e.target, validationElement, 'يجب أن يحتوي على حروف فقط (2-50 حرف)', 'error');  
+      }  
+    }  
+  
+    function validatePassword(e) {  
+      const value = e.target.value;  
+      const validationElement = document.getElementById('registerPasswordValidation');  
+        
+      if (value.length === 0) {  
+        clearValidation(e.target, validationElement);  
+      } else if (value.length >= 6) {  
+        showValidation(e.target, validationElement, 'كلمة مرور قوية ✅', 'success');  
+      } else {  
+        showValidation(e.target, validationElement, `يجب إدخال ${6 - value.length} أحرف إضافية على الأقل`, 'error');  
+      }  
+  
+      // Re-validate confirm password if it has value  
+      const confirmPassword = document.getElementById('confirmPassword');  
+      if (confirmPassword.value) {  
+        validateConfirmPassword({ target: confirmPassword });  
+      }  
+    }  
+  
+    function validateConfirmPassword(e) {  
+      const value = e.target.value;  
+      const password = document.getElementById('registerPassword').value;  
+      const validationElement = document.getElementById('confirmPasswordValidation');  
+        
+      if (value.length === 0) {  
+        clearValidation(e.target, validationElement);  
+      } else if (value === password) {  
+        showValidation(e.target, validationElement, 'كلمات المرور متطابقة ✅', 'success');  
+      } else {  
+        showValidation(e.target, validationElement, 'كلمات المرور غير متطابقة', 'error');  
+      }  
+    }  
+  
+    function validateVerificationCode(e) {  
+      let value = e.target.value.replace(/\D/g, '');  
+      if (value.length > 6) value = value.substring(0, 6);  
+      e.target.value = value;  
+  
+      const validationElement = document.getElementById('verificationCodeValidation');  
+      if (value.length === 0) {  
+        clearValidation(e.target, validationElement);  
+      } else if (codePattern.test(value)) {  
+        showValidation(e.target, validationElement, 'رمز مكتمل ✅', 'success');  
+      } else {  
+        showValidation(e.target, validationElement, `يجب إدخال ${6 - value.length} أرقام إضافية`, 'error');  
+      }  
+    }  
+  
+    function showValidation(input, validationElement, message, type) {  
+      input.classList.remove('error', 'success');  
+      input.classList.add(type);  
+        
+      validationElement.textContent = message;  
+      validationElement.className = `validation-message ${type}`;  
+      validationElement.style.display = 'block';  
+    }  
+  
+    function clearValidation(input, validationElement) {  
+      input.classList.remove('error', 'success');  
+      validationElement.style.display = 'none';  
+    }  
+  
+    function showAlert(message, type) {  
+      const alertMessage = document.getElementById('alertMessage');  
+      alertMessage.textContent = message;  
+      alertMessage.className = `alert ${type}`;  
+      alertMessage.style.display = 'block';  
+        
+      // Auto hide success messages  
+      if (type === 'success') {  
+        setTimeout(hideAlert, 5000);  
+      }  
+    }  
+  
+    function hideAlert() {  
+      const alertMessage = document.getElementById('alertMessage');  
+      alertMessage.style.display = 'none';  
+    }  
+  
+    function showLoading(form, show) {  
+      const btn = form.querySelector('.submit-btn');  
+      const btnText = btn.querySelector('.btn-text');  
+      const btnLoading = btn.querySelector('.btn-loading');  
+        
+      btn.disabled = show;  
+      btnText.style.display = show ? 'none' : 'flex';  
+      btnLoading.style.display = show ? 'flex' : 'none';  
+    }  
+  
+    function autoFocusFirstInput(tabName) {  
+      setTimeout(() => {  
+        const activeForm = document.querySelector(`[data-tab="${tabName}"]`);  
+        if (activeForm) {  
+          const firstInput = activeForm.querySelector('.form-input');  
+          if (firstInput) firstInput.focus();  
+        }  
+      }, 300);  
+    }  
+  
+    // Generate random 6-digit verification code  
+    function generateVerificationCode() {  
+      return Math.floor(100000 + Math.random() * 900000).toString();  
+    }  
+  
+    // Send SMS verification code (mock implementation)  
+    async function sendSMSVerificationCode(phone, code) {  
+      // في التطبيق الحقيقي، ستقوم بإرسال SMS من خلال خدمة مثل Twilio أو Firebase SMS  
+      // هنا سنقوم بمحاكاة الإرسال  
+        
+      console.log(`إرسال رمز التحقق ${code} إلى الرقم ${phone}`);  
+        
+      // محاكاة تأخير الشبكة  
+      await new Promise(resolve => setTimeout(resolve, 1000));  
+        
+      // في بيئة التطوير، سنعرض الرمز في console للمطور  
+      alert(`رمز التحقق (للاختبار فقط): ${code}`);  
+        
+      return { success: true, messageId: 'mock_message_id_' + Date.now() };  
+    }  
+  
+    // Start resend countdown timer  
+    function startResendTimer() {  
+      resendCountdown = 60; // 60 seconds  
+      const timerElement = document.getElementById('resendTimer');  
+      const resendButton = document.getElementById('resendBtn');  
+        
+      resendButton.disabled = true;  
+      timerElement.classList.add('active');  
+        
+      resendTimer = setInterval(() => {  
+        resendCountdown--;  
+        timerElement.textContent = `يمكن إعادة الإرسال بعد ${resendCountdown} ثانية`;  
           
-          if (customerData.password === password) {
-            // Store login info
-            sessionStorage.setItem('customerLoggedIn', 'true');
-            sessionStorage.setItem('customerPhone', phone);
-            sessionStorage.setItem('customerName', customerData.name);
-            sessionStorage.setItem('loginTime', new Date().toISOString());
+        if (resendCountdown <= 0) {  
+          clearInterval(resendTimer);  
+          resendButton.disabled = false;  
+          timerElement.classList.remove('active');  
+          timerElement.textContent = '';  
+        }  
+      }, 1000);  
+    }  
+  
+    // Handle SMS resend  
+    async function resendSMS() {  
+      if (!pendingCustomerData) {  
+        showAlert('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');  
+        return;  
+      }  
+  
+      try {  
+        generatedCode = generateVerificationCode();  
+        await sendSMSVerificationCode(pendingCustomerData.phone, generatedCode);  
+          
+        showAlert('تم إعادة إرسال رمز التحقق بنجاح', 'success');  
+        startResendTimer();  
+          
+        // Clear verification code input  
+        document.getElementById('verificationCode').value = '';  
+        document.getElementById('verificationCode').focus();  
+          
+      } catch (error) {  
+        console.error('خطأ في إعادة إرسال SMS:', error);  
+        showAlert('فشل في إعادة إرسال الرمز، يرجى المحاولة مرة أخرى', 'error');  
+      }  
+    }  
+  
+    // Handle login form submission  
+    async function handleLogin(e) {  
+      e.preventDefault();  
+      hideAlert();  
+  
+      const phone = document.getElementById('loginPhone').value.trim();  
+      const password = document.getElementById('loginPassword').value;  
+  
+      if (!phone || !password) {  
+        showAlert('يرجى إدخال جميع البيانات المطلوبة', 'error');  
+        return;  
+      }  
+  
+      if (!phonePattern.test(phone)) {  
+        showAlert('رقم الهاتف غير صحيح', 'error');  
+        document.getElementById('loginPhone').focus();  
+        return;  
+      }  
+  
+      showLoading(document.getElementById('loginForm'), true);  
+  
+      try {  
+        const customerDoc = await db.collection("customers").doc(phone).get();  
+          
+        if (customerDoc.exists) {  
+          const customerData = customerDoc.data();  
             
-            showAlert('تم تسجيل الدخول بنجاح! جاري التحويل إلى صفحة المهنيين...', 'success');
-            
-            setTimeout(() => {
-              window.location.href = 'index.html';
-            }, 2000);
-          } else {
-            showAlert('كلمة المرور غير صحيحة', 'error');
-            document.getElementById('loginPassword').focus();
-          }
-        } else {
-          showAlert('الحساب غير موجود. يرجى التسجيل أولاً أو التحقق من رقم الهاتف', 'error');
-          showTab('register');
-        }
-
-      } catch (error) {
-        console.error('Login error:', error);
-        showAlert('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى', 'error');
-      } finally {
-        showLoading(document.getElementById('loginForm'), false);
-      }
-    }
-
-    // Handle registration form submission
-    async function handleRegister(e) {
-      e.preventDefault();
-      hideAlert();
-
-      const name = document.getElementById('registerName').value.trim();
-      const phone = document.getElementById('registerPhone').value.trim();
-      const password = document.getElementById('registerPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-
-      // Validation
-      if (!name || !phone || !password || !confirmPassword) {
-        showAlert('يرجى إدخال جميع البيانات المطلوبة', 'error');
-        return;
-      }
-
-      if (!namePattern.test(name)) {
-        showAlert('الاسم يجب أن يحتوي على حروف فقط ويكون بين 2-50 حرف', 'error');
-        document.getElementById('registerName').focus();
-        return;
-      }
-
-      if (!phonePattern.test(phone)) {
-        showAlert('رقم الهاتف يجب أن يبدأ بـ 07 ويتكون من 10 أرقام', 'error');
-        document.getElementById('registerPhone').focus();
-        return;
-      }
-
-      if (password.length < 6) {
-        showAlert('كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل', 'error');
-        document.getElementById('registerPassword').focus();
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        showAlert('كلمات المرور غير متطابقة', 'error');
-        document.getElementById('confirmPassword').focus();
-        return;
-      }
-
-      showLoading(document.getElementById('registerForm'), true);
-
-      try {
-        // Check if phone already exists
-        const existingCustomer = await db.collection("customers").doc(phone).get();
-        
-        if (existingCustomer.exists) {
-          showAlert('رقم الهاتف مستخدم مسبقاً. يرجى تسجيل الدخول أو استخدام رقم آخر', 'error');
-          showTab('login');
-          document.getElementById('loginPhone').value = phone;
-          return;
-        }
-
-        // Create new customer account
-        const customerData = {
-          name: name,
-          phone: phone,
-          password: password,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-          isActive: true,
-          preferences: {
-            notifications: true,
-            emailUpdates: false
-          }
-        };
-
-        await db.collection("customers").doc(phone).set(customerData);
-
-        // Auto login after successful registration
-        sessionStorage.setItem('customerLoggedIn', 'true');
-        sessionStorage.setItem('customerPhone', phone);
-        sessionStorage.setItem('customerName', name);
-        sessionStorage.setItem('loginTime', new Date().toISOString());
-
-        showAlert('تم إنشاء الحساب بنجاح! مرحباً بك، جاري التحويل إلى صفحة المهنيين...', 'success');
-        
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 2500);
-
-      } catch (error) {
-        console.error('Registration error:', error);
-        showAlert('حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى', 'error');
-      } finally {
-        showLoading(document.getElementById('registerForm'), false);
-      }
-    }
-
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      // Event listeners
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
-      document.getElementById('registerForm').addEventListener('submit', handleRegister);
-
-      // Real-time validation
-      document.getElementById('loginPhone').addEventListener('input', formatAndValidatePhone);
-      document.getElementById('registerPhone').addEventListener('input', formatAndValidatePhone);
-      document.getElementById('registerName').addEventListener('input', validateName);
-      document.getElementById('registerPassword').addEventListener('input', validatePassword);
-      document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);
-
-      // Check if user is already logged in
-      if (sessionStorage.getItem('customerLoggedIn') === 'true') {
-        const customerName = sessionStorage.getItem('customerName');
-        showAlert(`مرحباً ${customerName}، أنت مسجل دخول بالفعل. جاري التحويل...`, 'info');
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 2000);
-      }
-
-      // Clear forms on page load
-      document.getElementById('loginForm').reset();
-      document.getElementById('registerForm').reset();
-      hideAlert();
-    });
-
-    // Handle browser back button
-    window.addEventListener('popstate', () => {
-      hideAlert();
-    });
-
-  </script>
-
-</body>
-</html>
+          if (customerData.password === password) {  
+            // Check if phone is verified  
+            if (!customerData.phoneVerified) {  
+              showAlert('يجب تأكيد رقم الهاتف أولاً. جاري إرسال رمز التحقق...', 'info');  
+                
+              // Send verification code  
+              generatedCode = generateVerificationCode();  
+              await sendSMSVerificationCode(phone, generatedCode);  
+                
+              // Store customer data temporarily  
+              pendingCustomerData = customerData;  
+                
+              // Show verification form  
+              document.getElementById('phoneDisplay').textContent = phone;  
+              showTab('verification');  
+              startResendTimer();  
+              return;  
+            }  
+              
+            // Store login info  
+           localStorage.setItem('customerLoggedIn', 'true');
+localStorage.setItem('customerPhone', phone);
+localStorage.setItem('customerName', customerData.name);
+localStorage.setItem('loginTime', new Date().toISOString());  
+              
+            showAlert('تم تسجيل الدخول بنجاح! جاري التحويل إلى صفحة المهنيين...', 'success');  
+              
+            setTimeout(() => {  
+              window.location.href = 'index.html';  
+            }, 2000);  
+          } else {  
+            showAlert('كلمة المرور غير صحيحة', 'error');  
+            document.getElementById('loginPassword').focus();  
+          }  
+        } else {  
+          showAlert('الحساب غير موجود. يرجى التسجيل أولاً أو التحقق من رقم الهاتف', 'error');  
+          showTab('register');  
+        }  
+  
+      } catch (error) {  
+        console.error('Login error:', error);  
+        showAlert('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى', 'error');  
+      } finally {  
+        showLoading(document.getElementById('loginForm'), false);  
+      }  
+    }  
+  
+    // Handle registration form submission  
+    async function handleRegister(e) {  
+      e.preventDefault();  
+      hideAlert();  
+  
+      const name = document.getElementById('registerName').value.trim();  
+      const phone = document.getElementById('registerPhone').value.trim();  
+      const password = document.getElementById('registerPassword').value;  
+      const confirmPassword = document.getElementById('confirmPassword').value;  
+  
+      // Validation  
+      if (!name || !phone || !password || !confirmPassword) {  
+        showAlert('يرجى إدخال جميع البيانات المطلوبة', 'error');  
+        return;  
+      }  
+  
+      if (!namePattern.test(name)) {  
+        showAlert('الاسم يجب أن يحتوي على حروف فقط ويكون بين 2-50 حرف', 'error');  
+        document.getElementById('registerName').focus();  
+        return;  
+      }  
+  
+      if (!phonePattern.test(phone)) {  
+        showAlert('رقم الهاتف يجب أن يبدأ بـ 07 ويتكون من 10 أرقام', 'error');  
+        document.getElementById('registerPhone').focus();  
+        return;  
+      }  
+  
+      if (password.length < 6) {  
+        showAlert('كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل', 'error');  
+        document.getElementById('registerPassword').focus();  
+        return;  
+      }  
+  
+      if (password !== confirmPassword) {  
+        showAlert('كلمات المرور غير متطابقة', 'error');  
+        document.getElementById('confirmPassword').focus();  
+        return;  
+      }  
+  
+      showLoading(document.getElementById('registerForm'), true);  
+  
+      try {  
+        // Check if phone already exists  
+        const existingCustomer = await db.collection("customers").doc(phone).get();  
+          
+        if (existingCustomer.exists) {  
+          showAlert('رقم الهاتف مستخدم مسبقاً. يرجى تسجيل الدخول أو استخدام رقم آخر', 'error');  
+          showTab('login');  
+          document.getElementById('loginPhone').value = phone;  
+          return;  
+        }  
+  
+        // Generate verification code  
+        generatedCode = generateVerificationCode();  
+  
+        // Store customer data temporarily (without saving to database yet)  
+        pendingCustomerData = {  
+          name: name,  
+          phone: phone,  
+          password: password,  
+          phoneVerified: false,  
+          createdAt: new Date().toISOString(),  
+          isActive: true,  
+          preferences: {  
+            notifications: true,  
+            emailUpdates: false  
+          }  
+        };  
+  
+        // Send verification code  
+        await sendSMSVerificationCode(phone, generatedCode);  
+  
+        // Show verification form  
+        document.getElementById('phoneDisplay').textContent = phone;  
+        showTab('verification');  
+        startResendTimer();  
+          
+        showAlert('تم إنشاء الحساب! يرجى تأكيد رقم هاتفك لإكمال التسجيل', 'success');  
+  
+      } catch (error) {  
+        console.error('Registration error:', error);  
+        showAlert('حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى', 'error');  
+      } finally {  
+        showLoading(document.getElementById('registerForm'), false);  
+      }  
+    }  
+  
+    // Handle SMS verification  
+    async function handleVerification(e) {  
+      e.preventDefault();  
+      hideAlert();  
+  
+      const enteredCode = document.getElementById('verificationCode').value.trim();  
+  
+      if (!enteredCode) {  
+        showAlert('يرجى إدخال رمز التحقق', 'error');  
+        return;  
+      }  
+  
+      if (!codePattern.test(enteredCode)) {  
+        showAlert('رمز التحقق يجب أن يكون مكون من 6 أرقام', 'error');  
+        document.getElementById('verificationCode').focus();  
+        return;  
+      }  
+  
+      if (enteredCode !== generatedCode) {  
+        showAlert('رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى', 'error');  
+        document.getElementById('verificationCode').focus();  
+        return;  
+      }  
+  
+      if (!pendingCustomerData) {  
+        showAlert('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');  
+        return;  
+      }  
+  
+      showLoading(document.getElementById('verificationForm'), true);  
+  
+      try {  
+        // Update customer data to mark phone as verified  
+        pendingCustomerData.phoneVerified = true;  
+        pendingCustomerData.verifiedAt = new Date().toISOString();  
+  
+        // Save to database  
+        await db.collection("customers").doc(pendingCustomerData.phone).set({  
+          ...pendingCustomerData,  
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),  
+          verifiedAt: firebase.firestore.FieldValue.serverTimestamp(),  
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()  
+        });  
+  
+        // Auto login after successful verification  
+       localStorage.setItem('customerLoggedIn', 'true');
+localStorage.setItem('customerPhone', phone);
+localStorage.setItem('customerName', customerData.name);
+localStorage.setItem('loginTime', new Date().toISOString());  
+  
+        showAlert('تم تأكيد رقم الهاتف بنجاح! مرحباً بك، جاري التحويل إلى صفحة المهنيين...', 'success');  
+          
+        // Clear timer  
+        if (resendTimer) {  
+          clearInterval(resendTimer);  
+        }  
+  
+        setTimeout(() => {  
+          window.location.href = 'index.html';  
+        }, 2500);  
+  
+      } catch (error) {  
+        console.error('Verification error:', error);  
+        showAlert('حدث خطأ أثناء التحقق. يرجى المحاولة مرة أخرى', 'error');  
+      } finally {  
+        showLoading(document.getElementById('verificationForm'), false);  
+      }  
+    }  
+  
+    // Initialize when DOM is loaded  
+    document.addEventListener('DOMContentLoaded', function() {  
+      // Event listeners  
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);  
+      document.getElementById('registerForm').addEventListener('submit', handleRegister);  
+      document.getElementById('verificationForm').addEventListener('submit', handleVerification);  
+  
+      // Real-time validation  
+      document.getElementById('loginPhone').addEventListener('input', formatAndValidatePhone);  
+      document.getElementById('registerPhone').addEventListener('input', formatAndValidatePhone);  
+      document.getElementById('registerName').addEventListener('input', validateName);  
+      document.getElementById('registerPassword').addEventListener('input', validatePassword);  
+      document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);  
+      document.getElementById('verificationCode').addEventListener('input', validateVerificationCode);  
+  
+      // Check if user is already logged in  
+if (localStorage.getItem('customerLoggedIn') === 'true') {       const customerName = localStorage.getItem('customerName');  
+        showAlert(`مرحباً ${customerName}، أنت مسجل دخول بالفعل. جاري التحويل...`, 'info');  
+        setTimeout(() => {  
+          window.location.href = 'index.html';  
+        }, 2000);  
+      }  
+  
+      // Clear forms on page load  
+      document.getElementById('loginForm').reset();  
+      document.getElementById('registerForm').reset();  
+      document.getElementById('verificationForm').reset();  
+      hideAlert();  
+    });  
+  
+    // Handle browser back button  
+    window.addEventListener('popstate', () => {  
+      hideAlert();  
+    });  
+  
+    // Cleanup timer on page unload  
+    window.addEventListener('beforeunload', () => {  
+      if (resendTimer) {  
+        clearInterval(resendTimer);  
+      }  
+    });  
+  
+  </script>  
+  
+</body>  
+</html>  
