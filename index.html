@@ -887,18 +887,18 @@
         });
 
         function checkUserLogin() {
-            const isLoggedIn = sessionStorage.getItem('customerLoggedIn');
-            const customerName = sessionStorage.getItem('customerName');
-            const customerPhone = sessionStorage.getItem('customerPhone');
+    const isLoggedIn = localStorage.getItem('customerLoggedIn');
+    const customerName = localStorage.getItem('customerName');
+    const customerPhone = localStorage.getItem('customerPhone');
 
-            if (isLoggedIn === 'true' && customerName && customerPhone) {
-                currentUser = { name: customerName, phone: customerPhone };
-                updateUserStatus(true, customerName);
-            } else {
-                currentUser = null;
-                updateUserStatus(false);
-            }
-        }
+    if (isLoggedIn === 'true' && customerName && customerPhone) {
+        currentUser = { name: customerName, phone: customerPhone };
+        updateUserStatus(true, customerName);
+    } else {
+        currentUser = null;
+        updateUserStatus(false);
+    }
+}
 
         function updateUserStatus(isLoggedIn, userName = '') {
             if (isLoggedIn) {
@@ -1298,20 +1298,20 @@
         }
 
         function logout() {
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                sessionStorage.removeItem('customerLoggedIn');
-                sessionStorage.removeItem('customerName');
-                sessionStorage.removeItem('customerPhone');
-                sessionStorage.removeItem('loginTime');
-                currentUser = null;
-                updateUserStatus(false);
-                
-                // إعادة رسم البطاقات لإخفاء التفاصيل
-                renderProfessionals();
-                
-                alert('تم تسجيل الخروج بنجاح');
-            }
-        }
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        localStorage.removeItem('customerLoggedIn');
+        localStorage.removeItem('customerName');
+        localStorage.removeItem('customerPhone');
+        localStorage.removeItem('loginTime');
+        currentUser = null;
+        updateUserStatus(false);
+        
+        // إعادة رسم البطاقات لإخفاء التفاصيل
+        renderProfessionals();
+        
+        alert('تم تسجيل الخروج بنجاح');
+    }
+}
 
         function debounce(func, wait) {
             let timeout;
