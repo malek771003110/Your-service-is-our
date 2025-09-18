@@ -19,6 +19,102 @@
             line-height: 1.6;
         }
 
+        /* Floating Registration Banner */
+.floating-register-banner {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 8px 25px rgba(238, 90, 82, 0.4);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+}
+
+.floating-register-banner:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(238, 90, 82, 0.6);
+    background: linear-gradient(45deg, #ff5252, #e53e3e);
+}
+
+.floating-register-banner .icon {
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.floating-register-banner .text {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Pulse animation */
+.floating-register-banner::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    border-radius: 30px;
+    z-index: -1;
+    opacity: 0;
+    animation: registerPulse 3s infinite;
+}
+
+@keyframes registerPulse {
+    0% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .floating-register-banner {
+        top: 10px;
+        right: 10px;
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+    
+    .floating-register-banner .text {
+        font-size: 12px;
+    }
+    
+    .floating-register-banner .icon {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+    }
+}
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -629,16 +725,9 @@
         }
 
         /* Responsive */
-        @media (min-width: 768px) {
+       @media (min-width: 768px) {
     .container {
         padding: 20px;
-    }
-
-    .search-form {
-        display: grid;
-        grid-template-columns: 1fr 1fr auto auto;
-        gap: 15px;
-        align-items: end;
     }
 
     .footer-links {
@@ -663,6 +752,7 @@
         text-align: center;
     }
 }
+
         @media (max-width: 768px) {
             .action-buttons {
                 flex-direction: column;
@@ -725,6 +815,14 @@
     </style>
 </head>
 <body>
+
+
+    <!-- Floating Registration Banner -->
+<a href="register.html" class="floating-register-banner">
+    <div class="icon">+</div>
+    <div class="text">سجل مهنتك</div>
+</a>
+
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -750,30 +848,37 @@
         </div>
 
         <!-- Search Section -->
-        <div class="search-section" id="search">
-            <h2>🔍 دليل المهنيين</h2>
+<div class="search-section" id="search">
+    <h2>🔍 دليل المهنيين</h2>
+    
+    <div class="search-form">
+        <!-- الصف الأول: البحث والمحافظة جنب بعض -->
+        <div class="search-row">
+            <input type="text" class="form-control" id="professionSearch" placeholder="مثال: نجار، كهربائي، سباك...">
             
-            <div class="search-form">
-                <input type="text" class="form-control" id="professionSearch" placeholder="مثال: نجار، كهربائي، سباك...">
-                
-                <select class="form-control" id="governorateSelect">
-                    <option value="">جميع المحافظات</option>
-                    <option value="عمان">عمان</option>
-                    <option value="الزرقاء">الزرقاء</option>
-                    <option value="إربد">إربد</option>
-                    <option value="البلقاء">البلقاء</option>
-                    <option value="المفرق">المفرق</option>
-                    <option value="الكرك">الكرك</option>
-                    <option value="معان">معان</option>
-                    <option value="الطفيلة">الطفيلة</option>
-                    <option value="العقبة">العقبة</option>
-                    <option value="السلط">السلط</option>
-                    <option value="مادبا">مادبا</option>
-                </select>
-                
-                <button class="search-btn" onclick="searchProfessionals()">🔍 ابدأ البحث</button>
-            </div>
+            <select class="form-control" id="governorateSelect">
+                <option value="">جميع المحافظات</option>
+                <option value="عمان">عمان</option>
+                <option value="الزرقاء">الزرقاء</option>
+                <option value="إربد">إربد</option>
+                <option value="البلقاء">البلقاء</option>
+                <option value="المفرق">المفرق</option>
+                <option value="الكرك">الكرك</option>
+                <option value="معان">معان</option>
+                <option value="الطفيلة">الطفيلة</option>
+                <option value="العقبة">العقبة</option>
+                <option value="السلط">السلط</option>
+                <option value="مادبا">مادبا</option>
+            </select>
         </div>
+        
+        <!-- الصف الثاني: الأزرار في الوسط -->
+        <div class="search-actions">
+            <button class="search-btn" onclick="searchProfessionals()">🔍 ابدأ البحث</button>
+            <button class="clear-btn" onclick="clearFilters()">مسح الفلاتر</button>
+        </div>
+    </div>
+</div>
 
         <!-- Results Section -->
         <div class="results-section">
@@ -894,11 +999,14 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 تحميل الصفحة الرئيسية...');
-            checkUserLogin();
-            await loadProfessionals();
-            setupEventListeners();
-        });
+    console.log('🚀 تحميل الصفحة الرئيسية...');
+    checkUserLogin();
+    await loadProfessionals(); // التحميل الأول يظهر loading
+    setupEventListeners();
+    
+    // بدء التحديث التلقائي الصامت بعد التحميل الأول
+    startBackgroundRefresh();
+});
 
         function checkUserLogin() {
     const isLoggedIn = localStorage.getItem('customerLoggedIn');
@@ -1350,18 +1458,134 @@
         window.logout = logout;
 
         // Auto-refresh data every 60 seconds
-        setInterval(async () => {
-            try {
-                console.log('🔄 تحديث تلقائي للبيانات...');
-                await loadProfessionals();
-            } catch (error) {
-                console.error('خطأ في التحديث التلقائي:', error);
-            }
-        }, 60000);
+       let backgroundRefreshInterval = null;
+let isBackgroundRefreshing = false;
+
+// دالة تحديث البيانات في الخلفية بدون loading
+async function backgroundRefresh() {
+    if (isBackgroundRefreshing) return; // منع التحديثات المتداخلة
+    
+    try {
+        isBackgroundRefreshing = true;
+        console.log('🔄 تحديث صامت للبيانات...');
+
+        // تحميل البيانات الجديدة بدون إظهار loading
+        const approvedSnapshot = await getDocs(collection(db, "approvedUsers"));
+        
+        const newProfessionals = [];
+        for (const docSnap of approvedSnapshot.docs) {
+            const data = docSnap.data();
+            const professional = {
+                id: docSnap.id,
+                name: data.name || 'غير محدد',
+                job: data.job || 'غير محدد',
+                city: data.city || 'غير محدد',
+                phone: data.phone || 'غير محدد',
+                bio: data.bio || 'لا يوجد وصف',
+                status: data.status || 'available',
+                createdAt: data.createdAt,
+                approvedAt: data.approvedAt,
+                workStartTime: data.workStartTime || 'غير محدد',
+                workEndTime: data.workEndTime || 'غير محدد',
+                hourlyPrice: data.hourlyPrice || 'غير محدد',
+                experienceYears: data.experienceYears || 'غير محدد'
+            };
+
+            // تحميل التقييمات
+            professional.ratings = await loadProfessionalRatings(docSnap.id);
+            newProfessionals.push(professional);
+        }
+
+        // مقارنة البيانات الجديدة مع القديمة
+        const hasChanges = checkForDataChanges(allProfessionals, newProfessionals);
+        
+        if (hasChanges) {
+            console.log('✅ تم العثور على تحديثات جديدة - تحديث العرض');
+            allProfessionals = [...newProfessionals];
+            
+            // إعادة تطبيق الفلاتر الحالية
+            applyCurrentFilters();
+            renderProfessionals();
+            updateResultsCount();
+        } else {
+            console.log('📊 لا توجد تحديثات جديدة');
+        }
+
+    } catch (error) {
+        console.error('❌ خطأ في التحديث الصامت:', error);
+        // لا نظهر أي رسالة خطأ للمستخدم
+    } finally {
+        isBackgroundRefreshing = false;
+    }
+}
+
+// دالة للتحقق من وجود تغييرات في البيانات
+function checkForDataChanges(oldData, newData) {
+    if (oldData.length !== newData.length) {
+        return true; // عدد المهنيين تغير
+    }
+    
+    // فحص سريع للتغييرات الأساسية
+    for (let i = 0; i < oldData.length; i++) {
+        const oldPro = oldData[i];
+        const newPro = newData.find(p => p.id === oldPro.id);
+        
+        if (!newPro) {
+            return true; // مهني تم حذفه
+        }
+        
+        // فحص التغييرات المهمة
+        if (oldPro.name !== newPro.name ||
+            oldPro.job !== newPro.job ||
+            oldPro.status !== newPro.status ||
+            oldPro.phone !== newPro.phone ||
+            oldPro.city !== newPro.city ||
+            oldPro.hourlyPrice !== newPro.hourlyPrice ||
+            oldPro.ratings?.totalCount !== newPro.ratings?.totalCount ||
+            Math.abs((oldPro.ratings?.averageRating || 0) - (newPro.ratings?.averageRating || 0)) > 0.1) {
+            return true;
+        }
+    }
+    
+    return false; // لا توجد تغييرات مهمة
+}
+
+// دالة لإعادة تطبيق الفلاتر الحالية
+function applyCurrentFilters() {
+    const professionSearch = elements.professionSearch.value.toLowerCase().trim();
+    const governorateFilter = elements.governorateSelect.value;
+
+    filteredProfessionals = allProfessionals.filter(professional => {
+        const matchesProfession = !professionSearch || 
+            professional.job.toLowerCase().includes(professionSearch) ||
+            professional.name.toLowerCase().includes(professionSearch);
+        
+        const matchesGovernorate = !governorateFilter || professional.city === governorateFilter;
+
+        return matchesProfession && matchesGovernorate;
+    });
+}
+
+// بدء التحديث التلقائي الصامت
+function startBackgroundRefresh() {
+    if (backgroundRefreshInterval) {
+        clearInterval(backgroundRefreshInterval);
+    }
+    
+    backgroundRefreshInterval = setInterval(backgroundRefresh, 30000); // كل 30 ثانية
+    console.log('🔄 تم تفعيل التحديث التلقائي الصامت');
+}
+
+// إيقاف التحديث التلقائي
+function stopBackgroundRefresh() {
+    if (backgroundRefreshInterval) {
+        clearInterval(backgroundRefreshInterval);
+        backgroundRefreshInterval = null;
+        console.log('⏹️ تم إيقاف التحديث التلقائي');
+    }
+}
 
         console.log('✅ الصفحة الرئيسية جاهزة مع نظام التقييم المحسن');
     </script>
 </body>
 </html>
-
-
