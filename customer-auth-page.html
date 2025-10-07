@@ -1,5 +1,5 @@
 <!DOCTYPE html>  
-
+  
 <html lang="ar" dir="rtl">  
 <head>  
   <meta charset="UTF-8">  
@@ -11,9 +11,9 @@
       padding: 0;  
       box-sizing: border-box;  
     }  
-
+  
 body {  
-font-family: ‘Segoe UI’, Tahoma, Geneva, Verdana, sans-serif;  
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  
 min-height: 100vh;  
 direction: rtl;  
@@ -21,8 +21,8 @@ display: flex;
 align-items: center;  
 justify-content: center;  
 padding: 20px;  
-}
-
+}  
+  
 .back-btn {  
 position: absolute;  
 top: 20px;  
@@ -36,13 +36,13 @@ font-size: 14px;
 backdrop-filter: blur(10px);  
 border: 1px solid rgba(255, 255, 255, 0.3);  
 transition: all 0.3s ease;  
-}
-
+}  
+  
 .back-btn:hover {  
 background: rgba(255, 255, 255, 0.3);  
 transform: translateY(-2px);  
-}
-
+}  
+  
 .container {  
 background: rgba(255, 255, 255, 0.95);  
 backdrop-filter: blur(20px);  
@@ -53,18 +53,18 @@ border: 1px solid rgba(255, 255, 255, 0.2);
 width: 100%;  
 max-width: 450px;  
 animation: slideIn 0.8s ease-out;  
-}
-
+}  
+  
 @keyframes slideIn {  
 from { transform: translateY(50px); opacity: 0; }  
 to { transform: translateY(0); opacity: 1; }  
-}
-
+}  
+  
 .header {  
 text-align: center;  
 margin-bottom: 30px;  
-}
-
+}  
+  
 .logo {  
 width: 80px;  
 height: 80px;  
@@ -77,54 +77,54 @@ font-size: 2.5rem;
 color: white;  
 margin: 0 auto 20px;  
 box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);  
-}
-
+}  
+  
 .header h1 {  
 color: #2c3e50;  
 font-size: 28px;  
 margin-bottom: 10px;  
 font-weight: bold;  
-}
-
+}  
+  
 .header p {  
 color: #7f8c8d;  
 font-size: 16px;  
 line-height: 1.5;  
 margin-bottom: 20px;  
-}
-
+}  
+  
 .features-list {  
 background: linear-gradient(45deg, #f8f9fa, #e9ecef);  
 border-radius: 15px;  
 padding: 15px;  
 margin-bottom: 25px;  
-}
-
+}  
+  
 .features-list h4 {  
 color: #495057;  
 margin-bottom: 10px;  
 font-size: 14px;  
 text-align: center;  
-}
-
+}  
+  
 .features-list ul {  
 list-style: none;  
 color: #6c757d;  
 font-size: 13px;  
-}
-
+}  
+  
 .features-list li {  
 margin-bottom: 5px;  
 display: flex;  
 align-items: center;  
 gap: 8px;  
-}
-
+}  
+  
 .features-list li:before {  
-content: “✅”;  
+content: "✅";  
 font-size: 12px;  
-}
-
+}  
+  
 .tabs {  
 display: flex;  
 background: #f8f9fa;  
@@ -132,8 +132,8 @@ border-radius: 25px;
 padding: 5px;  
 margin-bottom: 25px;  
 box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);  
-}
-
+}  
+  
 .tab {  
 flex: 1;  
 padding: 12px;  
@@ -145,44 +145,44 @@ font-weight: 600;
 cursor: pointer;  
 transition: all 0.3s ease;  
 color: #666;  
-}
-
+}  
+  
 .tab.active {  
 background: linear-gradient(45deg, #667eea, #764ba2);  
 color: white;  
 box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);  
-}
-
+}  
+  
 .form-content {  
 display: none;  
-}
-
+}  
+  
 .form-content.active {  
 display: block;  
 animation: fadeIn 0.5s ease-out;  
-}
-
+}  
+  
 @keyframes fadeIn {  
 from { opacity: 0; transform: translateY(10px); }  
 to { opacity: 1; transform: translateY(0); }  
-}
-
+}  
+  
 .form-group {  
 margin-bottom: 20px;  
-}
-
+}  
+  
 .form-group label {  
 display: block;  
 color: #2c3e50;  
 font-weight: 600;  
 margin-bottom: 8px;  
 font-size: 14px;  
-}
-
+}  
+  
 .input-wrapper {  
 position: relative;  
-}
-
+}  
+  
 .form-input {  
 width: 100%;  
 padding: 16px 20px;  
@@ -192,25 +192,25 @@ font-size: 16px;
 background: white;  
 transition: all 0.3s ease;  
 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);  
-}
-
+}  
+  
 .form-input:focus {  
 border-color: #667eea;  
 outline: none;  
 box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);  
 transform: translateY(-2px);  
-}
-
+}  
+  
 .form-input.error {  
 border-color: #dc3545;  
 background: #fff5f5;  
-}
-
+}  
+  
 .form-input.success {  
 border-color: #28a745;  
 background: #f8fff9;  
-}
-
+}  
+  
 .input-icon {  
 position: absolute;  
 right: 15px;  
@@ -218,8 +218,8 @@ top: 50%;
 transform: translateY(-50%);  
 color: #adb5bd;  
 font-size: 18px;  
-}
-
+}  
+  
 .password-toggle {  
 position: absolute;  
 left: 15px;  
@@ -233,12 +233,12 @@ font-size: 20px;
 padding: 5px;  
 border-radius: 5px;  
 transition: all 0.2s ease;  
-}
-
+}  
+  
 .password-toggle:hover {  
 background: rgba(102, 126, 234, 0.1);  
-}
-
+}  
+  
 .form-help {  
 font-size: 12px;  
 color: #6c757d;  
@@ -246,28 +246,28 @@ margin-top: 5px;
 display: flex;  
 align-items: center;  
 gap: 5px;  
-}
-
+}  
+  
 .validation-message {  
 font-size: 12px;  
 margin-top: 5px;  
 padding: 8px 12px;  
 border-radius: 8px;  
 display: none;  
-}
-
+}  
+  
 .validation-message.error {  
 background: #f8d7da;  
 color: #721c24;  
 border: 1px solid #f5c6cb;  
-}
-
+}  
+  
 .validation-message.success {  
 background: #d4edda;  
 color: #155724;  
 border: 1px solid #c3e6cb;  
-}
-
+}  
+  
 .submit-btn {  
 width: 100%;  
 background: linear-gradient(45deg, #667eea, #764ba2);  
@@ -283,30 +283,30 @@ box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
 margin-top: 10px;  
 position: relative;  
 overflow: hidden;  
-}
-
+}  
+  
 .submit-btn:hover:not(:disabled) {  
 transform: translateY(-3px);  
 box-shadow: 0 10px 35px rgba(102, 126, 234, 0.6);  
-}
-
+}  
+  
 .submit-btn:disabled {  
 background: #6c757d;  
 cursor: not-allowed;  
 transform: none;  
-}
-
+}  
+  
 .btn-text, .btn-loading {  
 display: flex;  
 align-items: center;  
 justify-content: center;  
 gap: 10px;  
-}
-
+}  
+  
 .btn-loading {  
 display: none;  
-}
-
+}  
+  
 .loading-spinner {  
 width: 20px;  
 height: 20px;  
@@ -314,12 +314,12 @@ border: 3px solid rgba(255, 255, 255, 0.3);
 border-radius: 50%;  
 border-top-color: white;  
 animation: spin 1s linear infinite;  
-}
-
+}  
+  
 @keyframes spin {  
 to { transform: rotate(360deg); }  
-}
-
+}  
+  
 .alert {  
 padding: 15px 20px;  
 border-radius: 12px;  
@@ -328,55 +328,55 @@ font-size: 14px;
 text-align: center;  
 display: none;  
 animation: slideDown 0.3s ease-out;  
-}
-
+}  
+  
 @keyframes slideDown {  
 from { transform: translateY(-20px); opacity: 0; }  
 to { transform: translateY(0); opacity: 1; }  
-}
-
+}  
+  
 .alert.success {  
 background: rgba(40, 167, 69, 0.1);  
 color: #155724;  
 border: 2px solid #28a745;  
-}
-
+}  
+  
 .alert.error {  
 background: rgba(220, 53, 69, 0.1);  
 color: #721c24;  
 border: 2px solid #dc3545;  
-}
-
+}  
+  
 .alert.info {  
 background: rgba(23, 162, 184, 0.1);  
 color: #0c5460;  
 border: 2px solid #17a2b8;  
-}
-
+}  
+  
 .divider {  
 text-align: center;  
 margin: 25px 0;  
 position: relative;  
 color: #adb5bd;  
 font-size: 14px;  
-}
-
+}  
+  
 .divider:before {  
-content: ‘’;  
+content: '';  
 position: absolute;  
 top: 50%;  
 left: 0;  
 right: 0;  
 height: 1px;  
 background: linear-gradient(to right, transparent, #dee2e6, transparent);  
-}
-
+}  
+  
 .divider span {  
 background: white;  
 padding: 0 15px;  
 position: relative;  
-}
-
+}  
+  
 .guest-access {  
 background: linear-gradient(45deg, #ffc107, #fd7e14);  
 color: white;  
@@ -384,19 +384,19 @@ padding: 15px;
 border-radius: 12px;  
 text-align: center;  
 margin-top: 15px;  
-}
-
+}  
+  
 .guest-access h5 {  
 margin-bottom: 8px;  
 font-size: 16px;  
-}
-
+}  
+  
 .guest-access p {  
 font-size: 13px;  
 opacity: 0.9;  
 margin-bottom: 12px;  
-}
-
+}  
+  
 .guest-btn {  
 background: rgba(255, 255, 255, 0.2);  
 color: white;  
@@ -408,13 +408,13 @@ font-size: 14px;
 font-weight: 600;  
 transition: all 0.3s ease;  
 display: inline-block;  
-}
-
+}  
+  
 .guest-btn:hover {  
 background: rgba(255, 255, 255, 0.3);  
 transform: translateY(-2px);  
-}
-
+}  
+  
 /* SMS Verification Styles */  
 .sms-verification {  
 text-align: center;  
@@ -424,8 +424,8 @@ padding: 30px 25px;
 border-radius: 20px;  
 margin-bottom: 25px;  
 box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);  
-}
-
+}  
+  
 .sms-verification .phone-display {  
 font-size: 18px;  
 font-weight: bold;  
@@ -436,8 +436,8 @@ margin: 15px 0;
 display: inline-block;  
 direction: ltr;  
 text-align: center;  
-}
-
+}  
+  
 .verification-code-input {  
 width: 100%;  
 padding: 18px;  
@@ -449,20 +449,20 @@ border: 3px solid #28a745;
 border-radius: 15px;  
 background: #f8fff9;  
 margin: 15px 0;  
-}
-
+}  
+  
 .verification-code-input:focus {  
 border-color: #20c997;  
 box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);  
 outline: none;  
-}
-
+}  
+  
 .resend-container {  
 margin-top: 20px;  
 padding-top: 20px;  
 border-top: 2px dashed rgba(108, 117, 125, 0.3);  
-}
-
+}  
+  
 .resend-btn {  
 background: rgba(108, 117, 125, 0.1);  
 color: #6c757d;  
@@ -474,95 +474,91 @@ font-size: 14px;
 font-weight: 600;  
 transition: all 0.3s ease;  
 margin-top: 10px;  
-}
-
+}  
+  
 .resend-btn:hover:not(:disabled) {  
 background: #6c757d;  
 color: white;  
 transform: translateY(-2px);  
-}
-
+}  
+  
 .resend-btn:disabled {  
 opacity: 0.5;  
 cursor: not-allowed;  
-}
-
+}  
+  
 .timer {  
 font-size: 14px;  
 color: #6c757d;  
 margin-top: 10px;  
-}
-
+}  
+  
 .timer.active {  
 color: #dc3545;  
 font-weight: bold;  
-}
-
-/* reCAPTCHA container */
-.recaptcha-container {
-margin: 20px 0;
-display: flex;
-justify-content: center;
-}
-
+}  
+  
 /* Mobile Responsive */  
 @media (max-width: 480px) {  
 body {  
 padding: 10px;  
-}
-
+}  
+  
 .back-btn {  
 top: 10px;  
 right: 10px;  
 font-size: 12px;  
 padding: 8px 15px;  
-}
-
+}  
+  
 .container {  
 padding: 30px 25px;  
 margin: 10px 0;  
-}
-
+}  
+  
 .logo {  
 width: 70px;  
 height: 70px;  
 font-size: 2rem;  
-}
-
+}  
+  
 .header h1 {  
 font-size: 24px;  
-}
-
+}  
+  
 .header p {  
 font-size: 14px;  
-}
-
+}  
+  
 .form-input {  
 padding: 14px 18px;  
-}
-
+}  
+  
 .verification-code-input {  
 font-size: 20px;  
 letter-spacing: 4px;  
-}
-
+}  
+  
 .phone-display {  
 font-size: 16px !important;  
 }  
-}
-
+}  
+  
   </style>  
 </head>  
 <body>  
-
-<a href="index.html" class="back-btn">← العودة للرئيسية</a>
+  
+<a href="index.html" class="back-btn">← العودة للرئيسية</a>  
+  
+<!-- Hidden reCAPTCHA container -->
+<div id="recaptcha-container"></div>
 
   <div class="container">  
     <div class="header">  
       <div class="logo">👥</div>  
       <h1>دخول العملاء</h1>  
       <p>سجل دخولك لرؤية تفاصيل المهنيين كاملة والتواصل معهم مباشرة</p>  
-
+  
   <div class="features-list">  
     <h4>مميزات الحساب المسجل:</h4>  
     <ul>  
@@ -573,16 +569,16 @@ font-size: 16px !important;
     </ul>  
   </div>  
 </div>  
-
+  
 <div id="alertMessage" class="alert"></div>  
-
+  
 <div class="tabs">  
   <button class="tab active" onclick="showTab('login')">تسجيل الدخول</button>  
   <button class="tab" onclick="showTab('register')">إنشاء حساب جديد</button>  
 </div>  
-
+  
 <!-- Login Form -->  
-
+  
 <form class="form-content active" id="loginForm" data-tab="login">  
   <div class="form-group">  
     <label for="loginPhone">رقم الهاتف</label>  
@@ -596,7 +592,7 @@ font-size: 16px !important;
     </div>  
     <div id="loginPhoneValidation" class="validation-message"></div>  
   </div>  
-
+  
   <div class="form-group">  
     <label for="loginPassword">كلمة المرور</label>  
     <div class="input-wrapper">  
@@ -606,7 +602,7 @@ font-size: 16px !important;
     </div>  
     <div id="loginPasswordValidation" class="validation-message"></div>  
   </div>  
-
+  
   <button type="submit" class="submit-btn" id="loginBtn">  
     <span class="btn-text">🔓 تسجيل الدخول</span>  
     <div class="btn-loading">  
@@ -615,9 +611,9 @@ font-size: 16px !important;
     </div>  
   </button>  
 </form>  
-
+  
 <!-- Register Form -->  
-
+  
 <form class="form-content" id="registerForm" data-tab="register">  
   <div class="form-group">  
     <label for="registerName">الاسم الكامل</label>  
@@ -631,7 +627,7 @@ font-size: 16px !important;
     </div>  
     <div id="registerNameValidation" class="validation-message"></div>  
   </div>  
-
+  
   <div class="form-group">  
     <label for="registerPhone">رقم الهاتف</label>  
     <div class="input-wrapper">  
@@ -644,7 +640,7 @@ font-size: 16px !important;
     </div>  
     <div id="registerPhoneValidation" class="validation-message"></div>  
   </div>  
-
+  
   <div class="form-group">  
     <label for="registerPassword">كلمة المرور</label>  
     <div class="input-wrapper">  
@@ -658,7 +654,7 @@ font-size: 16px !important;
     </div>  
     <div id="registerPasswordValidation" class="validation-message"></div>  
   </div>  
-
+  
   <div class="form-group">  
     <label for="confirmPassword">تأكيد كلمة المرور</label>  
     <div class="input-wrapper">  
@@ -667,14 +663,8 @@ font-size: 16px !important;
       <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁</button>  
     </div>  
     <div id="confirmPasswordValidation" class="validation-message"></div>  
-  </div>
-
-  <!-- reCAPTCHA -->
-
-  <div class="recaptcha-container">
-    <div id="recaptcha-container"></div>
-  </div>
-
+  </div>  
+  
   <button type="submit" class="submit-btn" id="registerBtn">  
     <span class="btn-text">✨ إنشاء الحساب</span>  
     <div class="btn-loading">  
@@ -683,9 +673,9 @@ font-size: 16px !important;
     </div>  
   </button>  
 </form>  
-
+  
 <!-- SMS Verification Form -->  
-
+  
 <form class="form-content" id="verificationForm" data-tab="verification">  
   <div class="sms-verification">  
     <h3>📱 تأكيد رقم الهاتف</h3>  
@@ -693,7 +683,7 @@ font-size: 16px !important;
     <div class="phone-display" id="phoneDisplay"></div>  
     <p>أدخل الرمز المكون من 6 أرقام:</p>  
   </div>  
-
+  
   <div class="form-group">  
     <label for="verificationCode">رمز التحقق</label>  
     <input type="text" id="verificationCode" class="form-input verification-code-input"   
@@ -705,7 +695,7 @@ font-size: 16px !important;
     </div>  
     <div id="verificationCodeValidation" class="validation-message"></div>  
   </div>  
-
+  
   <button type="submit" class="submit-btn" id="verifyBtn">  
     <span class="btn-text">✅ تأكيد الرمز</span>  
     <div class="btn-loading">  
@@ -713,7 +703,7 @@ font-size: 16px !important;
       <span>جاري التحقق...</span>  
     </div>  
   </button>  
-
+  
   <div class="resend-container">  
     <p>لم تستلم الرسالة؟</p>  
     <button type="button" class="resend-btn" id="resendBtn" onclick="resendSMS()">  
@@ -722,27 +712,27 @@ font-size: 16px !important;
     <div class="timer" id="resendTimer"></div>  
   </div>  
 </form>  
-
+  
 <div class="divider">  
   <span>أو</span>  
 </div>  
-
+  
 <div class="guest-access">  
   <h5>🔍 تصفح كزائر</h5>  
   <p>يمكنك تصفح المهنيين لكن لن تتمكن من رؤية تفاصيل الاتصال أو إضافة تقييمات</p>  
   <a href="index.html" class="guest-btn">متابعة كزائر</a>  
 </div>  
-
+  
   </div>  
-
-  <!-- Firebase Scripts -->
-
+  
+  <!-- Firebase Scripts -->  
+  
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>  
-
-  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-auth-compat.js"></script>  
-
-  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>  
-
+  
+  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-auth-compat.js"></script>
+  
   <script>  
     // Firebase configuration  
     const firebaseConfig = {  
@@ -756,8 +746,19 @@ font-size: 16px !important;
   
     // Initialize Firebase  
     firebase.initializeApp(firebaseConfig);  
+    const db = firebase.firestore();
     const auth = firebase.auth();
-    const db = firebase.firestore();  
+    
+    // Setup reCAPTCHA
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible',
+      'callback': (response) => {
+        console.log('✅ reCAPTCHA solved');
+      },
+      'expired-callback': () => {
+        console.log('⚠️ reCAPTCHA expired');
+      }
+    });
   
     // Form validation patterns  
     const phonePattern = /^07\d{8}$/;  
@@ -766,36 +767,10 @@ font-size: 16px !important;
   
     // Global variables  
     let pendingCustomerData = null;  
-    let confirmationResult = null;
-    let appVerifier = null;
     let resendTimer = null;  
-    let resendCountdown = 0;  
+    let resendCountdown = 0;
+    let confirmationResult = null; // Store Firebase confirmation result
   
-    // Initialize reCAPTCHA
-    function initializeRecaptcha() {
-      try {
-        appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-          'size': 'normal',
-          'callback': function(response) {
-            console.log('reCAPTCHA solved');
-          },
-          'expired-callback': function() {
-            console.log('reCAPTCHA expired');
-            showAlert('انتهت صلاحية التحقق، يرجى المحاولة مرة أخرى', 'error');
-          }
-        });
-
-        appVerifier.render().then(function(widgetId) {
-          console.log('reCAPTCHA rendered successfully');
-        }).catch(function(error) {
-          console.error('Error rendering reCAPTCHA:', error);
-          showAlert('خطأ في تحميل التحقق الأمني', 'error');
-        });
-      } catch (error) {
-        console.error('Error initializing reCAPTCHA:', error);
-      }
-    }
-
     // Global functions  
     function showTab(tabName) {  
       // Update tab buttons  
@@ -815,16 +790,7 @@ font-size: 16px !important;
       document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');  
   
       hideAlert();  
-      autoFocusFirstInput(tabName);
-      
-      // Initialize reCAPTCHA when showing register tab
-      if (tabName === 'register') {
-        setTimeout(() => {
-          if (!appVerifier) {
-            initializeRecaptcha();
-          }
-        }, 500);
-      }
+      autoFocusFirstInput(tabName);  
     }  
   
     function togglePassword(inputId) {  
@@ -969,94 +935,37 @@ font-size: 16px !important;
         }  
       }, 300);  
     }  
-
-    // Format phone number for Firebase Auth (convert from 07XXXXXXXX to +96270XXXXXXX)
-    function formatPhoneForFirebase(phone) {
-      if (phone.startsWith('07')) {
-        return '+962' + phone.substring(1);
-      }
-      return phone;
-    }
-
-    // Format phone number for display (convert from +96270XXXXXXX to 07XXXXXXXX)
-    function formatPhoneForDisplay(phone) {
-      if (phone.startsWith('+96270')) {
-        return '07' + phone.substring(6);
-      } else if (phone.startsWith('+9627')) {
-        return '07' + phone.substring(5);
-      }
-      return phone;
-    }
-
-    // Send SMS verification code using Firebase Auth
+  
+    // Send SMS verification code via Firebase
     async function sendSMSVerificationCode(phone) {
       try {
-        console.log('إرسال رمز التحقق إلى:', phone);
+        // تنسيق رقم الهاتف للصيغة الدولية (+962...)
+        const internationalPhone = '+962' + phone.substring(1); // تحويل 07xxxxxxxx إلى +9627xxxxxxxx
         
-        if (!appVerifier) {
-          throw new Error('reCAPTCHA not initialized');
-        }
-
-        const formattedPhone = formatPhoneForFirebase(phone);
-        console.log('Formatted phone for Firebase:', formattedPhone);
-
-        showAlert('جاري إرسال رمز التحقق...', 'info');
-
-        confirmationResult = await auth.signInWithPhoneNumber(formattedPhone, appVerifier);
+        console.log('📱 إرسال رمز التحقق إلى:', internationalPhone);
         
-        console.log('SMS sent successfully');
-        return { success: true, confirmationResult: confirmationResult };
+        const appVerifier = window.recaptchaVerifier;
+        
+        // إرسال رمز التحقق عبر Firebase
+        confirmationResult = await auth.signInWithPhoneNumber(internationalPhone, appVerifier);
+        
+        console.log('✅ تم إرسال رمز التحقق بنجاح');
+        
+        return { success: true, messageId: 'firebase_sms_' + Date.now() };
         
       } catch (error) {
-        console.error('خطأ في إرسال SMS:', error);
+        console.error('❌ خطأ في إرسال SMS:', error);
         
-        // Handle different error types
-        let errorMessage = 'فشل في إرسال رمز التحقق';
-        
+        // عرض رسالة خطأ مفصلة
         if (error.code === 'auth/invalid-phone-number') {
-          errorMessage = 'رقم الهاتف غير صحيح';
+          throw new Error('رقم الهاتف غير صحيح');
         } else if (error.code === 'auth/too-many-requests') {
-          errorMessage = 'تم إرسال الكثير من الطلبات. يرجى المحاولة لاحقاً';
-        } else if (error.code === 'auth/captcha-check-failed') {
-          errorMessage = 'فشل التحقق الأمني. يرجى إعادة المحاولة';
-          // Reset reCAPTCHA
-          if (appVerifier) {
-            appVerifier.clear();
-            appVerifier = null;
-            setTimeout(() => initializeRecaptcha(), 1000);
-          }
+          throw new Error('تم إرسال عدد كبير من الطلبات. يرجى المحاولة لاحقاً');
+        } else if (error.code === 'auth/quota-exceeded') {
+          throw new Error('تم تجاوز الحصة اليومية لإرسال الرسائل');
+        } else {
+          throw new Error('فشل في إرسال رمز التحقق: ' + error.message);
         }
-        
-        throw new Error(errorMessage);
-      }
-    }
-
-    // Verify SMS code using Firebase Auth
-    async function verifySMSCode(code) {
-      try {
-        if (!confirmationResult) {
-          throw new Error('لم يتم العثور على جلسة التحقق');
-        }
-
-        console.log('تحقق من الرمز:', code);
-        
-        const result = await confirmationResult.confirm(code);
-        console.log('تم التحقق بنجاح:', result);
-        
-        return { success: true, user: result.user };
-        
-      } catch (error) {
-        console.error('خطأ في التحقق من الرمز:', error);
-        
-        let errorMessage = 'رمز التحقق غير صحيح';
-        
-        if (error.code === 'auth/invalid-verification-code') {
-          errorMessage = 'رمز التحقق غير صحيح';
-        } else if (error.code === 'auth/code-expired') {
-          errorMessage = 'انتهت صلاحية الرمز. يرجى طلب رمز جديد';
-        }
-        
-        throw new Error(errorMessage);
       }
     }
   
@@ -1090,6 +999,8 @@ font-size: 16px !important;
       }  
   
       try {  
+        showAlert('جاري إعادة إرسال رمز التحقق...', 'info');
+        
         await sendSMSVerificationCode(pendingCustomerData.phone);  
           
         showAlert('تم إعادة إرسال رمز التحقق بنجاح', 'success');  
@@ -1101,7 +1012,7 @@ font-size: 16px !important;
           
       } catch (error) {  
         console.error('خطأ في إعادة إرسال SMS:', error);  
-        showAlert(error.message || 'فشل في إعادة إرسال الرمز، يرجى المحاولة مرة أخرى', 'error');  
+        showAlert('فشل في إعادة إرسال الرمز: ' + error.message, 'error');  
       }  
     }  
   
@@ -1137,9 +1048,16 @@ font-size: 16px !important;
             if (!customerData.phoneVerified) {  
               showAlert('يجب تأكيد رقم الهاتف أولاً. جاري إرسال رمز التحقق...', 'info');  
                 
-              // Send verification code using Firebase Auth
-              pendingCustomerData = customerData;
-              await sendSMSVerificationCode(phone);  
+              // Send verification code via Firebase
+              try {
+                await sendSMSVerificationCode(phone);  
+              } catch (error) {
+                showAlert('فشل في إرسال رمز التحقق: ' + error.message, 'error');
+                return;
+              }
+                
+              // Store customer data temporarily  
+              pendingCustomerData = customerData;  
                 
               // Show verification form  
               document.getElementById('phoneDisplay').textContent = phone;  
@@ -1149,10 +1067,10 @@ font-size: 16px !important;
             }  
               
             // Store login info  
-            localStorage.setItem('customerLoggedIn', 'true');
-            localStorage.setItem('customerPhone', phone);
-            localStorage.setItem('customerName', customerData.name);
-            localStorage.setItem('loginTime', new Date().toISOString());  
+           localStorage.setItem('customerLoggedIn', 'true');
+localStorage.setItem('customerPhone', phone);
+localStorage.setItem('customerName', customerData.name);
+localStorage.setItem('loginTime', new Date().toISOString());  
               
             showAlert('تم تسجيل الدخول بنجاح! جاري التحويل إلى صفحة المهنيين...', 'success');  
               
@@ -1228,7 +1146,7 @@ font-size: 16px !important;
           document.getElementById('loginPhone').value = phone;  
           return;  
         }  
-
+  
         // Store customer data temporarily (without saving to database yet)  
         pendingCustomerData = {  
           name: name,  
@@ -1243,8 +1161,13 @@ font-size: 16px !important;
           }  
         };  
   
-        // Send verification code using Firebase Auth
-        await sendSMSVerificationCode(phone);  
+        // Send verification code via Firebase
+        try {
+          await sendSMSVerificationCode(phone);
+        } catch (error) {
+          showAlert('فشل في إرسال رمز التحقق: ' + error.message, 'error');
+          return;
+        }
   
         // Show verification form  
         document.getElementById('phoneDisplay').textContent = phone;  
@@ -1255,7 +1178,7 @@ font-size: 16px !important;
   
       } catch (error) {  
         console.error('Registration error:', error);  
-        showAlert(error.message || 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى', 'error');  
+        showAlert('حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى', 'error');  
       } finally {  
         showLoading(document.getElementById('registerForm'), false);  
       }  
@@ -1279,7 +1202,7 @@ font-size: 16px !important;
         return;  
       }  
   
-      if (!pendingCustomerData) {  
+      if (!pendingCustomerData || !confirmationResult) {  
         showAlert('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');  
         return;  
       }  
@@ -1287,17 +1210,14 @@ font-size: 16px !important;
       showLoading(document.getElementById('verificationForm'), true);  
   
       try {  
-        // Verify SMS code with Firebase Auth
-        const verificationResult = await verifySMSCode(enteredCode);
+        // التحقق من الرمز عبر Firebase
+        await confirmationResult.confirm(enteredCode);
         
-        if (!verificationResult.success) {
-          throw new Error('فشل في التحقق من الرمز');
-        }
-
+        console.log('✅ تم التحقق من الرمز بنجاح');
+        
         // Update customer data to mark phone as verified  
         pendingCustomerData.phoneVerified = true;  
-        pendingCustomerData.verifiedAt = new Date().toISOString();
-        pendingCustomerData.firebaseUid = verificationResult.user.uid;  
+        pendingCustomerData.verifiedAt = new Date().toISOString();  
   
         // Save to database  
         await db.collection("customers").doc(pendingCustomerData.phone).set({  
@@ -1308,10 +1228,10 @@ font-size: 16px !important;
         });  
   
         // Auto login after successful verification  
-        localStorage.setItem('customerLoggedIn', 'true');
-        localStorage.setItem('customerPhone', pendingCustomerData.phone);
-        localStorage.setItem('customerName', pendingCustomerData.name);
-        localStorage.setItem('loginTime', new Date().toISOString());  
+       localStorage.setItem('customerLoggedIn', 'true');
+localStorage.setItem('customerPhone', pendingCustomerData.phone);
+localStorage.setItem('customerName', pendingCustomerData.name);
+localStorage.setItem('loginTime', new Date().toISOString());  
   
         showAlert('تم تأكيد رقم الهاتف بنجاح! مرحباً بك، جاري التحويل إلى صفحة المهنيين...', 'success');  
           
@@ -1320,16 +1240,20 @@ font-size: 16px !important;
           clearInterval(resendTimer);  
         }  
   
-        // Sign out from Firebase Auth (we use our own login system)
-        await auth.signOut();
-
         setTimeout(() => {  
           window.location.href = 'index.html';  
         }, 2500);  
   
       } catch (error) {  
         console.error('Verification error:', error);  
-        showAlert(error.message || 'حدث خطأ أثناء التحقق. يرجى المحاولة مرة أخرى', 'error');  
+        
+        if (error.code === 'auth/invalid-verification-code') {
+          showAlert('رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى', 'error');
+        } else if (error.code === 'auth/code-expired') {
+          showAlert('انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد', 'error');
+        } else {
+          showAlert('حدث خطأ أثناء التحقق: ' + error.message, 'error');
+        }
       } finally {  
         showLoading(document.getElementById('verificationForm'), false);  
       }  
@@ -1351,8 +1275,7 @@ font-size: 16px !important;
       document.getElementById('verificationCode').addEventListener('input', validateVerificationCode);  
   
       // Check if user is already logged in  
-      if (localStorage.getItem('customerLoggedIn') === 'true') {
-        const customerName = localStorage.getItem('customerName');  
+if (localStorage.getItem('customerLoggedIn') === 'true') {       const customerName = localStorage.getItem('customerName');  
         showAlert(`مرحباً ${customerName}، أنت مسجل دخول بالفعل. جاري التحويل...`, 'info');  
         setTimeout(() => {  
           window.location.href = 'index.html';  
@@ -1363,12 +1286,7 @@ font-size: 16px !important;
       document.getElementById('loginForm').reset();  
       document.getElementById('registerForm').reset();  
       document.getElementById('verificationForm').reset();  
-      hideAlert();
-
-      // Initialize reCAPTCHA for register tab if it's active
-      if (document.querySelector('[data-tab="register"]').classList.contains('active')) {
-        setTimeout(() => initializeRecaptcha(), 500);
-      }
+      hideAlert();  
     });  
   
     // Handle browser back button  
@@ -1383,7 +1301,7 @@ font-size: 16px !important;
       }  
     });
   
-  </script>  
+  </script>
 
 </body>  
 </html>
