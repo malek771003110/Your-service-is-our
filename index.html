@@ -1772,6 +1772,47 @@
 
         console.log('✅ الصفحة الرئيسية جاهزة مع التصميم العصري');
     </script>
+    
+<script>
+  // إعداد Firebase
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // مراقبة حالة تسجيل الدخول
+  auth.onAuthStateChanged(user => {
+    const loginBanner = document.querySelector('.floating-register-banner');
+    const userStatus = document.getElementById('userStatus');
+    const userAction = document.getElementById('userAction');
+    const userWelcome = document.getElementById('userWelcome');
+
+    if (user) {
+      // ✅ المستخدم مسجل دخول
+      if (loginBanner) loginBanner.style.display = 'none';
+      if (userStatus) {
+        userStatus.classList.remove('guest');
+        userStatus.classList.add('logged-in');
+        userWelcome.textContent = `👋 مرحبًا، ${user.displayName || "عميل"}`;
+        userAction.textContent = "تسجيل الخروج";
+        userAction.href = "#";
+        userAction.onclick = () => auth.signOut();
+      }
+    } else {
+      // 👤 المستخدم زائر
+      if (loginBanner) loginBanner.style.display = 'flex';
+      if (userStatus) {
+        userStatus.classList.remove('logged-in');
+        userStatus.classList.add('guest');
+        userWelcome.textContent = "🔓 زائر - يمكنك التصفح فقط";
+        userAction.textContent = "تسجيل الدخول";
+        userAction.href = "customer-auth-page.html";
+        userAction.onclick = null;
+      }
+    }
+  });
+</script>
+
+
+
 </body>
 </html>
-
