@@ -415,8 +415,8 @@ background: rgba(255, 255, 255, 0.3);
 transform: translateY(-2px);  
 }  
   
-/* SMS Verification Styles */  
-.sms-verification {  
+/* OTP Verification Styles */  
+.otp-verification {  
 text-align: center;  
 background: linear-gradient(45deg, #28a745, #20c997);  
 color: white;  
@@ -426,8 +426,8 @@ margin-bottom: 25px;
 box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);  
 }  
   
-.sms-verification .phone-display {  
-font-size: 18px;  
+.otp-verification .email-display {  
+font-size: 16px;  
 font-weight: bold;  
 background: rgba(255, 255, 255, 0.2);  
 padding: 10px 20px;  
@@ -436,6 +436,7 @@ margin: 15px 0;
 display: inline-block;  
 direction: ltr;  
 text-align: center;  
+word-break: break-all;
 }  
   
 .verification-code-input {  
@@ -539,8 +540,8 @@ font-size: 20px;
 letter-spacing: 4px;  
 }  
   
-.phone-display {  
-font-size: 16px !important;  
+.email-display {  
+font-size: 14px !important;  
 }  
 }  
   
@@ -550,9 +551,6 @@ font-size: 16px !important;
   
 <a href="index.html" class="back-btn">← العودة للرئيسية</a>  
   
-<!-- Hidden reCAPTCHA container -->
-<div id="recaptcha-container"></div>
-
   <div class="container">  
     <div class="header">  
       <div class="logo">👥</div>  
@@ -581,16 +579,16 @@ font-size: 16px !important;
   
 <form class="form-content active" id="loginForm" data-tab="login">  
   <div class="form-group">  
-    <label for="loginPhone">رقم الهاتف</label>  
+    <label for="loginEmail">البريد الإلكتروني</label>  
     <div class="input-wrapper">  
-      <span class="input-icon">📱</span>  
-      <input type="tel" id="loginPhone" class="form-input" placeholder="07XXXXXXXX" required>  
+      <span class="input-icon">📧</span>  
+      <input type="email" id="loginEmail" class="form-input" placeholder="example@email.com" required>  
     </div>  
     <div class="form-help">  
       <span>💡</span>  
-      <span>أدخل رقم هاتفك المسجل مسبقاً</span>  
+      <span>أدخل بريدك الإلكتروني المسجل مسبقاً</span>  
     </div>  
-    <div id="loginPhoneValidation" class="validation-message"></div>  
+    <div id="loginEmailValidation" class="validation-message"></div>  
   </div>  
   
   <div class="form-group">  
@@ -629,16 +627,16 @@ font-size: 16px !important;
   </div>  
   
   <div class="form-group">  
-    <label for="registerPhone">رقم الهاتف</label>  
+    <label for="registerEmail">البريد الإلكتروني</label>  
     <div class="input-wrapper">  
-      <span class="input-icon">📱</span>  
-      <input type="tel" id="registerPhone" class="form-input" placeholder="07XXXXXXXX" required>  
+      <span class="input-icon">📧</span>  
+      <input type="email" id="registerEmail" class="form-input" placeholder="example@email.com" required>  
     </div>  
     <div class="form-help">  
       <span>💡</span>  
       <span>سيكون هذا اسم المستخدم الخاص بك</span>  
     </div>  
-    <div id="registerPhoneValidation" class="validation-message"></div>  
+    <div id="registerEmailValidation" class="validation-message"></div>  
   </div>  
   
   <div class="form-group">  
@@ -674,13 +672,13 @@ font-size: 16px !important;
   </button>  
 </form>  
   
-<!-- SMS Verification Form -->  
+<!-- OTP Verification Form -->  
   
 <form class="form-content" id="verificationForm" data-tab="verification">  
-  <div class="sms-verification">  
-    <h3>📱 تأكيد رقم الهاتف</h3>  
+  <div class="otp-verification">  
+    <h3>📧 تأكيد البريد الإلكتروني</h3>  
     <p>تم إرسال رمز التحقق إلى:</p>  
-    <div class="phone-display" id="phoneDisplay"></div>  
+    <div class="email-display" id="emailDisplay"></div>  
     <p>أدخل الرمز المكون من 6 أرقام:</p>  
   </div>  
   
@@ -691,7 +689,7 @@ font-size: 16px !important;
            pattern="\d{6}" inputmode="numeric">  
     <div class="form-help">  
       <span>📩</span>  
-      <span>تحقق من رسائل SMS في هاتفك</span>  
+      <span>تحقق من بريدك الإلكتروني (وصندوق الرسائل غير المرغوبة)</span>  
     </div>  
     <div id="verificationCodeValidation" class="validation-message"></div>  
   </div>  
@@ -706,7 +704,7 @@ font-size: 16px !important;
   
   <div class="resend-container">  
     <p>لم تستلم الرسالة؟</p>  
-    <button type="button" class="resend-btn" id="resendBtn" onclick="resendSMS()">  
+    <button type="button" class="resend-btn" id="resendBtn" onclick="resendOTP()">  
       🔄 إعادة إرسال الرمز  
     </button>  
     <div class="timer" id="resendTimer"></div>  
@@ -725,15 +723,27 @@ font-size: 16px !important;
   
   </div>  
   
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  
   <!-- Firebase Scripts -->  
-  
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>  
-  
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>
-  
   <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-auth-compat.js"></script>
   
   <script>  
+    // ==========================================
+    // إعدادات EmailJS - ضع معلوماتك هنا
+    // ==========================================
+    const EMAILJS_CONFIG = {
+      PUBLIC_KEY: 'QptV4oUUGCK9jCfly', // ضع Public Key من EmailJS
+      SERVICE_ID: 'service_68k41kg', // ضع Service ID من EmailJS
+      TEMPLATE_ID: 'template_zub8lyj' // ضع Template ID من EmailJS
+    };
+    
+    // Initialize EmailJS
+    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+  
     // Firebase configuration  
     const firebaseConfig = {  
       apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",  
@@ -748,20 +758,9 @@ font-size: 16px !important;
     firebase.initializeApp(firebaseConfig);  
     const db = firebase.firestore();
     const auth = firebase.auth();
-    
-    // Setup reCAPTCHA
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      'size': 'invisible',
-      'callback': (response) => {
-        console.log('✅ reCAPTCHA solved');
-      },
-      'expired-callback': () => {
-        console.log('⚠️ reCAPTCHA expired');
-      }
-    });
   
     // Form validation patterns  
-    const phonePattern = /^07\d{8}$/;  
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  
     const namePattern = /^[\u0600-\u06FFa-zA-Z\s]{2,50}$/;  
     const codePattern = /^\d{6}$/;  
   
@@ -769,7 +768,7 @@ font-size: 16px !important;
     let pendingCustomerData = null;  
     let resendTimer = null;  
     let resendCountdown = 0;
-    let confirmationResult = null; // Store Firebase confirmation result
+    let generatedOTP = null;
   
     // Global functions  
     function showTab(tabName) {  
@@ -806,21 +805,16 @@ font-size: 16px !important;
       }  
     }  
   
-    function formatAndValidatePhone(e) {  
-      let value = e.target.value.replace(/\D/g, '');  
-      if (value.length > 0 && !value.startsWith('07')) {  
-        if (value.startsWith('7')) value = '0' + value;  
-      }  
-      if (value.length > 10) value = value.substring(0, 10);  
-      e.target.value = value;  
-  
+    function validateEmail(e) {  
+      const value = e.target.value.trim();  
       const validationElement = document.getElementById(e.target.id + 'Validation');  
+        
       if (value.length === 0) {  
         clearValidation(e.target, validationElement);  
-      } else if (phonePattern.test(value)) {  
-        showValidation(e.target, validationElement, 'رقم هاتف صحيح ✅', 'success');  
+      } else if (emailPattern.test(value)) {  
+        showValidation(e.target, validationElement, 'بريد إلكتروني صحيح ✅', 'success');  
       } else {  
-        showValidation(e.target, validationElement, 'يجب أن يبدأ بـ 07 ويتكون من 10 أرقام', 'error');  
+        showValidation(e.target, validationElement, 'يرجى إدخال بريد إلكتروني صحيح', 'error');  
       }  
     }  
   
@@ -936,36 +930,34 @@ font-size: 16px !important;
       }, 300);  
     }  
   
-    // Send SMS verification code via Firebase
-    async function sendSMSVerificationCode(phone) {
+    // Generate 6-digit OTP
+    function generateOTP() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+  
+   // Send OTP via EmailJS
+   async function sendOTPEmail(email, otp) {
       try {
-        // تنسيق رقم الهاتف للصيغة الدولية (+962...)
-        const internationalPhone = '+962' + phone.substring(1); // تحويل 07xxxxxxxx إلى +9627xxxxxxxx
+        console.log('📧 جاري إرسال رمز التحقق إلى:', email);
         
-        console.log('📱 إرسال رمز التحقق إلى:', internationalPhone);
+        const templateParams = {
+          to_email: email,
+          to_name: pendingCustomerData.name || 'عزيزي العميل',
+          otp: otp
+        };
         
-        const appVerifier = window.recaptchaVerifier;
+        const response = await emailjs.send(
+          EMAILJS_CONFIG.SERVICE_ID,
+          EMAILJS_CONFIG.TEMPLATE_ID,
+          templateParams
+        );
         
-        // إرسال رمز التحقق عبر Firebase
-        confirmationResult = await auth.signInWithPhoneNumber(internationalPhone, appVerifier);
-        
-        console.log('✅ تم إرسال رمز التحقق بنجاح');
-        
-        return { success: true, messageId: 'firebase_sms_' + Date.now() };
+        console.log('✅ تم إرسال البريد بنجاح:', response);
+        return { success: true, messageId: response.text };
         
       } catch (error) {
-        console.error('❌ خطأ في إرسال SMS:', error);
-        
-        // عرض رسالة خطأ مفصلة
-        if (error.code === 'auth/invalid-phone-number') {
-          throw new Error('رقم الهاتف غير صحيح');
-        } else if (error.code === 'auth/too-many-requests') {
-          throw new Error('تم إرسال عدد كبير من الطلبات. يرجى المحاولة لاحقاً');
-        } else if (error.code === 'auth/quota-exceeded') {
-          throw new Error('تم تجاوز الحصة اليومية لإرسال الرسائل');
-        } else {
-          throw new Error('فشل في إرسال رمز التحقق: ' + error.message);
-        }
+        console.error('❌ خطأ في إرسال البريد:', error);
+        throw new Error('فشل في إرسال رمز التحقق. يرجى التحقق من اتصالك بالإنترنت');
       }
     }
   
@@ -991,8 +983,8 @@ font-size: 16px !important;
       }, 1000);  
     }  
   
-    // Handle SMS resend  
-    async function resendSMS() {  
+    // Handle OTP resend  
+    async function resendOTP() {  
       if (!pendingCustomerData) {  
         showAlert('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');  
         return;  
@@ -1001,7 +993,11 @@ font-size: 16px !important;
       try {  
         showAlert('جاري إعادة إرسال رمز التحقق...', 'info');
         
-        await sendSMSVerificationCode(pendingCustomerData.phone);  
+        // Generate new OTP
+        generatedOTP = generateOTP();
+        
+        // Send via EmailJS
+        await sendOTPEmail(pendingCustomerData.email, generatedOTP);
           
         showAlert('تم إعادة إرسال رمز التحقق بنجاح', 'success');  
         startResendTimer();  
@@ -1011,7 +1007,7 @@ font-size: 16px !important;
         document.getElementById('verificationCode').focus();  
           
       } catch (error) {  
-        console.error('خطأ في إعادة إرسال SMS:', error);  
+        console.error('خطأ في إعادة إرسال OTP:', error);  
         showAlert('فشل في إعادة إرسال الرمز: ' + error.message, 'error');  
       }  
     }  
@@ -1021,56 +1017,75 @@ font-size: 16px !important;
       e.preventDefault();  
       hideAlert();  
   
-      const phone = document.getElementById('loginPhone').value.trim();  
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();  
       const password = document.getElementById('loginPassword').value;  
   
-      if (!phone || !password) {  
+      if (!email || !password) {  
         showAlert('يرجى إدخال جميع البيانات المطلوبة', 'error');  
         return;  
       }  
   
-      if (!phonePattern.test(phone)) {  
-        showAlert('رقم الهاتف غير صحيح', 'error');  
-        document.getElementById('loginPhone').focus();  
+      if (!emailPattern.test(email)) {  
+        showAlert('البريد الإلكتروني غير صحيح', 'error');  
+        document.getElementById('loginEmail').focus();  
         return;  
       }  
   
       showLoading(document.getElementById('loginForm'), true);  
   
       try {  
-        const customerDoc = await db.collection("customers").doc(phone).get();  
+        // Use email as document ID (replace dots with underscores for Firebase)
+        const emailKey = email.replace(/\./g, '_');
+        const customerDoc = await db.collection("customers").doc(emailKey).get();  
           
         if (customerDoc.exists) {  
           const customerData = customerDoc.data();  
             
           if (customerData.password === password) {  
-            // Check if phone is verified  
-            if (!customerData.phoneVerified) {  
-              showAlert('يجب تأكيد رقم الهاتف أولاً. جاري إرسال رمز التحقق...', 'info');  
+            // Check if email is verified  
+            if (!customerData.emailVerified) {  
+              showAlert('يجب تأكيد البريد الإلكتروني أولاً. جاري إرسال رمز التحقق...', 'info');  
                 
-              // Send verification code via Firebase
+              // Generate and send OTP
+              generatedOTP = generateOTP();
+              pendingCustomerData = { ...customerData, email: email };
+              
               try {
-                await sendSMSVerificationCode(phone);  
+// Show verification form BEFORE sending email
+document.getElementById('emailDisplay').textContent = email;
+showTab('verification');
+startResendTimer();
+
+// Try to send OTP
+try {
+  await sendOTPEmail(email, generatedOTP);
+  showAlert('تم إرسال رمز التحقق إلى بريدك الإلكتروني ✅', 'success');
+} catch (error) {
+  console.error('❌ فشل إرسال الإيميل:', error);
+  showAlert('فشل في إرسال رمز التحقق، لكن يمكنك المحاولة مرة أخرى بالضغط على "إعادة إرسال الرمز"', 'error');
+}
               } catch (error) {
                 showAlert('فشل في إرسال رمز التحقق: ' + error.message, 'error');
                 return;
               }
                 
-              // Store customer data temporarily  
-              pendingCustomerData = customerData;  
-                
               // Show verification form  
-              document.getElementById('phoneDisplay').textContent = phone;  
+              document.getElementById('emailDisplay').textContent = email;  
               showTab('verification');  
               startResendTimer();  
               return;  
             }  
               
-            // Store login info  
-           localStorage.setItem('customerLoggedIn', 'true');
-localStorage.setItem('customerPhone', phone);
-localStorage.setItem('customerName', customerData.name);
-localStorage.setItem('loginTime', new Date().toISOString());  
+            // Store login info in memory (not localStorage)
+            const loginData = {
+              customerLoggedIn: true,
+              customerEmail: email,
+              customerName: customerData.name,
+              loginTime: new Date().toISOString()
+            };
+            
+            // Store in session (you can use sessionStorage or a global variable)
+            window.customerSession = loginData;
               
             showAlert('تم تسجيل الدخول بنجاح! جاري التحويل إلى صفحة المهنيين...', 'success');  
               
@@ -1082,7 +1097,7 @@ localStorage.setItem('loginTime', new Date().toISOString());
             document.getElementById('loginPassword').focus();  
           }  
         } else {  
-          showAlert('الحساب غير موجود. يرجى التسجيل أولاً أو التحقق من رقم الهاتف', 'error');  
+          showAlert('الحساب غير موجود. يرجى التسجيل أولاً أو التحقق من البريد الإلكتروني', 'error');  
           showTab('register');  
         }  
   
@@ -1100,12 +1115,12 @@ localStorage.setItem('loginTime', new Date().toISOString());
       hideAlert();  
   
       const name = document.getElementById('registerName').value.trim();  
-      const phone = document.getElementById('registerPhone').value.trim();  
+      const email = document.getElementById('registerEmail').value.trim().toLowerCase();  
       const password = document.getElementById('registerPassword').value;  
       const confirmPassword = document.getElementById('confirmPassword').value;  
   
       // Validation  
-      if (!name || !phone || !password || !confirmPassword) {  
+      if (!name || !email || !password || !confirmPassword) {  
         showAlert('يرجى إدخال جميع البيانات المطلوبة', 'error');  
         return;  
       }  
@@ -1116,9 +1131,9 @@ localStorage.setItem('loginTime', new Date().toISOString());
         return;  
       }  
   
-      if (!phonePattern.test(phone)) {  
-        showAlert('رقم الهاتف يجب أن يبدأ بـ 07 ويتكون من 10 أرقام', 'error');  
-        document.getElementById('registerPhone').focus();  
+      if (!emailPattern.test(email)) {  
+        showAlert('يرجى إدخال بريد إلكتروني صحيح', 'error');  
+        document.getElementById('registerEmail').focus();  
         return;  
       }  
   
@@ -1137,44 +1152,61 @@ localStorage.setItem('loginTime', new Date().toISOString());
       showLoading(document.getElementById('registerForm'), true);  
   
       try {  
-        // Check if phone already exists  
-        const existingCustomer = await db.collection("customers").doc(phone).get();  
+        // Use email as document ID (replace dots with underscores for Firebase)
+        const emailKey = email.replace(/\./g, '_');
+        
+        // Check if email already exists  
+        const existingCustomer = await db.collection("customers").doc(emailKey).get();  
           
         if (existingCustomer.exists) {  
-          showAlert('رقم الهاتف مستخدم مسبقاً. يرجى تسجيل الدخول أو استخدام رقم آخر', 'error');  
+          showAlert('البريد الإلكتروني مستخدم مسبقاً. يرجى تسجيل الدخول أو استخدام بريد آخر', 'error');  
           showTab('login');  
-          document.getElementById('loginPhone').value = phone;  
+          document.getElementById('loginEmail').value = email;  
           return;  
         }  
   
         // Store customer data temporarily (without saving to database yet)  
         pendingCustomerData = {  
           name: name,  
-          phone: phone,  
+          email: email,  
           password: password,  
-          phoneVerified: false,  
+          emailVerified: false,  
           createdAt: new Date().toISOString(),  
           isActive: true,  
           preferences: {  
             notifications: true,  
-            emailUpdates: false  
+            emailUpdates: true  
           }  
         };  
   
-        // Send verification code via Firebase
+        // Generate and send OTP
+        generatedOTP = generateOTP();
+        
         try {
-          await sendSMSVerificationCode(phone);
+// Show verification form BEFORE sending email
+document.getElementById('emailDisplay').textContent = email;
+showTab('verification');
+startResendTimer();
+
+// Try to send OTP
+try {
+  await sendOTPEmail(email, generatedOTP);
+  showAlert('تم إرسال رمز التحقق إلى بريدك الإلكتروني ✅', 'success');
+} catch (error) {
+  console.error('❌ فشل إرسال الإيميل:', error);
+  showAlert('فشل في إرسال رمز التحقق، لكن يمكنك المحاولة مرة أخرى بالضغط على "إعادة إرسال الرمز"', 'error');
+}
         } catch (error) {
           showAlert('فشل في إرسال رمز التحقق: ' + error.message, 'error');
           return;
         }
   
         // Show verification form  
-        document.getElementById('phoneDisplay').textContent = phone;  
+        document.getElementById('emailDisplay').textContent = email;  
         showTab('verification');  
         startResendTimer();  
           
-        showAlert('تم إنشاء الحساب! يرجى تأكيد رقم هاتفك لإكمال التسجيل', 'success');  
+        showAlert('تم إنشاء الحساب! يرجى تأكيد بريدك الإلكتروني لإكمال التسجيل', 'success');  
   
       } catch (error) {  
         console.error('Registration error:', error);  
@@ -1184,7 +1216,7 @@ localStorage.setItem('loginTime', new Date().toISOString());
       }  
     }  
   
-    // Handle SMS verification  
+    // Handle OTP verification  
     async function handleVerification(e) {  
       e.preventDefault();  
       hideAlert();  
@@ -1202,7 +1234,7 @@ localStorage.setItem('loginTime', new Date().toISOString());
         return;  
       }  
   
-      if (!pendingCustomerData || !confirmationResult) {  
+      if (!pendingCustomerData || !generatedOTP) {  
         showAlert('حدث خطأ، يرجى المحاولة مرة أخرى', 'error');  
         return;  
       }  
@@ -1210,30 +1242,41 @@ localStorage.setItem('loginTime', new Date().toISOString());
       showLoading(document.getElementById('verificationForm'), true);  
   
       try {  
-        // التحقق من الرمز عبر Firebase
-        await confirmationResult.confirm(enteredCode);
+        // Verify OTP
+        if (enteredCode !== generatedOTP) {
+          showAlert('رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى', 'error');
+          document.getElementById('verificationCode').value = '';
+          document.getElementById('verificationCode').focus();
+          return;
+        }
         
         console.log('✅ تم التحقق من الرمز بنجاح');
         
-        // Update customer data to mark phone as verified  
-        pendingCustomerData.phoneVerified = true;  
+        // Update customer data to mark email as verified  
+        pendingCustomerData.emailVerified = true;  
         pendingCustomerData.verifiedAt = new Date().toISOString();  
   
-        // Save to database  
-        await db.collection("customers").doc(pendingCustomerData.phone).set({  
+        // Save to database
+        const emailKey = pendingCustomerData.email.replace(/\./g, '_');
+        await db.collection("customers").doc(emailKey).set({  
           ...pendingCustomerData,  
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),  
           verifiedAt: firebase.firestore.FieldValue.serverTimestamp(),  
           lastLogin: firebase.firestore.FieldValue.serverTimestamp()  
         });  
   
-        // Auto login after successful verification  
-       localStorage.setItem('customerLoggedIn', 'true');
-localStorage.setItem('customerPhone', pendingCustomerData.phone);
-localStorage.setItem('customerName', pendingCustomerData.name);
-localStorage.setItem('loginTime', new Date().toISOString());  
+        // Auto login after successful verification
+        const loginData = {
+          customerLoggedIn: true,
+          customerEmail: pendingCustomerData.email,
+          customerName: pendingCustomerData.name,
+          loginTime: new Date().toISOString()
+        };
+        
+        // Store in session
+        window.customerSession = loginData;
   
-        showAlert('تم تأكيد رقم الهاتف بنجاح! مرحباً بك، جاري التحويل إلى صفحة المهنيين...', 'success');  
+        showAlert('تم تأكيد البريد الإلكتروني بنجاح! مرحباً بك، جاري التحويل إلى صفحة المهنيين...', 'success');  
           
         // Clear timer  
         if (resendTimer) {  
@@ -1246,14 +1289,7 @@ localStorage.setItem('loginTime', new Date().toISOString());
   
       } catch (error) {  
         console.error('Verification error:', error);  
-        
-        if (error.code === 'auth/invalid-verification-code') {
-          showAlert('رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى', 'error');
-        } else if (error.code === 'auth/code-expired') {
-          showAlert('انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد', 'error');
-        } else {
-          showAlert('حدث خطأ أثناء التحقق: ' + error.message, 'error');
-        }
+        showAlert('حدث خطأ أثناء التحقق: ' + error.message, 'error');  
       } finally {  
         showLoading(document.getElementById('verificationForm'), false);  
       }  
@@ -1267,15 +1303,16 @@ localStorage.setItem('loginTime', new Date().toISOString());
       document.getElementById('verificationForm').addEventListener('submit', handleVerification);  
   
       // Real-time validation  
-      document.getElementById('loginPhone').addEventListener('input', formatAndValidatePhone);  
-      document.getElementById('registerPhone').addEventListener('input', formatAndValidatePhone);  
+      document.getElementById('loginEmail').addEventListener('input', validateEmail);  
+      document.getElementById('registerEmail').addEventListener('input', validateEmail);  
       document.getElementById('registerName').addEventListener('input', validateName);  
       document.getElementById('registerPassword').addEventListener('input', validatePassword);  
       document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);  
       document.getElementById('verificationCode').addEventListener('input', validateVerificationCode);  
   
-      // Check if user is already logged in  
-if (localStorage.getItem('customerLoggedIn') === 'true') {       const customerName = localStorage.getItem('customerName');  
+      // Check if user is already logged in
+      if (window.customerSession && window.customerSession.customerLoggedIn) {
+        const customerName = window.customerSession.customerName;
         showAlert(`مرحباً ${customerName}، أنت مسجل دخول بالفعل. جاري التحويل...`, 'info');  
         setTimeout(() => {  
           window.location.href = 'index.html';  
