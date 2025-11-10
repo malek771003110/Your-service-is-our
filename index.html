@@ -23,6 +23,39 @@
             overflow-x: hidden;
         }
 
+        /* تأثير hover على النجوم */
+.rating-input .star:hover ~ .star {
+    color: #ccc !important;
+}
+
+.rating-input .star:nth-child(1):hover ~ .star:nth-child(-n+1),
+.rating-input .star:nth-child(2):hover ~ .star:nth-child(-n+2),
+.rating-input .star:nth-child(3):hover ~ .star:nth-child(-n+3),
+.rating-input .star:nth-child(4):hover ~ .star:nth-child(-n+4),
+.rating-input .star:nth-child(5):hover ~ .star:nth-child(-n+5) {
+    color: #ffd700 !important;
+}
+
+
+/* رسالة توضيحية لعدد النجوم المختارة */
+.rating-selected-text {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #667eea;
+    min-height: 25px;
+    transition: all 0.3s ease;
+}
+
+.rating-selected-text.show {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
         
 
 select.form-control option {
@@ -30,16 +63,29 @@ select.form-control option {
     color: black;
 }
 
+/* نجوم التقييم */
 .rating-input .star {
-    color: #ccc; /* رمادي للنجوم غير المفعلة */
+    color: #ccc; /* لون رمادي للنجوم الغير المختارة */
     font-size: 3rem;
     cursor: pointer;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    display: inline-block;
 }
 
 .rating-input .star:hover,
 .rating-input .star.active {
-    color: #ffd700; /* ذهبي للنجوم المفعلة */
+    color: #ffd700; /* لون ذهبي للنجوم المختارة */
+    transform: scale(1.1); /* تأثير تكبير بسيط */
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* تأثير توهج */
+}
+
+/* تأثير إضافي لما الإيد تكون فوق النجوم */
+.rating-input:hover .star {
+    opacity: 0.7;
+}
+
+.rating-input:hover .star:hover {
+    opacity: 1;
 }
 
         /* Animated Background Particles */
@@ -1183,6 +1229,7 @@ select.form-control option {
     <!-- Rating Modal -->
     <div class="rating-modal" id="ratingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 1000; padding: 20px;">
         <div class="rating-modal-content" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 30px; padding: 40px; max-width: 450px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <div class="rating-selected-text" id="ratingSelectedText"></div>
             <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem;">تقييم المهني</h3>
             <p id="ratingProfessionalName" style="color: #666; margin-bottom: 20px;">اسم المهني</p>
             
@@ -1566,15 +1613,29 @@ select.form-control option {
             selectedRating = 0;
         }
 
-        function handleStarClick(e) {
-            if (e.target.classList.contains('star')) {
-                const rating = parseInt(e.target.dataset.rating);
-                selectedRating = rating;
-                updateStarDisplay(rating);
-            }
-        }
+       function handleStarClick(e) {
+    if (e.target.classList.contains('star')) {
+        const rating = parseInt(e.target.dataset.rating);
+        selectedRating = rating;
+        updateStarDisplay(rating);
+        
+        // عرض رسالة توضيحية
+        const ratingText = document.getElementById('ratingSelectedText');
+        const ratingTexts = [
+            '',
+            '⭐ تقييم ضعيف',
+            '⭐⭐ تقييم مقبول',
+            '⭐⭐⭐ تقييم جيد',
+            '⭐⭐⭐⭐ تقييم جيد جداً',
+            '⭐⭐⭐⭐⭐ تقييم ممتاز'
+        ];
+        
+        ratingText.textContent = ratingTexts[rating];
+        ratingText.classList.add('show');
+    }
+}
 
-       function updateStarDisplay(rating) {
+      function updateStarDisplay(rating) {
     const stars = elements.ratingStars.querySelectorAll('.star');
     stars.forEach((star, index) => {
         if (index < rating) {
