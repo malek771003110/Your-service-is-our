@@ -934,13 +934,16 @@ font-size: 14px !important;
     async function sendOTPEmail(email, otp, userName) {
       try {
         console.log('📧 جاري إرسال رمز التحقق إلى:', email);
+        console.log('🔑 رمز OTP:', otp);
         
+        // Template parameters - must match your EmailJS template variables
         const templateParams = {
-          to_email: email,
-          user_name: userName || 'عزيزي العميل',
-          otp: otp,
-          year: new Date().getFullYear()
+          to_email: email,           // البريد المستلم
+          user_name: userName || 'عزيزي العميل',  // اسم المستخدم
+          otp: otp                   // رمز التحقق
         };
+        
+        console.log('📤 محاولة إرسال البريد مع البيانات:', templateParams);
         
         const response = await emailjs.send(
           EMAILJS_CONFIG.SERVICE_ID,
@@ -948,16 +951,27 @@ font-size: 14px !important;
           templateParams
         );
         
+        console.log('✅ رد من EmailJS:', response);
+        
         if (response.status === 200) {
           console.log('✅ تم إرسال البريد بنجاح');
           return { success: true, messageId: response.text };
         } else {
-          throw new Error('فشل في إرسال رمز التحقق');
+          throw new Error('فشل في إرسال رمز التحقق - Status: ' + response.status);
         }
         
       } catch (error) {
         console.error('❌ خطأ في إرسال البريد:', error);
-        throw new Error('فشل في إرسال رمز التحقق. يرجى التحقق من اتصالك بالإنترنت');
+        
+        // معلومات تفصيلية عن الخطأ
+        if (error.text) {
+          console.error('📝 تفاصيل الخطأ:', error.text);
+          throw new Error('خطأ في الإرسال: ' + error.text);
+        } else if (error.message) {
+          throw new Error(error.message);
+        } else {
+          throw new Error('فشل في إرسال رمز التحقق. تحقق من إعدادات EmailJS');
+        }
       }
     }
   
