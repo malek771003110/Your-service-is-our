@@ -23,6 +23,25 @@
             overflow-x: hidden;
         }
 
+        
+
+select.form-control option {
+    background-color: white;
+    color: black;
+}
+
+.rating-input .star {
+    color: #ccc; /* رمادي للنجوم غير المفعلة */
+    font-size: 3rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.rating-input .star:hover,
+.rating-input .star.active {
+    color: #ffd700; /* ذهبي للنجوم المفعلة */
+}
+
         /* Animated Background Particles */
         .particles {
             position: fixed;
@@ -1259,21 +1278,27 @@
             }
         }
 
-        function updateUserStatus(isLoggedIn, userName = '') {
-            if (isLoggedIn) {
-                elements.userStatus.classList.remove('guest');
-                elements.userWelcome.textContent = `🔓 أهلاً ${userName} - يمكنك الآن تقييم المهنيين`;
-                elements.userAction.textContent = 'تسجيل خروج';
-                elements.userAction.onclick = logout;
-                elements.userAction.removeAttribute('href');
-            } else {
-                elements.userStatus.classList.add('guest');
-                elements.userWelcome.textContent = '🔒 زائر - يمكنك التصفح فقط';
-                elements.userAction.textContent = 'تسجيل الدخول';
-                elements.userAction.onclick = null;
-                elements.userAction.href = 'customer-auth-page.html';
-            }
-        }
+       function updateUserStatus(isLoggedIn, userName = '') {
+    if (isLoggedIn) {
+        elements.userStatus.classList.remove('guest');
+        elements.userWelcome.textContent = `🔓 أهلاً ${userName} - يمكنك الآن تقييم المهنيين`;
+        elements.userAction.textContent = 'تسجيل خروج';
+        elements.userAction.onclick = logout;
+        elements.userAction.removeAttribute('href');
+    } else {
+        elements.userStatus.classList.add('guest');
+        elements.userWelcome.textContent = '🔒 زائر - يمكنك التصفح فقط';
+        elements.userAction.textContent = 'تسجيل الدخول';
+        elements.userAction.onclick = null;
+        elements.userAction.href = 'customer-auth-page.html';
+    }
+
+    // ✅ إخفاء زر التسجيل العائم لما يكون مسجل دخول
+    const registerBanner = document.querySelector('.floating-register-banner');
+    if (registerBanner) {
+        registerBanner.style.display = isLoggedIn ? 'none' : 'flex';
+    }
+}
 
         function setupEventListeners() {
             elements.professionSearch.addEventListener('input', debounce(searchProfessionals, 300));
@@ -1549,16 +1574,18 @@
             }
         }
 
-        function updateStarDisplay(rating) {
-            const stars = elements.ratingStars.querySelectorAll('.star');
-            stars.forEach((star, index) => {
-                if (index < rating) {
-                    star.style.color = '#ffd700';
-                } else {
-                    star.style.color = '#e0e0e0';
-                }
-            });
+       function updateStarDisplay(rating) {
+    const stars = elements.ratingStars.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.style.color = '#ffd700';
+            star.classList.add('active');
+        } else {
+            star.style.color = '#ccc';
+            star.classList.remove('active');
         }
+    });
+}
 
         async function submitRating() {
             if (!currentUser || !currentRatingProfessional) {
