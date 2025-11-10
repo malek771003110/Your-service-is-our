@@ -638,6 +638,19 @@ font-size: 14px !important;
     </div>  
     <div id="registerEmailValidation" class="validation-message"></div>  
   </div>  
+
+  <div class="form-group">  
+    <label for="registerPhone">رقم الهاتف</label>  
+    <div class="input-wrapper">  
+      <span class="input-icon">📱</span>  
+      <input type="tel" id="registerPhone" class="form-input" placeholder="07XXXXXXXX" required pattern="07[0-9]{8}" maxlength="10">  
+    </div>  
+    <div class="form-help">  
+      <span>💡</span>  
+      <span>أدخل رقم هاتفك الأردني (10 أرقام)</span>  
+    </div>  
+    <div id="registerPhoneValidation" class="validation-message"></div>  
+  </div>
   
   <div class="form-group">  
     <label for="registerPassword">كلمة المرور</label>  
@@ -736,7 +749,7 @@ font-size: 14px !important;
     // إعدادات EmailJS - ضع بياناتك هنا
     // ==========================================
     const EMAILJS_CONFIG = {
-      PUBLIC_KEY: 'd0B6uRTE4nuR51KAw',      // ضع Public Key من EmailJS
+      PUBLIC_KEY: 'd0B6uRTE4nuR51KA',      // ضع Public Key من EmailJS
       SERVICE_ID: 'service_x9xl00a',      // ضع Service ID من EmailJS
       TEMPLATE_ID: 'template_yrncdau'     // ضع Template ID من EmailJS
     };
@@ -762,7 +775,8 @@ font-size: 14px !important;
     // Form validation patterns  
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  
     const namePattern = /^[\u0600-\u06FFa-zA-Z\s]{2,50}$/;  
-    const codePattern = /^\d{6}$/;  
+    const codePattern = /^\d{6}$/;
+    const phonePattern = /^07[0-9]{8}$/;  
   
     // Global variables  
     let pendingCustomerData = null;  
@@ -1071,10 +1085,11 @@ font-size: 14px !important;
               return;  
             }  
               
-            sessionStorage.setItem('customerLoggedIn', 'true');
-            sessionStorage.setItem('customerEmail', email);
-            sessionStorage.setItem('customerName', customerData.name);
-            sessionStorage.setItem('loginTime', new Date().toISOString());
+            localStorage.setItem('customerLoggedIn', 'true');
+            localStorage.setItem('customerEmail', email);
+            localStorage.setItem('customerName', customerData.name);
+            localStorage.setItem('customerPhone', customerData.phone || email);
+            localStorage.setItem('loginTime', new Date().toISOString());
               
             showAlert('تم تسجيل الدخول بنجاح! جاري التحويل إلى صفحة المهنيين...', 'success');  
               
@@ -1233,10 +1248,11 @@ font-size: 14px !important;
           lastLogin: firebase.firestore.FieldValue.serverTimestamp()  
         });  
   
-        sessionStorage.setItem('customerLoggedIn', 'true');
-        sessionStorage.setItem('customerEmail', pendingCustomerData.email);
-        sessionStorage.setItem('customerName', pendingCustomerData.name);
-        sessionStorage.setItem('loginTime', new Date().toISOString());
+        localStorage.setItem('customerLoggedIn', 'true');
+        localStorage.setItem('customerEmail', pendingCustomerData.email);
+        localStorage.setItem('customerName', pendingCustomerData.name);
+        localStorage.setItem('customerPhone', pendingCustomerData.phone || pendingCustomerData.email);
+        localStorage.setItem('loginTime', new Date().toISOString());
   
         showAlert('تم تأكيد البريد الإلكتروني بنجاح! مرحباً بك، جاري التحويل إلى صفحة المهنيين...', 'success');  
           
@@ -1269,8 +1285,8 @@ font-size: 14px !important;
       document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);  
       document.getElementById('verificationCode').addEventListener('input', validateVerificationCode);  
   
-      if (sessionStorage.getItem('customerLoggedIn') === 'true') {
-        const customerName = sessionStorage.getItem('customerName');
+      if (localStorage.getItem('customerLoggedIn') === 'true') {
+        const customerName = localStorage.getItem('customerName');
         showAlert(`مرحباً ${customerName}، أنت مسجل دخول بالفعل. جاري التحويل...`, 'info');  
         setTimeout(() => {  
           window.location.href = 'index.html';  
