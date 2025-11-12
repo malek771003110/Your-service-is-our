@@ -1257,29 +1257,47 @@
             };
         }
 
-       async function checkUserExists(nationalId) {
+      async function checkUserExists(nationalId) {
 try {
-// Check in all collections
-const collections = ['approvedUsers', 'pendingUsers', 'rejectedUsers'];
+// Check in approved users
+const approvedRef = doc(db, "approvedUsers", nationalId);
+const approvedSnap = await getDoc(approvedRef);
 
-    for (const collectionName of collections) {
-        const docRef = doc(db, collectionName, nationalId);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-            let message = '';
-            if (collectionName === 'approvedUsers') {
-                message = "هذا الرقم الوطني مسجل بالفعل كمستخدم مقبول.";
-            } else if (collectionName === 'pendingUsers') {
-                message = "يوجد طلب قيد المراجعة بهذا الرقم الوطني.";
-            } else {
-                message = "تم رفض طلب سابق بهذا الرقم. يمكنك التواصل مع الإدارة.";
-            }
-            return { exists: true, message };
-        }
+    if (approvedSnap.exists()) {
+        return { 
+            exists: true, 
+            message: "هذا الرقم الوطني مسجل بالفعل كمستخدم مقبول ونشط في النظام." 
+        };
     }
 
-    return { exists: false };
+    // Check in pending users
+    const pendingRef = doc(db, "pendingUsers", nationalId);
+    const pendingSnap = await getDoc(pendingRef);
+    
+    if (pendingSnap.exists()) {
+        return { 
+            exists: true, 
+            message: "يوجد طلب قيد المراجعة بهذا الرقم الوطني. يرجى الانتظار حتى تتم المراجعة." 
+        };
+    }
+
+    // Check in rejected users - but allow resubmission
+    const rejectedRef = doc(db, "rejectedUsers", nationalId);
+    const rejectedSnap = await getDoc(rejectedRef);
+    
+    if (rejectedSnap.exists()) {
+        const rejectedData = rejectedSnap.data();
+        // Return info about previous rejection but don't block
+        return { 
+            exists: false, 
+            wasRejected: true,
+            previousReason: rejectedData.reason || 'غير محدد',
+            message: null 
+        };
+    }
+
+    return { exists: false, wasRejected: false };
+    
 } catch (error) {
     console.error("Error checking existing user:", error);
     throw new Error("خطأ في التحقق من البيانات");
@@ -1287,6 +1305,8 @@ const collections = ['approvedUsers', 'pendingUsers', 'rejectedUsers'];
 
 
 }
+
+
 
         async function submitToFirebase(formData) {
             const userData = {
