@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
+<link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="iconsicon.png">
     <meta name="google-site-verification" content="abc123xyz" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1877,8 +1878,17 @@ select.form-control option {
 
         console.log('✅ الصفحة الرئيسية جاهزة مع التصميم العصري');
     </script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/Your-service-is-our/service-worker.js");
+  }
+</script>
+
+    
 </body>
 </html>
+
 
 
 
