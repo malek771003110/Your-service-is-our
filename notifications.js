@@ -1,9 +1,9 @@
 // notifications.js
-// ضع هذا الملف في مجلد js/
+// 🔧 الجزء المهم: تسجيل Service Worker بالمسار الصحيح
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-messaging.js";
-import { getFirestore, doc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
@@ -18,8 +18,8 @@ const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 const db = getFirestore(app);
 
-// VAPID Key من Firebase Console -> Project Settings -> Cloud Messaging -> Web Push certificates
-const VAPID_KEY = "YOUR_VAPID_KEY_HERE"; // ⚠️ استبدل هذا بمفتاحك من Firebase
+// ⚠️ استبدل هذا بمفتاچك من Firebase
+const VAPID_KEY = "YOUR_VAPID_KEY_HERE";
 
 class NotificationManager {
   constructor() {
@@ -27,13 +27,14 @@ class NotificationManager {
     this.permission = this.isSupported ? Notification.permission : 'denied';
     this.token = null;
     this.userId = null;
-    this.userType = null; // 'customer' or 'professional'
+    this.userType = null;
   }
 
-  // ✅ تهيئة نظام الإشعارات
   async initialize(userId, userType) {
+    console.log('🔔 تهيئة نظام الإشعارات...');
+    
     if (!this.isSupported) {
-      console.warn('⚠️ Push notifications not supported in this browser');
+      console.warn('⚠️ المتصفح لا يدعم الإشعارات');
       return { success: false, error: 'not_supported' };
     }
 
@@ -41,75 +42,65 @@ class NotificationManager {
     this.userType = userType;
 
     try {
-      // Register service worker
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-      console.log('✅ Service Worker registered:', registration);
+      // ✅ المسار الصحيح لـ Service Worker
+      const registration = await navigator.serviceWorker.register(
+        '/Your-service-is-our/firebase-messaging-sw.js',
+        { scope: '/Your-service-is-our/' }
+      );
+      console.log('✅ Service Worker مسجل:', registration);
 
-      // Request notification permission
-      const permission = await this.requestPermission();
+      const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
+        console.warn('⚠️ المستخدم رفض الإشعارات');
         return { success: false, error: 'permission_denied' };
       }
+      console.log('✅ تم منح إذن الإشعارات');
 
-      // Get FCM token
-      const token = await this.getOrCreateToken(registration);
-      if (!token) {
-        return { success: false, error: 'token_failed' };
-      }
+      // انتظر Service Worker يصير active
+      await this.waitForServiceWorker(registration);
 
-      // Save token to Firestore
-      await this.saveTokenToFirestore(token);
-
-      // Setup foreground message handler
-      this.setupForegroundHandler();
-
-      console.log('✅ Notifications initialized successfully');
-      return { success: true, token };
-
-    } catch (error) {
-      console.error('❌ Notification initialization failed:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // 🔔 طلب إذن الإشعارات
-  async requestPermission() {
-    if (this.permission === 'granted') {
-      return 'granted';
-    }
-
-    try {
-      this.permission = await Notification.requestPermission();
-      return this.permission;
-    } catch (error) {
-      console.error('❌ Permission request failed:', error);
-      return 'denied';
-    }
-  }
-
-  // 🎫 الحصول على Token
-  async getOrCreateToken(registration) {
-    try {
-      const currentToken = await getToken(messaging, {
+      const token = await getToken(messaging, {
         vapidKey: VAPID_KEY,
         serviceWorkerRegistration: registration
       });
 
-      if (currentToken) {
-        console.log('✅ FCM Token:', currentToken);
-        this.token = currentToken;
-        return currentToken;
-      } else {
-        console.warn('⚠️ No registration token available');
-        return null;
+      if (!token) {
+        return { success: false, error: 'no_token' };
       }
+
+      console.log('✅ FCM Token:', token);
+      this.token = token;
+
+      await this.saveTokenToFirestore(token);
+      this.setupForegroundHandler();
+
+      return { success: true, token };
+
     } catch (error) {
-      console.error('❌ Token generation failed:', error);
-      return null;
+      console.error('❌ خطأ في التهيئة:', error);
+      return { success: false, error: error.message };
     }
   }
 
-  // 💾 حفظ Token في Firestore
+  async waitForServiceWorker(registration) {
+    return new Promise((resolve) => {
+      if (registration.active) {
+        resolve();
+      } else {
+        const sw = registration.installing || registration.waiting;
+        if (sw) {
+          sw.addEventListener('statechange', (e) => {
+            if (e.target.state === 'activated') {
+              resolve();
+            }
+          });
+        } else {
+          resolve();
+        }
+      }
+    });
+  }
+
   async saveTokenToFirestore(token) {
     try {
       const collection = this.userType === 'customer' ? 'customers' : 'approvedUsers';
@@ -118,46 +109,32 @@ class NotificationManager {
       await updateDoc(userRef, {
         fcmToken: token,
         fcmTokenUpdatedAt: serverTimestamp(),
-        notificationsEnabled: true,
-        deviceInfo: {
-          userAgent: navigator.userAgent,
-          platform: navigator.platform,
-          language: navigator.language
-        }
+        notificationsEnabled: true
       });
 
-      console.log('✅ Token saved to Firestore');
+      console.log('✅ Token محفوظ في Firestore');
     } catch (error) {
-      console.error('❌ Failed to save token:', error);
-      throw error;
+      console.error('❌ فشل حفظ Token:', error);
     }
   }
 
-  // 📱 معالج الرسائل في الواجهة الأمامية (Foreground)
   setupForegroundHandler() {
     onMessage(messaging, (payload) => {
-      console.log('📩 Foreground message received:', payload);
+      console.log('📩 إشعار وارد:', payload);
 
-      const { title, body, icon } = payload.notification;
-      const data = payload.data || {};
+      const { title, body } = payload.notification;
+      this.showInAppNotification(title, body, payload.data);
 
-      // عرض إشعار مخصص في الصفحة
-      this.showInAppNotification(title, body, data);
-
-      // يمكن أيضاً عرض notification عادي
-      if (this.permission === 'granted') {
+      if (Notification.permission === 'granted') {
         new Notification(title, {
           body,
-          icon: icon || '/icon-192x192.png',
-          badge: '/badge-72x72.png',
-          tag: data.type || 'general',
-          data
+          icon: '/Your-service-is-our/icons/icon-192x192.png',
+          badge: '/Your-service-is-our/icons/badge-72x72.png'
         });
       }
     });
   }
 
-  // 🎨 عرض إشعار داخل التطبيق
   showInAppNotification(title, body, data) {
     const notification = document.createElement('div');
     notification.className = 'in-app-notification';
@@ -174,90 +151,18 @@ class NotificationManager {
 
     document.body.appendChild(notification);
 
-    // Auto remove after 5 seconds
     setTimeout(() => {
       notification.classList.add('fade-out');
       setTimeout(() => notification.remove(), 300);
     }, 5000);
 
-    // Close button
     notification.querySelector('.notification-close').addEventListener('click', () => {
-      notification.classList.add('fade-out');
-      setTimeout(() => notification.remove(), 300);
+      notification.remove();
     });
-
-    // Click to navigate
-    if (data.url) {
-      notification.style.cursor = 'pointer';
-      notification.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('notification-close')) {
-          window.location.href = data.url;
-        }
-      });
-    }
-  }
-
-  // 📤 إرسال إشعار (من جانب الإدارة أو الخادم)
-  static async sendNotification(recipientId, recipientType, notificationData) {
-    try {
-      // في الواقع، يجب إرسال هذا من الخادم (Backend)
-      // هنا مثال على البيانات المطلوبة
-
-      const payload = {
-        to: recipientId, // FCM Token أو User ID
-        notification: {
-          title: notificationData.title,
-          body: notificationData.body,
-          icon: notificationData.icon || '/icon-192x192.png',
-          click_action: notificationData.url || '/'
-        },
-        data: {
-          type: notificationData.type || 'general',
-          url: notificationData.url || '/',
-          ...notificationData.additionalData
-        }
-      };
-
-      // ⚠️ هذا يجب أن يتم من خلال Cloud Functions أو Backend
-      console.log('📤 Notification payload:', payload);
-      
-      // حفظ الإشعار في Firestore للسجل
-      await setDoc(doc(db, 'notifications', `${recipientId}_${Date.now()}`), {
-        recipientId,
-        recipientType,
-        ...notificationData,
-        createdAt: serverTimestamp(),
-        read: false
-      });
-
-      return { success: true };
-    } catch (error) {
-      console.error('❌ Send notification failed:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // 🔕 تعطيل الإشعارات
-  async disableNotifications() {
-    try {
-      const collection = this.userType === 'customer' ? 'customers' : 'approvedUsers';
-      const userRef = doc(db, collection, this.userId);
-
-      await updateDoc(userRef, {
-        notificationsEnabled: false,
-        fcmTokenDisabledAt: serverTimestamp()
-      });
-
-      console.log('✅ Notifications disabled');
-      return { success: true };
-    } catch (error) {
-      console.error('❌ Failed to disable notifications:', error);
-      return { success: false, error: error.message };
-    }
   }
 }
 
-// إضافة الأنماط للإشعارات داخل التطبيق
+// CSS للإشعارات
 const style = document.createElement('style');
 style.textContent = `
   .in-app-notification {
@@ -287,7 +192,6 @@ style.textContent = `
 
   .notification-icon {
     font-size: 24px;
-    flex-shrink: 0;
   }
 
   .notification-text {
@@ -305,7 +209,6 @@ style.textContent = `
     color: #7f8c8d;
     font-size: 14px;
     margin: 0;
-    line-height: 1.4;
   }
 
   .notification-close {
@@ -314,48 +217,18 @@ style.textContent = `
     font-size: 24px;
     color: #95a5a6;
     cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    transition: color 0.2s;
-  }
-
-  .notification-close:hover {
-    color: #e74c3c;
   }
 
   @keyframes slideIn {
-    from {
-      transform: translateX(400px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
   }
 
   @keyframes slideOut {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(400px);
-      opacity: 0;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .in-app-notification {
-      top: 10px;
-      right: 10px;
-      left: 10px;
-      min-width: auto;
-      max-width: none;
-    }
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(400px); opacity: 0; }
   }
 `;
 document.head.appendChild(style);
 
-// تصدير الكلاس
 export default NotificationManager;
