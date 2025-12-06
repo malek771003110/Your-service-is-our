@@ -766,7 +766,7 @@
         }
 
         // Global Functions
-        window.acceptRequest = async function(nationalId) {
+       window.acceptRequest = async function(nationalId) {
             if (confirm('هل أنت متأكد من قبول هذا الطلب؟')) {
                 try {
                     showMessage('معالجة', 'جاري قبول الطلب...', 'success');
@@ -787,6 +787,15 @@
                         // Remove from pending users
                         await deleteDoc(doc(db, "pendingUsers", nationalId));
                         
+                        // 🔔 إرسال إشعار للمهني
+                        if (userData.fcmToken) {
+                            await sendNotificationToUser(userData.fcmToken, {
+                                title: '🎉 تم قبول طلبك!',
+                                body: `مبروك ${userData.name}! أنت الآن جزء من شبكة المهنيين`,
+                                url: '/Your-service-is-our/profile.html'
+                            });
+                        }
+                        
                         showMessage('نجح', 'تم قبول الطلب بنجاح!', 'success');
                         await loadAllData();
                         renderRequests();
@@ -796,6 +805,13 @@
                     showMessage('خطأ', 'فشل في قبول الطلب', 'error');
                 }
             }
+        }
+
+        // دالة إرسال الإشعارات (تحتاج Firebase Cloud Functions)
+        async function sendNotificationToUser(fcmToken, notification) {
+            // هذه الدالة تحتاج Firebase Cloud Functions
+            // يمكن تفعيلها لاحقاً من Firebase Console
+            console.log('📤 إرسال إشعار:', notification);
         }
 
         window.rejectRequest = async function(nationalId) {
