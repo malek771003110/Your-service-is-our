@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المحادثات - خدمات منزلية</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    .chat-container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-user-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .chat-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 15px;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.sent {
+      justify-content: flex-end;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 18px;
+    }
+
+    .message.received .message-bubble {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .message.sent .message-bubble {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .message-time {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .chat-input-area {
+      background: white;
+      border-top: 1px solid #e1e8ed;
+      padding: 15px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .message-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e1e8ed;
+      border-radius: 25px;
+      font-size: 14px;
+    }
+
+    .message-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .send-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .send-btn:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #95a5a6;
+      padding: 40px;
+    }
+
+    .empty-state .icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-user-info">
+        <div class="chat-avatar" id="chatAvatar">?</div>
+        <div>
+          <h3 id="chatUserName">جاري التحميل...</h3>
+          <div style="font-size: 12px; opacity: 0.9;">متصل الآن</div>
+        </div>
+      </div>
+      <a href="index.html" class="back-btn">← رجوع</a>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-state">
+        <div class="icon">💬</div>
+        <h3>ابدأ المحادثة</h3>
+        <p>أرسل رسالتك الأولى</p>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="input-wrapper">
+        <input type="text" class="message-input" id="messageInput" placeholder="اكتب رسالتك...">
+        <button class="send-btn" id="sendBtn" disabled>✉️</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+    import { 
+      getDatabase, 
+      ref, 
+      push, 
+      set,
+      onValue,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
+      authDomain: "home-services-app-a9c5e.firebaseapp.com",
+      projectId: "home-services-app-a9c5e",
+      storageBucket: "home-services-app-a9c5e.appspot.com",
+      messagingSenderId: "287028219636",
+      appId: "1:287028219636:web:2ad4b0e092a2c007e318a1",
+      databaseURL: "https://home-services-app-a9c5e-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const rtdb = getDatabase(app);
+
+    let currentUser = { id: null, name: null };
+    let conversationId = null;
+    let otherUserName = 'مستخدم';
+
+    // تحقق من تسجيل الدخول
+    function checkAuth() {
+      const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+      const professionalLoggedIn = localStorage.getItem('loggedNationalId');
+
+      if (customerLoggedIn === 'true') {
+        currentUser.id = localStorage.getItem('customerEmail').replace(/\./g, '_');
+        currentUser.name = localStorage.getItem('customerName');
+      } else if (professionalLoggedIn) {
+        currentUser.id = professionalLoggedIn;
+        currentUser.name = 'مهني';
+      } else {
+        alert('يجب تسجيل الدخول أولاً');
+        window.location.href = 'index.html';
+        return false;
+      }
+      return true;
+    }
+
+    // الحصول على معلومات المحادثة من URL
+    function getConversationInfo() {
+      const params = new URLSearchParams(window.location.search);
+      conversationId = params.get('conversation');
+      otherUserName = params.get('with') || 'مستخدم';
+
+      if (!conversationId) {
+        alert('خطأ في المحادثة');
+        window.location.href = 'index.html';
+        return false;
+      }
+
+      document.getElementById('chatUserName').textContent = otherUserName;
+      document.getElementById('chatAvatar').textContent = otherUserName.charAt(0);
+      return true;
+    }
+
+    // تحميل الرسائل
+    function loadMessages() {
+      const messagesRef = ref(rtdb, `messages/${conversationId}`);
+      
+      onValue(messagesRef, (snapshot) => {
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+
+        if (!snapshot.exists()) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="icon">💬</div>
+              <h3>ابدأ المحادثة</h3>
+              <p>أرسل رسالتك الأولى</p>
+            </div>
+          `;
+          return;
+        }
+
+        snapshot.forEach((child) => {
+          const message = child.val();
+          const messageEl = createMessageElement(message);
+          container.appendChild(messageEl);
+        });
+
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+
+    // إنشاء عنصر رسالة
+    function createMessageElement(message) {
+      const div = document.createElement('div');
+      div.className = `message ${message.senderId === currentUser.id ? 'sent' : 'received'}`;
+      
+      const time = message.timestamp ? new Date(message.timestamp).toLocaleTimeString('ar-SA', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : '';
+
+      div.innerHTML = `
+        <div class="message-bubble">
+          <div>${escapeHtml(message.content)}</div>
+          <div class="message-time">${time}</div>
+        </div>
+      `;
+
+      return div;
+    }
+
+    // إرسال رسالة
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const content = input.value.trim();
+      
+      if (!content) return;
+
+      const messagesRef = ref(rtdb, `messages/${conversationId}`);
+      const newMessageRef = push(messagesRef);
+
+      try {
+        await set(newMessageRef, {
+          senderId: currentUser.id,
+          senderName: currentUser.name,
+          content: content,
+          timestamp: serverTimestamp(),
+          read: false
+        });
+
+        input.value = '';
+        document.getElementById('sendBtn').disabled = true;
+
+      } catch (error) {
+        console.error('خطأ في الإرسال:', error);
+        alert('فشل إرسال الرسالة');
+      }
+    }
+
+    // إعداد واجهة الإدخال
+    function setupInput() {
+      const input = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+
+      input.addEventListener('input', () => {
+        sendBtn.disabled = !input.value.trim();
+      });
+
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && input.value.trim()) {
+          sendMessage();
+        }
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // البدء
+    if (checkAuth() && getConversationInfo()) {
+      loadMessages();
+      setupInput();
+    }
+  </script>
+</body>
+</html>

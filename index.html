@@ -1127,6 +1127,42 @@ select.form-control option {
         font-size: 2rem;
     }
 }
+
+.notification-toggle-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    margin: 10px auto;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+  }
+
+  .notification-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+  }
+
+  .notification-toggle-btn.active {
+    background: linear-gradient(45deg, #27ae60, #2ecc71);
+  }
+
+
+
+
+  .btn-chat {
+  background: linear-gradient(45deg, #3498db, #2980b9);
+  color: white;
+  box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+}
+
     </style>
 </head>
 <body>
@@ -1156,6 +1192,10 @@ select.form-control option {
                 <div class="user-info">
                     <span id="userWelcome">🔓 زائر - يمكنك التصفح فقط</span>
                 </div>
+                <button id="notificationBtn" class="notification-toggle-btn" style="display: none;" onclick="toggleNotifications()">
+  <span id="notificationIcon">🔔</span>
+  <span id="notificationText">تفعيل الإشعارات</span>
+</button>
                 <a href="customer-auth-page.html" class="login-btn" id="userAction">تسجيل الدخول</a>
             </div>
 
@@ -1472,15 +1512,15 @@ select.form-control option {
             const displayPhone = isLoggedIn ? professional.phone : maskPhone(professional.phone);
             const starsDisplay = generateStarsDisplay(professional.ratings.averageRating);
             
-            card.innerHTML = `
-                <div class="professional-header">
-                    <div class="professional-avatar">${avatarLetter}</div>
-                    <div class="professional-info">
-                        <h3>${professional.name}</h3>
-                        <div class="profession">${professional.job}</div>
-                        <div class="location">📍 ${professional.city}</div>
-                    </div>
-                </div>
+           card.innerHTML = `
+  <div class="professional-header">
+    <div class="professional-avatar">${avatarLetter}</div>
+    <div class="professional-info">
+      <h3>${professional.name}</h3>
+      <div class="profession">${professional.job}</div>
+      <div class="location">📍 ${professional.city}</div>
+    </div>
+  </div>
                 
                 <div class="rating-section">
                     <div class="rating-display">
@@ -1519,17 +1559,17 @@ select.form-control option {
                     </div>
                 </div>
                 
-                <div class="professional-actions">
-                    ${isLoggedIn ? `
-                        <button class="action-btn btn-rate" onclick="openRatingModal('${professional.id}', '${professional.name}')">⭐ تقييم</button>
-                        <button class="action-btn btn-call" onclick="callProfessional('${professional.phone}')">📞 اتصال</button>
-                        <button class="action-btn btn-whatsapp" onclick="whatsappProfessional('${professional.phone}')">💬 واتساب</button>
-                    ` : `
-                        <a href="customer-auth-page.html" class="action-btn btn-login">🔐 سجل دخولك للتواصل والتقييم</a>
-                    `}
-                </div>
-            `;
-
+                 <div class="professional-actions">
+    ${isLoggedIn ? `
+      <button class="action-btn btn-rate" onclick="openRatingModal('${professional.id}', '${professional.name}')">⭐ تقييم</button>
+      <button class="action-btn btn-chat" onclick="startChat('${professional.id}', '${professional.name}')">💬 محادثة</button>
+      <button class="action-btn btn-call" onclick="callProfessional('${professional.phone}')">📞 اتصال</button>
+      <button class="action-btn btn-whatsapp" onclick="whatsappProfessional('${professional.phone}')">💬 واتساب</button>
+    ` : `
+      <a href="customer-auth-page.html" class="action-btn btn-login">🔐 سجل دخولك للتواصل والتقييم</a>
+    `}
+  </div>
+`;
             return card;
         }
 
@@ -1875,12 +1915,167 @@ select.form-control option {
         }
 
         console.log('✅ الصفحة الرئيسية جاهزة مع التصميم العصري');
+
+
+
+window.startChat = function(professionalId, professionalName) {
+  const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+  
+  if (customerLoggedIn !== 'true') {
+    alert('يجب تسجيل الدخول أولاً');
+    window.location.href = 'customer-auth-page.html';
+    return;
+  }
+
+  const customerEmail = localStorage.getItem('customerEmail');
+  const customerId = customerEmail.replace(/\./g, '_');
+  
+  // إنشاء معرف فريد للمحادثة
+  const conversationId = [customerId, professionalId].sort().join('_');
+  
+  // الانتقال لصفحة المحادثة
+  window.location.href = `chat-page.html?conversation=${conversationId}&with=${encodeURIComponent(professionalName)}`;
+}
+
     </script>
+
+
+
+<script type="module">
+  // 🔔 نظام الإشعارات
+import NotificationManager from './notifications.js';
+  
+  const notificationManager = new NotificationManager();
+  let notificationsEnabled = false;
+
+  // إظهار الزر للمستخدمين المسجلين فقط
+  function checkAndShowNotificationButton() {
+    const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+    const professionalLoggedIn = localStorage.getItem('loggedNationalId');
+    
+    if (customerLoggedIn === 'true' || professionalLoggedIn) {
+      document.getElementById('notificationBtn').style.display = 'flex';
+      
+      // تحقق من حالة الإشعارات
+      if (Notification.permission === 'granted') {
+        updateNotificationButton(true);
+      }
+    }
+  }
+
+  window.toggleNotifications = async function() {
+    const btn = document.getElementById('notificationBtn');
+    const icon = document.getElementById('notificationIcon');
+    const text = document.getElementById('notificationText');
+
+    if (notificationsEnabled) {
+      // تعطيل الإشعارات
+      notificationsEnabled = false;
+      btn.classList.remove('active');
+      icon.textContent = '🔕';
+      text.textContent = 'الإشعارات معطلة';
+      
+      setTimeout(() => {
+        icon.textContent = '🔔';
+        text.textContent = 'تفعيل الإشعارات';
+      }, 2000);
+      
+      return;
+    }
+
+    // تفعيل الإشعارات
+    btn.disabled = true;
+    text.textContent = 'جاري التفعيل...';
+
+    let userId, userType;
+    
+    const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+    if (customerLoggedIn === 'true') {
+      userId = localStorage.getItem('customerEmail').replace(/\./g, '_');
+      userType = 'customer';
+    } else {
+      userId = localStorage.getItem('loggedNationalId');
+      userType = 'professional';
+    }
+
+    const result = await notificationManager.initialize(userId, userType);
+
+    if (result.success) {
+      notificationsEnabled = true;
+      updateNotificationButton(true);
+      
+      // إظهار رسالة نجاح
+      showSuccessMessage('✅ تم تفعيل الإشعارات بنجاح!');
+    } else {
+      showErrorMessage('❌ فشل تفعيل الإشعارات: ' + result.error);
+      btn.disabled = false;
+      text.textContent = 'تفعيل الإشعارات';
+    }
+  }
+
+  function updateNotificationButton(enabled) {
+    const btn = document.getElementById('notificationBtn');
+    const icon = document.getElementById('notificationIcon');
+    const text = document.getElementById('notificationText');
+    
+    btn.disabled = false;
+    btn.classList.add('active');
+    icon.textContent = '✅';
+    text.textContent = 'الإشعارات مفعلة';
+    notificationsEnabled = true;
+  }
+
+  function showSuccessMessage(message) {
+    const div = document.createElement('div');
+    div.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 50%;
+      transform: translateX(50%);
+      background: linear-gradient(45deg, #27ae60, #2ecc71);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 25px;
+      box-shadow: 0 10px 40px rgba(39, 174, 96, 0.4);
+      z-index: 10001;
+      font-weight: 600;
+      animation: slideDown 0.5s ease-out;
+    `;
+    div.textContent = message;
+    document.body.appendChild(div);
+    
+    setTimeout(() => div.remove(), 3000);
+  }
+
+  function showErrorMessage(message) {
+    alert(message);
+  }
+
+  // تشغيل عند تحميل الصفحة
+  document.addEventListener('DOMContentLoaded', function() {
+    checkAndShowNotificationButton();
+  });
+
+  // إضافة الأنيميشن
+  const animationStyle = document.createElement('style');
+  animationStyle.textContent = `
+    @keyframes slideDown {
+      from {
+        transform: translateX(50%) translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(50%) translateY(0);
+        opacity: 1;
+      }
+    }
+  `;
+  document.head.appendChild(animationStyle);
+  </script>
 
     
 </body>
 </html>
-
 
 
 
