@@ -19,7 +19,7 @@ const messaging = getMessaging(app);
 const db = getFirestore(app);
 
 // ⚠️ استبدل هذا بمفتاچك من Firebase
-const VAPID_KEY = "YOUR_VAPID_KEY_HERE";
+const VAPID_KEY = "BLYG3ZcUi_Tf9t6cH7dRkAOJE-KEUk2bXL7AE4rta-4lTr_U5UfEr_eS0MAjvAHlqs_3ni0KALoRspUyRdN0aVE";
 
 class NotificationManager {
   constructor() {
@@ -232,3 +232,4 @@ style.textContent = `
 document.head.appendChild(style);
 
 export default NotificationManager;
+
