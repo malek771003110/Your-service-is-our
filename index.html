@@ -1163,6 +1163,10 @@ select.form-control option {
   box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
 }
 
+
+
+
+
     </style>
 </head>
 <body>
@@ -1743,6 +1747,13 @@ select.form-control option {
 
                 await setDoc(doc(db, "ratings", ratingId), ratingData);
 
+
+                // 🔔 إرسال إشعار للمهني
+        await sendNotificationToProfessional(
+            currentRatingProfessional,
+            '⭐ تقييم جديد!',
+            `${currentUser.name} قام بتقييمك بـ ${selectedRating} نجوم`
+        );
                 alert('تم إرسال تقييمك بنجاح! شكراً لك');
                 closeRatingModal();
                 
@@ -1935,12 +1946,37 @@ window.startChat = function(professionalId, professionalName) {
 
 
 
+// استبدل script الإشعارات في index.html بهذا:
+
 <script type="module">
-  // 🔔 نظام الإشعارات
-import NotificationManager from './notifications.js';
+  import NotificationManager from './notifications.js';
   
   const notificationManager = new NotificationManager();
   let notificationsEnabled = false;
+  let currentUserId = null;
+
+  // 🔑 مفتاح LocalStorage
+  function getNotificationStateKey() {
+    const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+    if (customerLoggedIn === 'true') {
+      return `notifications_enabled_${localStorage.getItem('customerEmail')}`;
+    } else {
+      return `notifications_enabled_${localStorage.getItem('loggedNationalId')}`;
+    }
+  }
+
+  // 📥 تحميل حالة الإشعارات من LocalStorage
+  function loadNotificationState() {
+    const key = getNotificationStateKey();
+    const savedState = localStorage.getItem(key);
+    return savedState === 'true';
+  }
+
+  // 💾 حفظ حالة الإشعارات في LocalStorage
+  function saveNotificationState(enabled) {
+    const key = getNotificationStateKey();
+    localStorage.setItem(key, enabled.toString());
+  }
 
   // إظهار الزر للمستخدمين المسجلين فقط
   function checkAndShowNotificationButton() {
@@ -1948,11 +1984,24 @@ import NotificationManager from './notifications.js';
     const professionalLoggedIn = localStorage.getItem('loggedNationalId');
     
     if (customerLoggedIn === 'true' || professionalLoggedIn) {
-      document.getElementById('notificationBtn').style.display = 'flex';
-      
-      // تحقق من حالة الإشعارات
-      if (Notification.permission === 'granted') {
-        updateNotificationButton(true);
+      const btn = document.getElementById('notificationBtn');
+      if (btn) {
+        btn.style.display = 'flex';
+        
+        // ✅ تحميل الحالة المحفوظة
+        const savedState = loadNotificationState();
+        notificationsEnabled = savedState;
+        
+        // تحقق من حالة الدعم
+        if (!notificationManager.isSupported) {
+          updateNotificationButton('not_supported');
+        } else if (savedState) {
+          // الإشعارات كانت مفعلة، نعرض الحالة فقط
+          updateNotificationButton('enabled');
+        } else {
+          // الإشعارات معطلة أو لم يتم تفعيلها
+          updateNotificationButton('disabled');
+        }
       }
     }
   }
@@ -1962,22 +2011,45 @@ import NotificationManager from './notifications.js';
     const icon = document.getElementById('notificationIcon');
     const text = document.getElementById('notificationText');
 
-    if (notificationsEnabled) {
-      // تعطيل الإشعارات
-      notificationsEnabled = false;
-      btn.classList.remove('active');
-      icon.textContent = '🔕';
-      text.textContent = 'الإشعارات معطلة';
+    // التحقق من الدعم أولاً
+    if (!notificationManager.isSupported) {
+      const details = notificationManager.supportDetails;
+      let message = details.reason || 'متصفحك لا يدعم الإشعارات';
       
-      setTimeout(() => {
-        icon.textContent = '🔔';
-        text.textContent = 'تفعيل الإشعارات';
-      }, 2000);
+      if (details.device === 'iOS Safari') {
+        message = `
+          📱 iPhone/iPad - Safari لا يدعم إشعارات الويب
+          
+          ✅ الحلول البديلة:
+          1️⃣ استخدم Chrome على Android
+          2️⃣ افتح الموقع في Chrome iOS (محدود)
+          3️⃣ سنرسل لك رسائل SMS بدلاً من الإشعارات
+        `;
+      } else if (details.device === 'In-App Browser') {
+        message = `
+          🌐 أنت تستخدم متصفح داخل التطبيق
+          
+          ✅ الحل:
+          اضغط على "⋮" أو "..." واختر "فتح في المتصفح"
+        `;
+      }
+      
+      showDetailedMessage('غير مدعوم', message, 'warning');
+      return;
+    }
+
+    // ✅ إذا كانت الإشعارات مفعلة، نطفيها
+    if (notificationsEnabled) {
+      notificationsEnabled = false;
+      saveNotificationState(false); // 💾 حفظ الحالة
+      
+      updateNotificationButton('disabled');
+      showSuccessMessage('🔕 تم تعطيل الإشعارات');
       
       return;
     }
 
-    // تفعيل الإشعارات
+    // ✅ تفعيل الإشعارات
     btn.disabled = true;
     text.textContent = 'جاري التفعيل...';
 
@@ -1992,48 +2064,166 @@ import NotificationManager from './notifications.js';
       userType = 'professional';
     }
 
+    currentUserId = userId;
+    console.log('🔄 محاولة تفعيل الإشعارات...');
+
     const result = await notificationManager.initialize(userId, userType);
 
     if (result.success) {
       notificationsEnabled = true;
-      updateNotificationButton(true);
-      
-      // إظهار رسالة نجاح
+      saveNotificationState(true); // 💾 حفظ الحالة
+      updateNotificationButton('enabled');
       showSuccessMessage('✅ تم تفعيل الإشعارات بنجاح!');
     } else {
-      showErrorMessage('❌ فشل تفعيل الإشعارات: ' + result.error);
+      let errorMsg = 'فشل تفعيل الإشعارات';
+      
+      switch(result.error) {
+        case 'not_supported':
+          errorMsg = result.details?.reason || 'متصفحك لا يدعم الإشعارات';
+          break;
+        case 'permission_denied':
+          errorMsg = `
+            ❌ تم رفض الإذن
+            
+            لتفعيل الإشعارات:
+            1️⃣ اضغط على 🔒 بجانب عنوان الموقع
+            2️⃣ اختر "إعدادات الموقع"
+            3️⃣ اسمح بالإشعارات
+            4️⃣ أعد تحميل الصفحة
+          `;
+          break;
+        case 'sw_registration_failed':
+          errorMsg = 'فشل تسجيل Service Worker. تأكد من اتصالك بالإنترنت';
+          break;
+        case 'no_token':
+          errorMsg = 'فشل الحصول على رمز الإشعارات. حاول مرة أخرى';
+          break;
+        default:
+          errorMsg = result.message || 'حدث خطأ غير متوقع';
+      }
+      
+      showErrorMessage(errorMsg);
       btn.disabled = false;
       text.textContent = 'تفعيل الإشعارات';
     }
   }
 
-  function updateNotificationButton(enabled) {
+  function updateNotificationButton(state) {
     const btn = document.getElementById('notificationBtn');
     const icon = document.getElementById('notificationIcon');
     const text = document.getElementById('notificationText');
     
+    if (!btn || !icon || !text) return;
+    
     btn.disabled = false;
-    btn.classList.add('active');
-    icon.textContent = '✅';
-    text.textContent = 'الإشعارات مفعلة';
-    notificationsEnabled = true;
+    btn.classList.remove('active', 'disabled');
+    
+    switch(state) {
+      case 'enabled':
+        btn.classList.add('active');
+        icon.textContent = '✅';
+        text.textContent = 'الإشعارات مفعلة';
+        break;
+        
+      case 'disabled':
+        icon.textContent = '🔔';
+        text.textContent = 'تفعيل الإشعارات';
+        break;
+        
+      case 'not_supported':
+        btn.classList.add('disabled');
+        icon.textContent = '⚠️';
+        text.textContent = 'غير مدعوم';
+        btn.disabled = true;
+        break;
+    }
   }
 
   function showSuccessMessage(message) {
+    showCustomAlert(message, 'success');
+  }
+
+  function showErrorMessage(message) {
+    showCustomAlert(message, 'error');
+  }
+
+  function showDetailedMessage(title, message, type) {
+    const alert = document.createElement('div');
+    alert.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      z-index: 10002;
+      max-width: 90%;
+      width: 400px;
+      text-align: center;
+    `;
+    
+    alert.innerHTML = `
+      <div style="font-size: 3rem; margin-bottom: 15px;">
+        ${type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️'}
+      </div>
+      <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.3rem;">${title}</h3>
+      <p style="color: #666; line-height: 1.6; white-space: pre-line; font-size: 14px;">${message}</p>
+      <button onclick="this.parentElement.remove(); document.getElementById('overlay-notif').remove();" style="
+        margin-top: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+      ">فهمت</button>
+    `;
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'overlay-notif';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10001;
+    `;
+    overlay.onclick = () => {
+      overlay.remove();
+      alert.remove();
+    };
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(alert);
+  }
+
+  function showCustomAlert(message, type) {
     const div = document.createElement('div');
+    const bgColor = type === 'success' ? 
+      'linear-gradient(45deg, #27ae60, #2ecc71)' : 
+      'linear-gradient(45deg, #e74c3c, #c0392b)';
+    
     div.style.cssText = `
       position: fixed;
       top: 20px;
       right: 50%;
       transform: translateX(50%);
-      background: linear-gradient(45deg, #27ae60, #2ecc71);
+      background: ${bgColor};
       color: white;
       padding: 15px 30px;
       border-radius: 25px;
-      box-shadow: 0 10px 40px rgba(39, 174, 96, 0.4);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
       z-index: 10001;
       font-weight: 600;
       animation: slideDown 0.5s ease-out;
+      max-width: 90%;
+      text-align: center;
     `;
     div.textContent = message;
     document.body.appendChild(div);
@@ -2041,31 +2231,25 @@ import NotificationManager from './notifications.js';
     setTimeout(() => div.remove(), 3000);
   }
 
-  function showErrorMessage(message) {
-    alert(message);
-  }
-
   // تشغيل عند تحميل الصفحة
   document.addEventListener('DOMContentLoaded', function() {
     checkAndShowNotificationButton();
   });
 
-  // إضافة الأنيميشن
+  // تنظيف عند تسجيل الخروج
+  window.addEventListener('beforeunload', function() {
+    // LocalStorage بحفظ تلقائياً
+  });
+
   const animationStyle = document.createElement('style');
   animationStyle.textContent = `
     @keyframes slideDown {
-      from {
-        transform: translateX(50%) translateY(-100px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(50%) translateY(0);
-        opacity: 1;
-      }
+      from { transform: translateX(50%) translateY(-100px); opacity: 0; }
+      to { transform: translateX(50%) translateY(0); opacity: 1; }
     }
   `;
   document.head.appendChild(animationStyle);
-  </script>
+</script>
 
     
 </body>
