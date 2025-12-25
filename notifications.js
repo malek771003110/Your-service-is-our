@@ -1,9 +1,7 @@
-// notifications.js
-// 🔧 الجزء المهم: تسجيل Service Worker بالمسار الصحيح
-
+// notifications.js - نسخة مصلحة
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-messaging.js";
-import { getFirestore, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
@@ -18,7 +16,7 @@ const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 const db = getFirestore(app);
 
-// ⚠️ استبدل هذا بمفتاچك من Firebase
+// ⚠️ استبدل هذا بمفتاحك الصحيح من Firebase Console
 const VAPID_KEY = "BLYG3ZcUi_Tf9t6cH7dRkAOJE-KEUk2bXL7AE4rta-4lTr_U5UfEr_eS0MAjvAHlqs_3ni0KALoRspUyRdN0aVE";
 
 class NotificationManager {
@@ -44,8 +42,8 @@ class NotificationManager {
     try {
       // ✅ المسار الصحيح لـ Service Worker
       const registration = await navigator.serviceWorker.register(
-        '/Your-service-is-our/firebase-messaging-sw.js',
-        { scope: '/Your-service-is-our/' }
+        './firebase-messaging-sw.js',
+        { scope: './' }
       );
       console.log('✅ Service Worker مسجل:', registration);
 
@@ -106,11 +104,12 @@ class NotificationManager {
       const collection = this.userType === 'customer' ? 'customers' : 'approvedUsers';
       const userRef = doc(db, collection, this.userId);
 
-      await updateDoc(userRef, {
+      // ✅ استخدم setDoc مع merge
+      await setDoc(userRef, {
         fcmToken: token,
         fcmTokenUpdatedAt: serverTimestamp(),
         notificationsEnabled: true
-      });
+      }, { merge: true });
 
       console.log('✅ Token محفوظ في Firestore');
     } catch (error) {
@@ -128,8 +127,8 @@ class NotificationManager {
       if (Notification.permission === 'granted') {
         new Notification(title, {
           body,
-          icon: '/Your-service-is-our/icons/icon-192x192.png',
-          badge: '/Your-service-is-our/icons/badge-72x72.png'
+          icon: './logo.png', // ✅ استخدم لوجو موجود
+          badge: './logo.png'
         });
       }
     });
@@ -232,4 +231,3 @@ style.textContent = `
 document.head.appendChild(style);
 
 export default NotificationManager;
-

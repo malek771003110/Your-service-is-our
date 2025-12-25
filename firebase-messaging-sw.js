@@ -1,6 +1,4 @@
-// firebase-messaging-sw.js
-// ضع هذا الملف في المجلد الرئيسي للمشروع (نفس مستوى index.html)
-
+// firebase-messaging-sw.js - نسخة مصلحة
 importScripts('https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.1.0/firebase-messaging-compat.js');
 
@@ -24,24 +22,12 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title || 'إشعار جديد';
   const notificationOptions = {
     body: payload.notification.body || 'لديك إشعار جديد',
-    icon: payload.notification.icon || '/icon-192x192.png',
-    badge: '/badge-72x72.png',
+    icon: './logo.png', // ✅ استخدم لوجو موجود
+    badge: './logo.png',
     tag: payload.data?.type || 'general',
     data: payload.data,
     vibrate: [200, 100, 200],
-    requireInteraction: true,
-    actions: [
-      {
-        action: 'open',
-        title: 'فتح',
-        icon: '/icons/open.png'
-      },
-      {
-        action: 'close',
-        title: 'إغلاق',
-        icon: '/icons/close.png'
-      }
-    ]
+    requireInteraction: true
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
@@ -53,18 +39,16 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   if (event.action === 'open' || !event.action) {
-    const urlToOpen = event.notification.data?.url || '/';
+    const urlToOpen = event.notification.data?.url || './index.html';
     
     event.waitUntil(
       clients.matchAll({ type: 'window', includeUncontrolled: true })
         .then((clientList) => {
-          // Check if app is already open
           for (let client of clientList) {
-            if (client.url === urlToOpen && 'focus' in client) {
+            if (client.url.includes('Your-service-is-our') && 'focus' in client) {
               return client.focus();
             }
           }
-          // Open new window if not already open
           if (clients.openWindow) {
             return clients.openWindow(urlToOpen);
           }

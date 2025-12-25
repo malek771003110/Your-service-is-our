@@ -1562,7 +1562,6 @@ select.form-control option {
                  <div class="professional-actions">
     ${isLoggedIn ? `
       <button class="action-btn btn-rate" onclick="openRatingModal('${professional.id}', '${professional.name}')">⭐ تقييم</button>
-      <button class="action-btn btn-chat" onclick="startChat('${professional.id}', '${professional.name}')">💬 محادثة</button>
       <button class="action-btn btn-call" onclick="callProfessional('${professional.phone}')">📞 اتصال</button>
       <button class="action-btn btn-whatsapp" onclick="whatsappProfessional('${professional.phone}')">💬 واتساب</button>
     ` : `
@@ -1929,12 +1928,7 @@ window.startChat = function(professionalId, professionalName) {
 
   const customerEmail = localStorage.getItem('customerEmail');
   const customerId = customerEmail.replace(/\./g, '_');
-  
-  // إنشاء معرف فريد للمحادثة
-  const conversationId = [customerId, professionalId].sort().join('_');
-  
-  // الانتقال لصفحة المحادثة
-  window.location.href = `chat-page.html?conversation=${conversationId}&with=${encodeURIComponent(professionalName)}`;
+    
 }
 
     </script>
@@ -2076,7 +2070,3 @@ import NotificationManager from './notifications.js';
     
 </body>
 </html>
-
-
-
-
