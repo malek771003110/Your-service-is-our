@@ -1596,6 +1596,165 @@
             color: white;
             box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
         }
+
+/* ========== تحسينات بطاقة المهني ========== */
+
+/* ترتيب الأزرار في صفين */
+.professional-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+/* زر المقارنة في صف منفصل - عرض كامل */
+.btn-compare {
+    grid-column: 1 / -1; /* يأخذ العرض الكامل */
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4);
+    order: 2; /* يظهر في الصف الثاني */
+}
+
+/* الأزرار الثلاثة في الصف الأول */
+.btn-rate,
+.btn-call,
+.btn-whatsapp {
+    order: 1;
+}
+
+/* ❤️ تصغير زر المفضلة */
+.favorites-btn {
+    position: fixed;
+    top: 80px; /* تحته من زر التسجيل */
+    right: 20px;
+    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+    color: white;
+    padding: 10px 18px; /* حجم أصغر */
+    border-radius: 40px;
+    box-shadow: 0 8px 30px rgba(255, 107, 157, 0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 13px; /* خط أصغر */
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.favorites-btn .icon {
+    font-size: 18px; /* أيقونة أصغر */
+    animation: heartBeat 1.5s infinite;
+}
+
+.favorites-count {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 800;
+    min-width: 22px;
+    text-align: center;
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px) {
+    /* بطاقة المهني */
+    .professional-actions {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    /* الأزرار الثلاثة في صف واحد */
+    .action-btn {
+        padding: 10px 5px;
+        font-size: 11px;
+        border-radius: 10px;
+    }
+
+    /* زر المقارنة تحتهم - عرض كامل */
+    .btn-compare {
+        grid-column: 1 / -1;
+        padding: 12px;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    /* تصغير زر المفضلة للموبايل */
+    .favorites-btn {
+        top: 70px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 12px;
+        gap: 6px;
+        border-radius: 35px;
+    }
+
+    .favorites-btn .icon {
+        font-size: 16px;
+    }
+
+    .favorites-count {
+        padding: 2px 6px;
+        font-size: 11px;
+        min-width: 20px;
+    }
+
+    /* إخفاء النص في شاشات صغيرة جداً */
+    @media (max-width: 400px) {
+        .favorites-btn span:not(.icon):not(.favorites-count) {
+            display: none;
+        }
+        
+        .favorites-btn {
+            padding: 8px 12px;
+        }
+    }
+}
+
+/* شاشات صغيرة جداً */
+@media (max-width: 400px) {
+    .professional-actions {
+        gap: 6px;
+    }
+
+    .action-btn {
+        padding: 9px 4px;
+        font-size: 10px;
+    }
+
+    .btn-compare {
+        font-size: 12px;
+        padding: 10px;
+    }
+}
+
+/* ========== تحسين زر المقارنة ========== */
+.btn-compare.added {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    box-shadow: 0 5px 20px rgba(39, 174, 96, 0.4);
+}
+
+.btn-compare.disabled {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-compare:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(243, 156, 18, 0.6);
+}
+
+.btn-compare.added:hover {
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.6);
+}
+        
     </style>
 </head>
 
@@ -2683,7 +2842,8 @@
 
 
 
-   
+    // استبدل script الإشعارات في index.html بهذا:
+
     <script type="module">
         import NotificationManager from './notifications.js';
 
@@ -3012,6 +3172,5 @@
     </div>
 
 </body>
-
 
 </html>

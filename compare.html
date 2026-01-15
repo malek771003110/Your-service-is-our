@@ -20,6 +20,7 @@
             direction: rtl;
             line-height: 1.6;
             color: #333;
+            padding-bottom: 40px;
         }
 
         /* Animated Background Particles */
@@ -42,23 +43,13 @@
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0) translateX(0) rotate(0deg);
-            }
-
-            33% {
-                transform: translateY(-100px) translateX(50px) rotate(120deg);
-            }
-
-            66% {
-                transform: translateY(-200px) translateX(-50px) rotate(240deg);
-            }
+            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+            33% { transform: translateY(-100px) translateX(50px) rotate(120deg); }
+            66% { transform: translateY(-200px) translateX(-50px) rotate(240deg); }
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
@@ -94,6 +85,16 @@
             font-size: 1.1rem;
         }
 
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* Back Button */
         .back-btn {
             position: absolute;
@@ -118,162 +119,207 @@
             transform: translateX(-5px);
         }
 
-        /* Comparison Table Container */
-        .comparison-container {
-            overflow-x: auto;
-            border-radius: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Comparison Grid Container */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
             animation: fadeInUp 0.8s ease-out 0.2s both;
-            margin-bottom: 50px;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-            color: white;
-        }
-
-        th,
-        td {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            vertical-align: middle;
-        }
-
-        /* First Column (Labels) */
-        td:first-child {
-            padding-left: 30px;
-            text-align: right;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(0, 0, 0, 0.2);
-            width: 200px;
-            position: sticky;
-            right: 0;
-            z-index: 10;
-            backdrop-filter: blur(10px);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Header Row (Professionals) */
-        thead th {
-            padding-top: 30px;
-            padding-bottom: 30px;
-            background: rgba(0, 0, 0, 0.3);
+        /* Professional Card */
+        .professional-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        thead th:first-child {
-            background: rgba(0, 0, 0, 0.4);
-            border-top-right-radius: 25px;
-            z-index: 20;
+        .professional-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            border-color: rgba(102, 126, 234, 0.5);
         }
 
-        thead th:last-child {
-            border-top-left-radius: 25px;
-        }
-
-        /* Professional Header Info */
-        .prof-header-content {
+        /* Remove Button */
+        .remove-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 35px;
+            height: 35px;
+            background: rgba(231, 76, 60, 0.3);
+            color: white;
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            border-radius: 50%;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            z-index: 10;
         }
 
-        .prof-avatar {
-            width: 80px;
-            height: 80px;
+        .remove-btn:hover {
+            background: #e74c3c;
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        /* Card Header */
+        .card-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .card-avatar {
+            width: 100px;
+            height: 100px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 2rem;
+            font-size: 3rem;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+            position: relative;
         }
 
-        .prof-name {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .card-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.3;
+            animation: avatarPulse 2s infinite;
         }
 
-        .prof-job {
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+        }
+
+        .card-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-job {
             color: #f39c12;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
         }
 
-        /* Remove Button */
-        .btn-remove {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.5);
-            padding: 5px 15px;
+        /* Card Details */
+        .card-details {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
             border-radius: 15px;
-            font-size: 0.8rem;
-            cursor: pointer;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
-            margin-top: 10px;
         }
 
-        .btn-remove:hover {
-            background: #e74c3c;
-            color: white;
+        .detail-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
         }
 
-        /* Action Buttons Cell */
-        .action-buttons-cell {
+        .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 5px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-value {
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Best Badge */
+        .best-badge {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Card Actions */
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
-            align-items: stretch;
-            padding: 20px 40px;
         }
 
         .action-btn {
-            padding: 10px 15px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 15px;
             border: none;
             color: white;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
         }
 
         .btn-call {
             background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
         }
 
         .btn-whatsapp {
             background: linear-gradient(135deg, #25D366, #128C7E);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
         }
 
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
         /* Empty State */
@@ -307,8 +353,25 @@
             box-shadow: 0 10px 20px rgba(243, 156, 18, 0.4);
         }
 
-        /* Responsive Mobile Cards */
+        /* Responsive */
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 15px;
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
             .back-btn {
                 top: 15px;
                 left: 15px;
@@ -316,26 +379,77 @@
                 height: 40px;
                 padding: 0;
                 justify-content: center;
+                border-radius: 50%;
             }
 
-            .back-btn span {
+            .back-btn span:not(:first-child) {
                 display: none;
             }
 
-            .back-btn::after {
-                content: '🏠';
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
 
-            .header h1 {
-                font-size: 1.8rem;
+            .professional-card {
+                padding: 20px;
             }
 
-            /* On mobile, we might switch to a different view or keep the scrollable table */
-            /* Keeping scrollable table for now but with sticky first column */
-            td:first-child {
-                left: auto;
-                right: 0;
-                background: rgba(30, 30, 50, 0.95);
+            .card-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+
+            .card-name {
+                font-size: 1.3rem;
+            }
+
+            .detail-item {
+                padding: 12px;
+            }
+
+            .detail-value {
+                font-size: 1rem;
+            }
+
+            .card-actions {
+                gap: 8px;
+            }
+
+            .action-btn {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .card-avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+
+            .card-name {
+                font-size: 1.2rem;
+            }
+
+            .card-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* For 2 cards side by side on tablet */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .comparison-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* For 3 cards on desktop */
+        @media (min-width: 1025px) {
+            .comparison-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
     </style>
@@ -351,7 +465,7 @@
                 <span>الرئيسية</span>
             </a>
             <h1>⚖️ مقارنة المهنيين</h1>
-            <p>مقارنة شاملة لمساعدتك في اتخاذ القرار الأفضل</p>
+            <p>قارن بين المهنيين جنباً إلى جنب لاختيار الأفضل</p>
         </div>
 
         <div class="empty-state" id="emptyState">
@@ -361,19 +475,7 @@
             <a href="index.html" class="btn-browse">تصفح المهنيين</a>
         </div>
 
-        <div class="comparison-container" id="comparisonContainer">
-            <table id="compareTable">
-                <thead>
-                    <tr id="headerRow">
-                        <th>المهني</th>
-                        <!-- Headers will be injected here -->
-                    </tr>
-                </thead>
-                <tbody id="compareBody">
-                    <!-- Rows will be injected here -->
-                </tbody>
-            </table>
-        </div>
+        <div class="comparison-grid" id="comparisonGrid"></div>
     </div>
 
     <script>
@@ -383,87 +485,110 @@
         });
 
         function loadComparison() {
-            const container = document.getElementById('comparisonContainer');
+            const grid = document.getElementById('comparisonGrid');
             const emptyState = document.getElementById('emptyState');
-            const headerRow = document.getElementById('headerRow');
-            const tbody = document.getElementById('compareBody');
-
-            // Get data from localStorage
             const compareList = JSON.parse(localStorage.getItem('compareList')) || [];
 
             if (compareList.length === 0) {
-                container.style.display = 'none';
+                grid.style.display = 'none';
                 emptyState.style.display = 'block';
                 return;
             }
 
-            container.style.display = 'block';
             emptyState.style.display = 'none';
+            grid.style.display = 'grid';
 
-            // Generate Columns (Headers)
+            // Find best values for comparison
+            const bestRating = Math.max(...compareList.map(p => p.ratings?.averageRating || 0));
+            const bestPrice = Math.min(...compareList.map(p => p.hourlyPrice || Infinity).filter(p => p !== Infinity));
+            const bestExperience = Math.max(...compareList.map(p => parseInt(p.experienceYears) || 0));
+
+            // Create cards
             compareList.forEach(prof => {
-                const th = document.createElement('th');
-                th.innerHTML = `
-                    <div class="prof-header-content">
-                        <div class="prof-avatar">${prof.name.charAt(0).toUpperCase()}</div>
-                        <div class="text-center">
-                            <div class="prof-name">${prof.name}</div>
-                            <div class="prof-job">${prof.job}</div>
-                        </div>
-                        <button class="btn-remove" onclick="removeFromCompare('${prof.id}')">❌ إزالة</button>
-                    </div>
-                `;
-                headerRow.appendChild(th);
-            });
-
-            // Define rows structure
-            const rows = [
-                { label: '📍 المدينة', key: 'city' },
-                { label: '⭐ التقييم', key: 'rating', render: (p) => generateStars(p.ratings?.averageRating || 0) + ` <br><small>(${p.ratings?.totalCount || 0} تقييم)</small>` },
-                { label: '💰 السعر / ساعة', key: 'price', render: (p) => p.hourlyPrice ? `${p.hourlyPrice} د.أ` : 'غير محدد' },
-                { label: '📚 الخبرة', key: 'experience', render: (p) => `${p.experienceYears || 0} سنوات` },
-                { label: '🕐 ساعات العمل', key: 'hours', render: (p) => `${p.workStartTime || '?'} - ${p.workEndTime || '?'}` },
-                {
-                    label: '📞 التواصل', key: 'actions', render: (p) => `
-                    <div class="action-buttons-cell">
-                        <a href="tel:${p.phone}" class="action-btn btn-call">📞 اتصال</a>
-                        <a href="https://wa.me/${p.phone}" target="_blank" class="action-btn btn-whatsapp">💬 واتساب</a>
-                    </div>
-                ` }
-            ];
-
-            // Generate Rows
-            rows.forEach(row => {
-                const tr = document.createElement('tr');
-
-                // Label Cell
-                const labelTd = document.createElement('td');
-                labelTd.textContent = row.label;
-                tr.appendChild(labelTd);
-
-                // Data Cells
-                compareList.forEach(prof => {
-                    const td = document.createElement('td');
-                    if (row.render) {
-                        td.innerHTML = row.render(prof);
-                    } else {
-                        td.textContent = prof[row.key] || prof[row.key.replace('professional', '').toLowerCase()] || '-';
-                    }
-                    tr.appendChild(td);
+                const card = createProfessionalCard(prof, {
+                    bestRating,
+                    bestPrice,
+                    bestExperience
                 });
-
-                tbody.appendChild(tr);
+                grid.appendChild(card);
             });
         }
 
-        function generateStars(rating) {
-            const fullStars = Math.floor(rating);
-            const halfStar = rating % 1 >= 0.5;
-            let starsHtml = '';
+        function createProfessionalCard(prof, bestValues) {
+            const card = document.createElement('div');
+            card.className = 'professional-card';
 
-            for (let i = 0; i < fullStars; i++) starsHtml += '⭐';
-            // if (halfStar) starsHtml += '½'; 
-            return starsHtml || '-';
+            const rating = prof.ratings?.averageRating || 0;
+            const price = prof.hourlyPrice || 0;
+            const experience = parseInt(prof.experienceYears) || 0;
+
+            const isBestRating = rating > 0 && rating === bestValues.bestRating;
+            const isBestPrice = price > 0 && price === bestValues.bestPrice;
+            const isBestExperience = experience > 0 && experience === bestValues.bestExperience;
+
+            card.innerHTML = `
+                <button class="remove-btn" onclick="removeFromCompare('${prof.id}')">✖</button>
+                
+                <div class="card-header">
+                    <div class="card-avatar">${prof.name.charAt(0).toUpperCase()}</div>
+                    <div class="card-name">${prof.name}</div>
+                    <div class="card-job">${prof.job}</div>
+                </div>
+
+                <div class="card-details">
+                    <div class="detail-item">
+                        <div class="detail-label">📍 المدينة</div>
+                        <div class="detail-value">${prof.city}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">⭐ التقييم</div>
+                        <div class="detail-value">
+                            ${generateStars(rating)} (${prof.ratings?.totalCount || 0})
+                            ${isBestRating ? '<span class="best-badge">✅ الأفضل</span>' : ''}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">💰 السعر / ساعة</div>
+                        <div class="detail-value">
+                            ${price ? price + ' د.أ' : 'غير محدد'}
+                            ${isBestPrice && price > 0 ? '<span class="best-badge">✅ الأرخص</span>' : ''}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">📚 سنوات الخبرة</div>
+                        <div class="detail-value">
+                            ${experience} سنوات
+                            ${isBestExperience && experience > 0 ? '<span class="best-badge">✅ الأكثر</span>' : ''}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">🕐 ساعات العمل</div>
+                        <div class="detail-value">${prof.workStartTime || '?'} - ${prof.workEndTime || '?'}</div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a href="tel:${prof.phone}" class="action-btn btn-call">
+                        📞 اتصال
+                    </a>
+                    <a href="https://wa.me/962${prof.phone.substring(1)}" target="_blank" class="action-btn btn-whatsapp">
+                        💬 واتساب
+                    </a>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function generateStars(rating) {
+            if (!rating || rating === 0) return '☆☆☆☆☆';
+            const fullStars = Math.floor(rating);
+            const emptyStars = 5 - fullStars;
+            return '⭐'.repeat(fullStars) + '☆'.repeat(emptyStars);
         }
 
         function removeFromCompare(id) {
