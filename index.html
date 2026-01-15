@@ -1755,18 +1755,279 @@
     box-shadow: 0 8px 25px rgba(39, 174, 96, 0.6);
 }
         
+
+/* Modern Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.top-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.btn-compact {
+    padding: 18px 20px;
+    font-size: 15px;
+}
+
+.btn-register-main {
+    padding: 20px;
+    font-size: 17px;
+    justify-self: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+
+
+/* ☰ Hamburger Menu Styles */
+.hamburger-menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 2001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+}
+
+.hamburger-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 2002;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.hamburger-menu {
+    position: fixed;
+    top: 0;
+    left: -350px;
+    width: 320px;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(15, 12, 41, 0.98), rgba(48, 43, 99, 0.98));
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 2003;
+    padding: 25px;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+    transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow-y: auto;
+}
+
+.hamburger-menu.show {
+    left: 0;
+}
+
+.hamburger-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.hamburger-header h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.close-hamburger {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-hamburger:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.hamburger-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hamburger-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.hamburger-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-5px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.link-icon {
+    font-size: 22px;
+    width: 30px;
+    text-align: center;
+}
+
+.link-text {
+    flex: 1;
+}
+
+.link-badge {
+    background: rgba(255, 107, 157, 0.8);
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 25px;
+    text-align: center;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .hamburger-menu-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+        top: 15px;
+        left: 15px;
+    }
+
+    .hamburger-menu {
+        width: 280px;
+    }
+
+    .hamburger-link {
+        padding: 15px 18px;
+        font-size: 15px;
+    }
+}
+
+
+
+
+/* Action Buttons - Mobile */
+.action-buttons {
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.top-buttons {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.btn-compact {
+    padding: 15px 12px;
+    font-size: 13px;
+    gap: 8px;
+}
+
+.btn-register-main {
+    padding: 16px;
+    font-size: 14px;
+}
+
+
     </style>
 </head>
 
 <body>
     <!-- Animated Background Particles -->
     <div class="particles">
+        
         <div class="particle" style="width: 10px; height: 10px; top: 10%; left: 20%; animation-delay: 0s;"></div>
         <div class="particle" style="width: 15px; height: 15px; top: 30%; left: 60%; animation-delay: 2s;"></div>
         <div class="particle" style="width: 8px; height: 8px; top: 60%; left: 10%; animation-delay: 4s;"></div>
         <div class="particle" style="width: 12px; height: 12px; top: 80%; left: 80%; animation-delay: 1s;"></div>
         <div class="particle" style="width: 6px; height: 6px; top: 40%; left: 40%; animation-delay: 3s;"></div>
     </div>
+    <!-- Hamburger Menu Button -->
+<button class="hamburger-menu-btn" id="hamburgerBtn" onclick="toggleHamburgerMenu()">
+    <span>☰</span>
+</button>
+
+<!-- Hamburger Menu Overlay -->
+<div class="hamburger-menu-overlay" id="hamburgerOverlay" onclick="closeHamburgerMenu()"></div>
+
+<!-- Hamburger Menu -->
+<div class="hamburger-menu" id="hamburgerMenu">
+    <div class="hamburger-header">
+        <h3>القائمة</h3>
+        <button class="close-hamburger" onclick="closeHamburgerMenu()">✕</button>
+    </div>
+    
+    <div class="hamburger-links">
+        <a href="favorites.html" class="hamburger-link" id="hamburgerFavorites">
+            <span class="link-icon">❤️</span>
+            <span class="link-text">مفضلتي</span>
+            <span class="link-badge" id="hamburgerFavCount">0</span>
+        </a>
+        
+        <a href="register.html" class="hamburger-link">
+            <span class="link-icon">✨</span>
+            <span class="link-text">سجل مهنتك</span>
+        </a>
+        
+        <a href="#contact" class="hamburger-link" onclick="scrollToContact()">
+            <span class="link-icon">📞</span>
+            <span class="link-text">تواصل معنا</span>
+        </a>
+        
+        <a href="customer-auth-page.html" class="hamburger-link" id="hamburgerAuth">
+            <span class="link-icon">🔐</span>
+            <span class="link-text">تسجيل الدخول</span>
+        </a>
+    </div>
+</div>
 
     <!-- Floating Registration Banner -->
     <a href="register.html" class="floating-register-banner">
@@ -1774,12 +2035,12 @@
         <span>سجل كمهني الآن</span>
     </a>
 
-    <!-- ❤️ Favorites Button -->
-    <a href="favorites.html" class="favorites-btn" id="favoritesBtn" style="display: none;">
-        <span class="icon">❤️</span>
+    <!-- ❤️ Favorites Button - HIDDEN, moved to hamburger menu -->
+<!-- <a href="favorites.html" class="favorites-btn" id="favoritesBtn" style="display: none;"></a> -->
+        <!-- <span class="icon">❤️</span>
         <span>مفضلتي</span>
-        <span class="favorites-count" id="favoritesCount">0</span>
-    </a>
+        <span class="favorites-count" id="favoritesCount">0</span> -->
+    
 
     <div class="container">
         <!-- Header -->
@@ -1800,20 +2061,22 @@
                 <a href="customer-auth-page.html" class="login-btn" id="userAction">تسجيل الدخول</a>
             </div>
 
-            <div class="action-buttons">
-                <a href="register.html" class="btn btn-primary">
-                    <span>✨</span>
-                    <span>سجل مهنتك الآن</span>
-                </a>
-                <a href="map.html" class="btn btn-secondary">
-                    <span>🗺️</span>
-                    <span>عرض الخريطة</span>
-                </a>
-                <a href="#search" class="btn btn-secondary">
-                    <span>🔍</span>
-                    <span>ابحث عن مهني</span>
-                </a>
-            </div>
+           <div class="action-buttons">
+    <div class="top-buttons">
+        <a href="map.html" class="btn btn-secondary btn-compact">
+            <span>🗺️</span>
+            <span>عرض الخريطة</span>
+        </a>
+        <a href="#search" class="btn btn-secondary btn-compact">
+            <span>🔍</span>
+            <span>ابحث عن مهني</span>
+        </a>
+    </div>
+    <a href="register.html" class="btn btn-primary btn-register-main">
+        <span>✨</span>
+        <span>سجل مهنتك الآن</span>
+    </a>
+</div>
         </div>
 
         <!-- Search Section -->
@@ -2842,7 +3105,6 @@
 
 
 
-    // استبدل script الإشعارات في index.html بهذا:
 
     <script type="module">
         import NotificationManager from './notifications.js';
@@ -3145,6 +3407,79 @@
     }
   `;
         document.head.appendChild(animationStyle);
+
+
+// ☰ Hamburger Menu Functions
+window.toggleHamburgerMenu = function() {
+    const menu = document.getElementById('hamburgerMenu');
+    const overlay = document.getElementById('hamburgerOverlay');
+    
+    menu.classList.toggle('show');
+    overlay.classList.toggle('show');
+    
+    // Update favorites count in hamburger
+    updateHamburgerFavorites();
+}
+
+window.closeHamburgerMenu = function() {
+    const menu = document.getElementById('hamburgerMenu');
+    const overlay = document.getElementById('hamburgerOverlay');
+    
+    menu.classList.remove('show');
+    overlay.classList.remove('show');
+}
+
+window.scrollToContact = function() {
+    closeHamburgerMenu();
+    document.querySelector('.footer').scrollIntoView({ behavior: 'smooth' });
+}
+
+function updateHamburgerFavorites() {
+    const hamburgerFav = document.getElementById('hamburgerFavorites');
+    const hamburgerAuth = document.getElementById('hamburgerAuth');
+    const hamburgerFavCount = document.getElementById('hamburgerFavCount');
+    
+    if (currentUser) {
+        // Show favorites, hide auth
+        if (hamburgerFav) hamburgerFav.style.display = 'flex';
+        if (hamburgerAuth) {
+            hamburgerAuth.querySelector('.link-text').textContent = 'تسجيل خروج';
+            hamburgerAuth.querySelector('.link-icon').textContent = '🚪';
+            hamburgerAuth.onclick = (e) => {
+                e.preventDefault();
+                logout();
+                closeHamburgerMenu();
+            };
+            hamburgerAuth.removeAttribute('href');
+        }
+        
+        // Update count
+        if (hamburgerFavCount) {
+            hamburgerFavCount.textContent = favoritesCount;
+        }
+    } else {
+        // Hide favorites, show auth
+        if (hamburgerFav) hamburgerFav.style.display = 'none';
+        if (hamburgerAuth) {
+            hamburgerAuth.querySelector('.link-text').textContent = 'تسجيل الدخول';
+            hamburgerAuth.querySelector('.link-icon').textContent = '🔐';
+            hamburgerAuth.onclick = null;
+            hamburgerAuth.href = 'customer-auth-page.html';
+        }
+    }
+}
+
+// Update hamburger when favorites count changes
+const originalUpdateFavoritesCount = updateFavoritesCount;
+updateFavoritesCount = function() {
+    originalUpdateFavoritesCount();
+    const hamburgerFavCount = document.getElementById('hamburgerFavCount');
+    if (hamburgerFavCount) {
+        hamburgerFavCount.textContent = favoritesCount;
+    }
+}
+
+
     </script>
 
 
