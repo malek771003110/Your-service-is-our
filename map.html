@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خريطة المهنيين 🗺️ | خدمتك عنا</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Overlays */
+        .map-overlay {
+            position: absolute;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            padding-right: 45px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 15px rgba(118, 75, 162, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            max-width: 100%;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Bottom Control */
+        .bottom-control {
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nearby-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        .nearby-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Info Window Styling */
+        .gm-style-iw {
+            padding: 0 !important;
+            border-radius: 15px !important;
+            overflow: hidden !important;
+        }
+
+        .gm-style .gm-style-iw-c {
+            padding: 0;
+            border-radius: 15px;
+        }
+
+        .active-window {
+            width: 280px;
+            direction: rtl;
+        }
+
+        .window-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .window-avatar {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .window-info {
+            flex: 1;
+        }
+
+        .window-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .window-job {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .window-body {
+            padding: 15px;
+        }
+
+        .window-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .window-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .window-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-green {
+            background: #27ae60;
+        }
+
+        .btn-blue {
+            background: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+                top: 10px;
+                padding: 10px;
+            }
+
+            .back-btn span {
+                display: none;
+            }
+
+            .back-btn::after {
+                content: '🏠';
+            }
+
+            .back-btn {
+                width: 40px;
+                padding: 0;
+                justify-content: center;
+                height: 40px;
+                position: absolute;
+                left: 10px;
+                top: 10px;
+                z-index: 100;
+            }
+
+            .search-container {
+                margin-left: 50px;
+            }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .api-warning {
+            color: #c0392b;
+            text-align: center;
+            max-width: 500px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e74c3c;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+        <h3>جاري تحميل الخريطة...</h3>
+        <div id="apiWarning" class="api-warning">
+            ⚠️ <strong>تنبيه:</strong> مفتاح API غير موجود أو غير صالح.
+            <br>يرجى إضافة مفتاح Google Maps API صالح في الكود لتعمل الخريطة.
+            <br>تم استخدام بيانات وهمية للتجربة.
+        </div>
+    </div>
+
+    <!-- UI Overlay: Top -->
+    <div class="map-overlay top-bar">
+        <a href="index.html" class="back-btn">
+            <span>🏠 العودة</span>
+        </a>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="mapSearch" class="search-input" placeholder="ابحث عن مهني أو خدمة...">
+        </div>
+
+        <div class="filter-group" id="mapFilters">
+            <button class="filter-btn active" data-filter="all">الكل</button>
+            <button class="filter-btn" data-filter="carpenter">نجارة</button>
+            <button class="filter-btn" data-filter="plumber">سباكة</button>
+            <button class="filter-btn" data-filter="electrician">كهرباء</button>
+            <button class="filter-btn" data-filter="cleaning">تنظيف</button>
+        </div>
+    </div>
+
+    <!-- UI Overlay: Bottom -->
+    <div class="map-overlay bottom-control">
+        <button class="nearby-btn" onclick="findNearby()">
+            <span>📍</span>
+            ابحث بالقرب مني
+        </button>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Firebase Config (Same as index.html) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+        // Firebase Setup
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
+            authDomain: "home-services-app-a9c5e.firebaseapp.com",
+            projectId: "home-services-app-a9c5e",
+            storageBucket: "home-services-app-a9c5e.appspot.com",
+            messagingSenderId: "287028219636",
+            appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global Variables
+        window.map = null;
+        window.markers = [];
+        window.professionals = [];
+        window.userLocation = { lat: 31.9539, lng: 35.9106 }; // Default: Amman
+
+        // Load Professionals from Firebase
+        async function loadMapData() {
+            try {
+                const snapshot = await getDocs(collection(db, 'professionals'));
+                window.professionals = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    // Mock Location if missing (Randomize around Amman)
+                    const lat = 31.9539 + (Math.random() - 0.5) * 0.1;
+                    const lng = 35.9106 + (Math.random() - 0.5) * 0.1;
+
+                    return {
+                        id: doc.id,
+                        ...data,
+                        location: {
+                            lat: data.latitude || lat,
+                            lng: data.longitude || lng
+                        }
+                    };
+                });
+
+                initMap(); // Init map after data load
+            } catch (error) {
+                console.error("Error loading map data:", error);
+                document.getElementById('loading').innerHTML = `<h3>⚠️ خطأ في تحميل البيانات</h3>`;
+            }
+        }
+
+        // Initialize Map
+        window.initMap = function () {
+            try {
+                const mapOptions = {
+                    zoom: 13,
+                    center: window.userLocation,
+                    mapId: 'DEMO_MAP_ID', // Using Demo ID for custom markers
+                    disableDefaultUI: true, // Clean look
+                    zoomControl: true,
+                };
+
+                window.map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+                // Add Markers
+                window.professionals.forEach(prof => addMarker(prof));
+
+                document.getElementById('loading').style.display = 'none';
+
+            } catch (e) {
+                console.error("Map Init Error:", e);
+                document.getElementById('apiWarning').style.display = 'block';
+            }
+        };
+
+        // Add Marker
+        function addMarker(prof) {
+            // Determine Color based on status
+            const isAvailable = prof.status === 'available';
+            const pinColor = isAvailable ? "#2ecc71" : "#e74c3c"; // Green or Red
+
+            const marker = new google.maps.Marker({
+                position: prof.location,
+                map: window.map,
+                title: prof.name,
+                animation: google.maps.Animation.DROP,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: pinColor,
+                    fillOpacity: 1,
+                    strokeColor: "white",
+                    strokeWeight: 2,
+                }
+            });
+
+            // Info Window Content
+            const contentString = `
+                <div class="active-window">
+                    <div class="window-header">
+                        <div class="window-avatar">${prof.name.charAt(0).toUpperCase()}</div>
+                        <div class="window-info">
+                            <div class="window-title">${prof.name}</div>
+                            <div class="window-job">${prof.job} | ${prof.city}</div>
+                        </div>
+                    </div>
+                    <div class="window-body">
+                        <div class="window-stat">
+                            <span>⭐ التقييم</span>
+                            <span>${prof.ratings?.averageRating?.toFixed(1) || 'جديد'} (${prof.ratings?.totalCount || 0})</span>
+                        </div>
+                        <div class="window-stat">
+                            <span>💰 السعر</span>
+                            <span>${prof.hourlyPrice} د.أ / ساعة</span>
+                        </div>
+                        <div class="window-stat">
+                            <span>📅 الحالة</span>
+                            <span style="color: ${isAvailable ? '#2ecc71' : '#e74c3c'}">${isAvailable ? 'متاح الآن' : 'مشغول'}</span>
+                        </div>
+                        
+                        <div class="window-actions">
+                            <a href="tel:${prof.phone}" class="window-btn btn-green">📞 اتصال</a>
+                            <a href="index.html#booking" class="window-btn btn-blue">📅 حجز</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: contentString,
+                maxWidth: 300
+            });
+
+            marker.addListener("click", () => {
+                // Close other windows
+                window.markers.forEach(m => m.infoWindow.close());
+                infoWindow.open({
+                    anchor: marker,
+                    map: window.map,
+                });
+            });
+
+            // Store marker for filtering
+            window.markers.push({
+                marker,
+                infoWindow,
+                category: prof.job,
+                name: prof.name
+            });
+        }
+
+        // Search Near Me
+        window.findNearby = function () {
+            if (navigator.geolocation) {
+                // Show loading state
+                const btn = document.querySelector('.nearby-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'جاري التحديد...';
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+
+                        // User Marker
+                        new google.maps.Marker({
+                            position: pos,
+                            map: window.map,
+                            title: "موقعك الحالي",
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 8,
+                                fillColor: "#3498db",
+                                fillOpacity: 1,
+                                strokeColor: "white",
+                                strokeWeight: 3,
+                            }
+                        });
+
+                        window.map.setCenter(pos);
+                        window.map.setZoom(15);
+
+                        // Show success
+                        btn.innerHTML = '✅ تم تحديد الموقع';
+                        setTimeout(() => btn.innerHTML = originalText, 2000);
+                    },
+                    (error) => {
+                        alert("تعذر تحديد موقعك. يرجى تفعيل الـ GPS.");
+                        console.error('GPS Error', error);
+                        btn.innerHTML = originalText;
+                    }
+                );
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع.");
+            }
+        };
+
+        // Filtering Logic
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // UI Toggle
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+
+                const filter = e.target.dataset.filter;
+                const search = document.getElementById('mapSearch').value.toLowerCase();
+
+                filterMarkers(filter, search);
+            });
+        });
+
+        // Search Logic
+        document.getElementById('mapSearch').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            const filter = document.querySelector('.filter-btn.active').dataset.filter;
+            filterMarkers(filter, search);
+        });
+
+        function filterMarkers(category, searchText) {
+            window.markers.forEach(item => {
+                let matchCategory = category === 'all' || mapCategory(item.category) === category;
+                let matchSearch = item.name.toLowerCase().includes(searchText);
+
+                if (matchCategory && matchSearch) {
+                    item.marker.setMap(window.map);
+                } else {
+                    item.marker.setMap(null);
+                }
+            });
+        }
+
+        // Helper to map Arabic View Types to English filters
+        function mapCategory(arabicJob) {
+            if (arabicJob.includes('نجار')) return 'carpenter';
+            if (arabicJob.includes('سباك') || arabicJob.includes('مواسرجي')) return 'plumber';
+            if (arabicJob.includes('كهرب')) return 'electrician';
+            if (arabicJob.includes('تنظيف')) return 'cleaning';
+            return 'other';
+        }
+
+        // Initialize Load
+        loadMapData();
+
+    </script>
+
+    <!-- Google Maps API Script -->
+    <!-- REPLACE YOUR_API_KEY_HERE WITH YOUR ACTUAL KEY -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&libraries=places&callback=initMap"
+        defer></script>
+
+</body>
+
+</html>

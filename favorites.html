@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مفضلتي ❤️ | خدمتك عنا</title>
+    <meta name="description" content="قائمة المهنيين المفضلين لديك">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-100px) translateX(50px) rotate(120deg);
+            }
+
+            66% {
+                transform: translateY(-200px) translateX(-50px) rotate(240deg);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-weight: 900;
+            animation: textShine 3s infinite;
+        }
+
+        @keyframes textShine {
+
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(1.3);
+            }
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.7);
+        }
+
+        /* Favorites Grid */
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .professional-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            animation: cardFadeIn 0.6s ease-out;
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .professional-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(196, 69, 105, 0.2));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .professional-card:hover::before {
+            opacity: 1;
+        }
+
+        .professional-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255, 107, 157, 0.5);
+            box-shadow: 0 20px 60px rgba(255, 107, 157, 0.4);
+        }
+
+        .professional-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .professional-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5);
+        }
+
+        .professional-info h3 {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .professional-info .profession {
+            color: #ff6b9d;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .professional-info .location {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .added-date {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-remove {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: white;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .empty-state .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: heartBreak 2s ease-in-out infinite;
+        }
+
+        @keyframes heartBreak {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .empty-state h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .empty-state p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .empty-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .empty-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.2);
+            border-top: 6px solid #ff6b9d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Toast Notification */
+        .favorite-toast {
+            position: fixed;
+            top: 100px;
+            right: 50%;
+            transform: translateX(50%);
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(255, 107, 157, 0.5);
+            z-index: 10001;
+            font-weight: 600;
+            animation: slideDownFade 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        @keyframes slideDownFade {
+            from {
+                transform: translateX(50%) translateY(-100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 25px 20px;
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .back-btn {
+                top: 10px;
+                left: 10px;
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            .favorites-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .professional-card {
+                padding: 20px;
+            }
+
+            .empty-state .icon {
+                font-size: 3.5rem;
+            }
+
+            .empty-state h2 {
+                font-size: 1.5rem;
+            }
+
+            .empty-state p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Back Button -->
+    <a href="index.html" class="back-btn">
+        <span>🏠</span>
+        <span>العودة للرئيسية</span>
+    </a>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>❤️ مفضلتي</h1>
+            <p>المهنيون المحفوظون في قائمتك المفضلة</p>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loadingState">
+            <div class="loading-spinner"></div>
+            <h3>جاري تحميل المفضلة...</h3>
+        </div>
+
+        <!-- Favorites Grid -->
+        <div class="favorites-grid" id="favoritesGrid" style="display: none;"></div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="icon">💔</div>
+            <h2>لا توجد مفضلات بعد</h2>
+            <p>لم تقم بإضافة أي مهني إلى قائمة المفضلة</p>
+            <a href="index.html" class="empty-btn">تصفح المهنيين</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            doc,
+            deleteDoc,
+            query,
+            where,
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
+            authDomain: "home-services-app-a9c5e.firebaseapp.com",
+            projectId: "home-services-app-a9c5e",
+            storageBucket: "home-services-app-a9c5e.appspot.com",
+            messagingSenderId: "287028219636",
+            appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let favorites = [];
+
+        // DOM Elements
+        const elements = {
+            loadingState: document.getElementById('loadingState'),
+            favoritesGrid: document.getElementById('favoritesGrid'),
+            emptyState: document.getElementById('emptyState')
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function () {
+            console.log('❤️ تحميل صفحة المفضلة...');
+
+            // Create particles
+            createParticles();
+
+            // Check login
+            checkUserLogin();
+
+            if (!currentUser) {
+                showToast('⚠️ يجب تسجيل الدخول أولاً');
+                setTimeout(() => {
+                    window.location.href = 'customer-auth-page.html';
+                }, 1500);
+                return;
+            }
+
+            // Load favorites
+            await loadFavorites();
+        });
+
+        function checkUserLogin() {
+            const isLoggedIn = localStorage.getItem('customerLoggedIn');
+            const customerEmail = localStorage.getItem('customerEmail');
+
+            if (isLoggedIn === 'true' && customerEmail) {
+                currentUser = { email: customerEmail };
+            } else {
+                currentUser = null;
+            }
+        }
+
+        async function loadFavorites() {
+            try {
+                showLoading(true);
+
+                const customerEmail = localStorage.getItem('customerEmail');
+                console.log('📧 Email:', customerEmail);
+
+                const favoritesSnapshot = await getDocs(
+                    query(
+                        collection(db, "favorites"),
+                        where("customerEmail", "==", customerEmail)
+                    )
+                );
+
+                favorites = [];
+                favoritesSnapshot.forEach((doc) => {
+                    favorites.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                console.log(`❤️ تم تحميل ${favorites.length} مفضلة`);
+
+                showLoading(false);
+                renderFavorites();
+
+            } catch (error) {
+                console.error('❌ خطأ في تحميل المفضلة:', error);
+                showLoading(false);
+                showError();
+            }
+        }
+
+        function renderFavorites() {
+            const grid = elements.favoritesGrid;
+
+            if (favorites.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            grid.innerHTML = '';
+            grid.style.display = 'grid';
+            elements.emptyState.style.display = 'none';
+
+            favorites.forEach((favorite, index) => {
+                const card = createFavoriteCard(favorite, index);
+                grid.appendChild(card);
+            });
+        }
+
+        function createFavoriteCard(favorite, index) {
+            const card = document.createElement('div');
+            card.className = 'professional-card';
+            card.style.animationDelay = `${index * 0.1}s`;
+
+            const avatarLetter = favorite.professionalName.charAt(0).toUpperCase();
+            const addedDate = formatDate(favorite.addedAt);
+
+            card.innerHTML = `
+                <div class="professional-header">
+                    <div class="professional-avatar">${avatarLetter}</div>
+                    <div class="professional-info">
+                        <h3>${favorite.professionalName}</h3>
+                        <div class="profession">${favorite.professionalJob}</div>
+                        <div class="location">📍 ${favorite.professionalCity}</div>
+                    </div>
+                </div>
+                
+                <div class="added-date">
+                    ⏰ أضيف في: ${addedDate}
+                </div>
+                
+                <div class="card-actions">
+                    <button class="action-btn btn-remove" onclick="removeFavorite('${favorite.id}', '${favorite.professionalName}')">
+                        🗑️ إزالة
+                    </button>
+                    <a href="index.html" class="action-btn btn-view">
+                        👁️ عرض الكل
+                    </a>
+                </div>
+            `;
+
+            return card;
+        }
+
+        window.removeFavorite = async function (favoriteId, professionalName) {
+            if (!confirm(`هل تريد إزالة "${professionalName}" من المفضلة؟`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, "favorites", favoriteId));
+
+                // Remove from local array
+                favorites = favorites.filter(f => f.id !== favoriteId);
+
+                showToast('💔 تمت الإزالة من المفضلة');
+                renderFavorites();
+
+            } catch (error) {
+                console.error('❌ خطأ في الإزالة:', error);
+                showToast('❌ حدث خطأ، حاول مرة أخرى');
+            }
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'غير محدد';
+
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'اليوم';
+            if (diffDays === 1) return 'أمس';
+            if (diffDays < 7) return `منذ ${diffDays} أيام`;
+            if (diffDays < 30) return `منذ ${Math.floor(diffDays / 7)} أسابيع`;
+
+            return date.toLocaleDateString('ar-SA');
+        }
+
+        function showLoading(show) {
+            elements.loadingState.style.display = show ? 'block' : 'none';
+            elements.favoritesGrid.style.display = show ? 'none' : 'grid';
+            elements.emptyState.style.display = 'none';
+        }
+
+        function showEmptyState() {
+            elements.emptyState.style.display = 'block';
+            elements.favoritesGrid.style.display = 'none';
+        }
+
+        function showError() {
+            elements.favoritesGrid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
+                    <h3>خطأ في التحميل</h3>
+                    <p>فشل في تحميل المفضلة</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 20px; cursor: pointer;">إعادة المحاولة</button>
+                </div>
+            `;
+            elements.favoritesGrid.style.display = 'grid';
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'favorite-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50%) translateY(-20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const size = Math.random() * 60 + 20;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+    </script>
+</body>
+
+</html>

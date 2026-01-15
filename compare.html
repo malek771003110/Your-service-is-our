@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مقارنة المهنيين ⚖️ | خدمتك عنا</title>
+    <meta name="description" content="قارن بين أفضل المهنيين لاختيار الأنسب لك">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Animated Background Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-100px) translateX(50px) rotate(120deg);
+            }
+
+            66% {
+                transform: translateY(-200px) translateX(-50px) rotate(240deg);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            animation: fadeInDown 0.8s ease-out;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        /* Comparison Table Container */
+        .comparison-container {
+            overflow-x: auto;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            margin-bottom: 50px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            color: white;
+        }
+
+        th,
+        td {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            vertical-align: middle;
+        }
+
+        /* First Column (Labels) */
+        td:first-child {
+            padding-left: 30px;
+            text-align: right;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(0, 0, 0, 0.2);
+            width: 200px;
+            position: sticky;
+            right: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Header Row (Professionals) */
+        thead th {
+            padding-top: 30px;
+            padding-bottom: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        thead th:first-child {
+            background: rgba(0, 0, 0, 0.4);
+            border-top-right-radius: 25px;
+            z-index: 20;
+        }
+
+        thead th:last-child {
+            border-top-left-radius: 25px;
+        }
+
+        /* Professional Header Info */
+        .prof-header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .prof-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .prof-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .prof-job {
+            color: #f39c12;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Remove Button */
+        .btn-remove {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-remove:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Action Buttons Cell */
+        .action-buttons-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+            padding: 20px 40px;
+        }
+
+        .action-btn {
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .btn-call {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: white;
+            display: none;
+        }
+
+        .empty-state .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .btn-browse {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-browse:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        /* Responsive Mobile Cards */
+        @media (max-width: 768px) {
+            .back-btn {
+                top: 15px;
+                left: 15px;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                justify-content: center;
+            }
+
+            .back-btn span {
+                display: none;
+            }
+
+            .back-btn::after {
+                content: '🏠';
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            /* On mobile, we might switch to a different view or keep the scrollable table */
+            /* Keeping scrollable table for now but with sticky first column */
+            td:first-child {
+                left: auto;
+                right: 0;
+                background: rgba(30, 30, 50, 0.95);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                <span>🏠</span>
+                <span>الرئيسية</span>
+            </a>
+            <h1>⚖️ مقارنة المهنيين</h1>
+            <p>مقارنة شاملة لمساعدتك في اتخاذ القرار الأفضل</p>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <div class="icon">⚖️</div>
+            <h2>لا يوجد مهنيين للمقارنة</h2>
+            <p>قم بإضافة مهنيين من القائمة الرئيسية للمقارنة بينهم (حد أقصى 3)</p>
+            <a href="index.html" class="btn-browse">تصفح المهنيين</a>
+        </div>
+
+        <div class="comparison-container" id="comparisonContainer">
+            <table id="compareTable">
+                <thead>
+                    <tr id="headerRow">
+                        <th>المهني</th>
+                        <!-- Headers will be injected here -->
+                    </tr>
+                </thead>
+                <tbody id="compareBody">
+                    <!-- Rows will be injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadComparison();
+            createParticles();
+        });
+
+        function loadComparison() {
+            const container = document.getElementById('comparisonContainer');
+            const emptyState = document.getElementById('emptyState');
+            const headerRow = document.getElementById('headerRow');
+            const tbody = document.getElementById('compareBody');
+
+            // Get data from localStorage
+            const compareList = JSON.parse(localStorage.getItem('compareList')) || [];
+
+            if (compareList.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            // Generate Columns (Headers)
+            compareList.forEach(prof => {
+                const th = document.createElement('th');
+                th.innerHTML = `
+                    <div class="prof-header-content">
+                        <div class="prof-avatar">${prof.name.charAt(0).toUpperCase()}</div>
+                        <div class="text-center">
+                            <div class="prof-name">${prof.name}</div>
+                            <div class="prof-job">${prof.job}</div>
+                        </div>
+                        <button class="btn-remove" onclick="removeFromCompare('${prof.id}')">❌ إزالة</button>
+                    </div>
+                `;
+                headerRow.appendChild(th);
+            });
+
+            // Define rows structure
+            const rows = [
+                { label: '📍 المدينة', key: 'city' },
+                { label: '⭐ التقييم', key: 'rating', render: (p) => generateStars(p.ratings?.averageRating || 0) + ` <br><small>(${p.ratings?.totalCount || 0} تقييم)</small>` },
+                { label: '💰 السعر / ساعة', key: 'price', render: (p) => p.hourlyPrice ? `${p.hourlyPrice} د.أ` : 'غير محدد' },
+                { label: '📚 الخبرة', key: 'experience', render: (p) => `${p.experienceYears || 0} سنوات` },
+                { label: '🕐 ساعات العمل', key: 'hours', render: (p) => `${p.workStartTime || '?'} - ${p.workEndTime || '?'}` },
+                {
+                    label: '📞 التواصل', key: 'actions', render: (p) => `
+                    <div class="action-buttons-cell">
+                        <a href="tel:${p.phone}" class="action-btn btn-call">📞 اتصال</a>
+                        <a href="https://wa.me/${p.phone}" target="_blank" class="action-btn btn-whatsapp">💬 واتساب</a>
+                    </div>
+                ` }
+            ];
+
+            // Generate Rows
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+
+                // Label Cell
+                const labelTd = document.createElement('td');
+                labelTd.textContent = row.label;
+                tr.appendChild(labelTd);
+
+                // Data Cells
+                compareList.forEach(prof => {
+                    const td = document.createElement('td');
+                    if (row.render) {
+                        td.innerHTML = row.render(prof);
+                    } else {
+                        td.textContent = prof[row.key] || prof[row.key.replace('professional', '').toLowerCase()] || '-';
+                    }
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            let starsHtml = '';
+
+            for (let i = 0; i < fullStars; i++) starsHtml += '⭐';
+            // if (halfStar) starsHtml += '½'; 
+            return starsHtml || '-';
+        }
+
+        function removeFromCompare(id) {
+            let list = JSON.parse(localStorage.getItem('compareList')) || [];
+            list = list.filter(p => p.id !== id);
+            localStorage.setItem('compareList', JSON.stringify(list));
+            location.reload();
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 5 + 's';
+                p.style.opacity = Math.random() * 0.5 + 0.1;
+                p.style.width = p.style.height = (Math.random() * 5 + 2) + 'px';
+                container.appendChild(p);
+            }
+        }
+    </script>
+</body>
+
+</html>
