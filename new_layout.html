@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta name="google-site-verification" content="abc123xyz" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>خدمات منزلية احترافية | رئيسية</title>
+    <!-- Google Fonts import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #5B4FCF;
+            --primary-light: #7B6FE8;
+            --primary-dark: #3D34A5;
+            --secondary: #FF6B35;
+            --accent: #00C9A7;
+            --surface: #F8F7FF;
+            --card-bg: #FFFFFF;
+            --text-primary: #1A1A2E;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --border: #E8E6F0;
+            --shadow-sm: 0 2px 8px rgba(91, 79, 207, 0.08);
+            --shadow-md: 0 8px 30px rgba(91, 79, 207, 0.15);
+            --shadow-lg: 0 20px 60px rgba(91, 79, 207, 0.2);
+            --gradient-hero: linear-gradient(135deg, #5B4FCF 0%, #9B59B6 50%, #FF6B35 100%);
+            --gradient-card: linear-gradient(145deg, #FFFFFF 0%, #F8F7FF 100%);
+            --gradient-cta: linear-gradient(45deg, #FF6B35, #FF8C42);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+            background-color: var(--surface);
+            color: var(--text-primary);
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: calc(72px + env(safe-area-inset-bottom)); /* Bottom Nav space */
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* HEADER THIN TOP */
+        .top-header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-logo { font-size: 20px; font-weight: 800; color: var(--primary); display:flex; align-items:center; gap:8px; }
+        .header-logo i { color: var(--secondary); font-size: 24px; }
+        
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-btn.active { color: var(--secondary); }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px; right: -2px;
+            background: var(--secondary);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            border-radius: 50%;
+            width: 16px; height: 16px;
+            display: flex; justify-content: center; align-items: center;
+            border: 2px solid white;
+        }
+
+        .user-avatar-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--gradient-hero);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        /* HERO CARD */
+        .hero-container {
+            padding: 16px;
+        }
+
+        .hero-card {
+            background: var(--gradient-hero);
+            border-radius: 28px;
+            padding: 32px 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            animation: fadeSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            top: -20px; left: -20px;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-welcome { font-size: 16px; font-weight: 600; margin-bottom: 4px; opacity: 0.9; }
+        .hero-title { font-size: 28px; font-weight: 800; line-height: 1.3; margin-bottom: 24px; }
+        
+        .hero-stats {
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .stat-item:last-child { border-left: none; }
+        .stat-val { font-size: 20px; font-weight: 800; display: block; margin-bottom: 4px; }
+        .stat-lbl { font-size: 11px; font-weight: 600; opacity: 0.9; }
+
+        /* MAIN SEARCH SECTION */
+        .search-area {
+            padding: 16px;
+            margin-top: 8px;
+            animation: fadeSlideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
+            opacity: 0;
+        }
+
+        .search-wrapper {
+            display: flex;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .search-input-box {
+            position: relative;
+            flex: 2;
+        }
+
+        .search-input-box input {
+            width: 100%;
+            padding: 14px 40px 14px 16px;
+            border: none;
+            background: var(--surface);
+            border-radius: 14px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+        }
+
+        .search-input-box input:focus { outline: none; box-shadow: 0 0 0 2px var(--primary-light); }
+        .search-input-box i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--primary); }
+
+        .search-select-box {
+            flex: 1;
+        }
+
+        .search-select-box select {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            background: var(--surface);
+            border-radius: 14px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        /* SECTION HEADERS */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            margin: 32px 0 16px;
+        }
+
+        .section-header h2 { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+        .section-header a { font-size: 14px; font-weight: 600; color: var(--primary); }
+
+        /* QUICK ACTIONS SECTION */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 4px 16px 8px;
+        }
+
+        .quick-action-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 20px 20px 0 0;
+        }
+        .quick-action-card.map::before { background: linear-gradient(90deg, #5B4FCF, #9B59B6); }
+        .quick-action-card.status::before { background: linear-gradient(90deg, #FF6B35, #FF8C42); }
+        .quick-action-card.profile::before { background: linear-gradient(90deg, #00C9A7, #00A884); }
+        .quick-action-card.join::before { background: linear-gradient(90deg, #F59E0B, #D97706); }
+
+        .quick-action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .qa-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+        }
+        .quick-action-card.map .qa-icon { background: rgba(91,79,207,0.1); color: var(--primary); }
+        .quick-action-card.status .qa-icon { background: rgba(255,107,53,0.1); color: var(--secondary); }
+        .quick-action-card.profile .qa-icon { background: rgba(0,201,167,0.1); color: var(--accent); }
+        .quick-action-card.join .qa-icon { background: rgba(245,158,11,0.1); color: #D97706; }
+
+        .qa-title { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+        .qa-desc { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .qa-arrow { position: absolute; bottom: 14px; left: 14px; font-size: 12px; color: var(--text-muted); }
+
+        /* CATEGORIES (Popular Services) */
+        .categories-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px;
+            padding: 8px 16px 24px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 80px;
+            scroll-snap-align: start;
+            cursor: pointer;
+        }
+
+        .cat-icon {
+            width: 64px; height: 64px;
+            border-radius: 20px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .category-item:hover .cat-icon {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(91, 79, 207, 0.3);
+            color: var(--secondary);
+            background: var(--surface);
+        }
+
+        .cat-name { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-align: center; }
+
+        /* PROFESSIONALS GRID — responsive wrap layout like old site */
+        .professionals-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+            gap: 20px;
+            padding: 8px 16px 32px;
+        }
+        .professionals-grid::-webkit-scrollbar { display: none; }
+
+        /* The JS outputs a string we must style. We override its layout. */
+        .professional-card {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            gap: 16px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .professional-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(91, 79, 207, 0.3);
+        }
+
+        .professional-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .professional-avatar {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: var(--surface);
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            display: flex; justify-content: center; align-items: center;
+            border: 2px solid var(--border);
+        }
+
+        .favorite-icon {
+            position: absolute;
+            top: 20px; left: 20px;
+            font-size: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .favorite-icon.active { color: #f43f5e; animation: scaleIn 0.3s; }
+
+        .professional-info h3 { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .professional-info .profession { font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 2px; }
+        .professional-info .location { font-size: 12px; color: var(--text-muted); }
+
+        .rating-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 10px 14px;
+            border-radius: 12px;
+        }
+
+        .rating-display { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; }
+        .stars .star { color: #ccc; font-size: 14px; }
+        .stars .star.filled { color: #F59E0B; }
+        .rating-count { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+
+        .status { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 100px; }
+        .status.available { background: rgba(0, 201, 167, 0.1); color: #007A64; border: 1px solid rgba(0, 201, 167, 0.3); }
+        .status.busy { background: #FFEBEE; color: #B71C1C; border: 1px solid #EF9A9A; }
+
+        .professional-description { font-size: 13px; color: var(--text-secondary); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .contact-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .detail-item { background: var(--surface); padding: 10px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+        .detail-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .detail-value { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+        .masked-info { font-size: 11px; color: var(--secondary); background: rgba(255,107,53,0.1); padding: 2px 6px; border-radius: 8px; margin-top: 4px; }
+
+        .professional-actions {
+            display: flex; gap: 8px; margin-top: auto;
+        }
+        .action-btn { flex: 1; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; transition: all 0.3s; color: white; text-decoration: none; }
+        .btn-rate { background: #F59E0B; }
+        .btn-call { background: var(--gradient-cta); }
+        .btn-whatsapp { background: #10B981; }
+
+        .loading-state, .empty-state { text-align: center; padding: 40px; color: var(--text-muted); font-weight: 600; font-size: 14px; width: 100%; display: flex; flex-direction: column; align-items: center;}
+        
+        .loading-spinner {
+            width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary);
+            border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 16px;
+        }
+
+        /* HAMBURGER SIDEBAR */
+        .hamburger-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            justify-content: center;
+        }
+        .hamburger-btn span {
+            display: block;
+            width: 24px;
+            height: 2.5px;
+            background: var(--text-secondary);
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        .hamburger-btn.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+        .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+        .hamburger-btn.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed;
+            top: 0; right: -290px;
+            width: 280px;
+            height: 100%;
+            background: var(--card-bg);
+            z-index: 3001;
+            transition: right 0.35s cubic-bezier(0.34, 1.26, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 40px rgba(91,79,207,0.2);
+            overflow-y: auto;
+        }
+        .sidebar.show { right: 0; }
+
+        .sidebar-header {
+            background: var(--gradient-hero);
+            padding: 48px 24px 28px;
+            color: white;
+            position: relative;
+        }
+        .sidebar-close {
+            position: absolute;
+            top: 14px; left: 14px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sidebar-avatar {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 3px solid rgba(255,255,255,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .sidebar-username { font-size: 16px; font-weight: 700; }
+        .sidebar-subtitle { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+        .sidebar-body { flex: 1; padding: 16px; }
+
+        .sidebar-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0 8px;
+            margin: 16px 0 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 14px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+        }
+        .sidebar-link:hover { background: var(--surface); color: var(--primary); }
+        .sidebar-link i { width: 20px; text-align: center; font-size: 16px; color: var(--text-muted); transition: color 0.2s; }
+        .sidebar-link:hover i { color: var(--primary); }
+
+        .sidebar-link .fav-badge {
+            margin-right: auto;
+            background: var(--secondary);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 100px;
+        }
+
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+        .sidebar-link.danger { color: #ef4444; }
+        .sidebar-link.danger i { color: #ef4444; }
+
+        /* COMPARES AND RATINGS AND ALERTS */
+        .compare-bar {
+            position: fixed; bottom: 82px; left: 16px; right: 16px; background: var(--primary-dark);
+            color: white; border-radius: 20px; padding: 16px; display: flex; justify-content: space-between;
+            align-items: center; z-index: 1001; transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-lg);
+        }
+        .compare-bar.show { transform: translateY(0); }
+        .compare-action-btn { background: white; color: var(--primary); padding: 8px 16px; border-radius: 12px; font-weight: 700; text-decoration: none; font-size: 13px; }
+        
+        .btn-compare { background: rgba(91, 79, 207, 0.08); color: var(--primary); font-weight: 600; padding: 12px; border-radius: 12px; font-size: 13px; border: none; cursor: pointer; flex: 1; margin-top: 8px; width: 100%; transition: all 0.3s; }
+        .btn-compare.added { background: rgba(0, 201, 167, 0.15); color: var(--accent); }
+
+        .rating-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+            z-index: 3000; display: none; align-items: flex-end; justify-content: center;
+        }
+        .rating-modal.show { display: flex; animation: fadeIn 0.3s forwards; }
+        .rating-modal-content {
+            background: var(--card-bg); width: 100%; border-radius: 28px 28px 0 0; padding: 32px 24px;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; position: relative;
+        }
+        .rating-stars { display: flex; justify-content: center; gap: 8px; margin: 24px 0; direction: ltr; }
+        .rating-stars .star { font-size: 44px; color: var(--border); cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .rating-stars .star.active, .rating-stars .star:hover { color: #F59E0B; transform: scale(1.1); }
+        
+        .form-textarea { width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 16px; font-size: 14px; font-family: inherit; margin-bottom: 24px; background: var(--surface); }
+
+        .btn-primary { background: var(--gradient-cta); color: white; padding: 16px 24px; border-radius: 16px; width: 100%; border: none; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3); }
+
+        /* BOTTOM NAV BAR */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 72px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 2000;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            flex: 1;
+            height: 100%;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i { font-size: 20px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .nav-item.active i { transform: scale(1.15); }
+        
+        .nav-item span { font-size: 11px; font-weight: 700; }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 3px; background: var(--primary); border-radius: 0 0 4px 4px;
+        }
+
+        /* HIDDEN ELEMENTS FOR JS */
+        #userStatus, #hamburgerMenu, #hamburgerOverlay { display: none !important; }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- STICKY TOP HEADER -->
+    <header class="top-header">
+        <div class="header-actions">
+            <!-- Notification Icon -->
+            <button class="notification-btn" id="notificationBtn">
+                <i class="fa-regular fa-bell" id="notificationIcon"></i>
+                <span class="notification-badge" id="notificationText" style="display:none;">0</span>
+            </button>
+            <div class="user-avatar-btn" id="userAction" style="cursor:pointer;" onclick="window.location.href='profile.html'">
+                <i class="fas fa-user" id="userWelcome" style="font-size: 16px;"></i>
+            </div>
+        </div>
+        <a href="index.html" class="header-logo">
+            <i class="fas fa-home"></i> خدمتك عنا
+        </a>
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="openSidebar()" aria-label="القائمة">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR MENU -->
+    <aside class="sidebar" id="sidebarMenu">
+        <div class="sidebar-header">
+            <button class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
+            <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+            <div class="sidebar-username" id="sidebarUsername">أهلاً بك</div>
+            <div class="sidebar-subtitle">خدمتك عنا — منصة الخدمات المنزلية</div>
+        </div>
+        <div class="sidebar-body">
+            <div class="sidebar-section-title">التنقل</div>
+            <a href="index.html" class="sidebar-link"><i class="fas fa-home"></i> الرئيسية</a>
+            <a href="map.html" class="sidebar-link"><i class="fas fa-map-marker-alt"></i> الخريطة التفاعلية</a>
+            <a href="bookings.html" class="sidebar-link"><i class="fas fa-calendar-check"></i> حالة طلباتي</a>
+
+            <div class="sidebar-section-title">الحساب</div>
+            <a href="favorites.html" class="sidebar-link">
+                <i class="fas fa-heart"></i> المفضلة
+                <span class="fav-badge" id="sidebarFavBadge" style="display:none;">0</span>
+            </a>
+            <a href="profile.html" class="sidebar-link"><i class="fas fa-user-circle"></i> ملفي الشخصي</a>
+
+            <div class="sidebar-section-title">للمهنيين</div>
+            <a href="professional-register.html" class="sidebar-link"><i class="fas fa-tools"></i> انضم كمهني</a>
+            <a href="professional-login.html" class="sidebar-link"><i class="fas fa-briefcase"></i> دخول المهنيين</a>
+
+            <div class="sidebar-divider"></div>
+            <a href="customer-auth-page.html" class="sidebar-link" id="sidebarAuthLink"><i class="fas fa-sign-in-alt"></i> <span id="sidebarAuthText">تسجيل الدخول</span></a>
+            <button onclick="handleSidebarLogout()" class="sidebar-link danger" id="sidebarLogoutBtn" style="display:none;"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </div>
+    </aside>
+
+    <!-- HIDDEN REQUIRED ID BY JS -->
+    <div id="userStatus"></div>
+
+    <!-- HERO SECTION -->
+    <div class="hero-container">
+        <div class="hero-card">
+            <div class="hero-welcome">أهلاً بك في منصتك،</div>
+            <div class="hero-title">اطلب أي خدمة<br>تحتاجها لمنزلك بسهولة 🏠</div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-val">+120</span>
+                    <span class="stat-lbl">خدمة متاحة</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" id="resultsCount">0</span>
+                    <span class="stat-lbl">مزود خدمة</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val">4.9</span>
+                    <span class="stat-lbl">تقييم المنصة</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SEARCH -->
+    <div class="search-area">
+        <div class="search-wrapper">
+            <div class="search-input-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="professionSearch" placeholder="عن ماذا تبحث؟ (مثال: نجار، منظف...)">
+            </div>
+            <div class="search-select-box">
+                <select id="governorateSelect">
+                    <option value="">كل المدن</option>
+                    <option value="عمان">عمان</option>
+                    <option value="الزرقاء">الزرقاء</option>
+                    <option value="إربد">إربد</option>
+                    <option value="العقبة">العقبة</option>
+                    <option value="البلقاء">البلقاء</option>
+                    <option value="الكرك">الكرك</option>
+                    <option value="المفرق">المفرق</option>
+                    <option value="معان">معان</option>
+                    <option value="الطفيلة">الطفيلة</option>
+                    <option value="مادبا">مادبا</option>
+                    <option value="جرش">جرش</option>
+                    <option value="عجلون">عجلون</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK ACTIONS SECTION -->
+    <div class="section-header" style="margin-top: 24px;">
+        <h2>خدمات سريعة</h2>
+    </div>
+    <div class="quick-actions">
+        <a href="map.html" class="quick-action-card map">
+            <div class="qa-icon"><i class="fas fa-map-location-dot"></i></div>
+            <div class="qa-title">الخريطة</div>
+            <div class="qa-desc">اعثر على مهني قريب منك</div>
+            <i class="fas fa-chevron-left qa-arrow"></i>
+        </a>
+        <a href="bookings.html" class="quick-action-card status">
+            <div class="qa-icon"><i class="fas fa-clipboard-list"></i></div>
+            <div class="qa-title">حالة الطلبات</div>
+            <div class="qa-desc">تتبع طلباتك الحالية</div>
+            <i class="fas fa-chevron-left qa-arrow"></i>
+        </a>
+        <a href="profile.html" class="quick-action-card profile">
+            <div class="qa-icon"><i class="fas fa-user-circle"></i></div>
+            <div class="qa-title">ملف المهني</div>
+            <div class="qa-desc">اطلع على تفاصيل الخدمة</div>
+            <i class="fas fa-chevron-left qa-arrow"></i>
+        </a>
+        <a href="professional-register.html" class="quick-action-card join">
+            <div class="qa-icon"><i class="fas fa-tools"></i></div>
+            <div class="qa-title">انضم كمهني</div>
+            <div class="qa-desc">سجّل ضمن شبكتنا المهنية</div>
+            <i class="fas fa-chevron-left qa-arrow"></i>
+        </a>
+    </div>
+
+    <!-- POPULAR CATEGORIES -->
+    <div class="section-header">
+        <h2>الخدمات الشائعة</h2>
+        <a href="#">عرض الكل</a>
+    </div>
+    <div class="categories-scroll">
+        <div class="category-item" onclick="document.getElementById('professionSearch').value='نجار'; document.getElementById('professionSearch').dispatchEvent(new Event('input'))">
+            <div class="cat-icon"><i class="fas fa-hammer"></i></div>
+            <span class="cat-name">نجارة</span>
+        </div>
+        <div class="category-item" onclick="document.getElementById('professionSearch').value='كهرباء'; document.getElementById('professionSearch').dispatchEvent(new Event('input'))">
+            <div class="cat-icon"><i class="fas fa-bolt"></i></div>
+            <span class="cat-name">كهرباء</span>
+        </div>
+        <div class="category-item" onclick="document.getElementById('professionSearch').value='سباكة'; document.getElementById('professionSearch').dispatchEvent(new Event('input'))">
+            <div class="cat-icon"><i class="fas fa-wrench"></i></div>
+            <span class="cat-name">سباكة</span>
+        </div>
+        <div class="category-item" onclick="document.getElementById('professionSearch').value='تنظيف'; document.getElementById('professionSearch').dispatchEvent(new Event('input'))">
+            <div class="cat-icon"><i class="fas fa-broom"></i></div>
+            <span class="cat-name">تنظيف</span>
+        </div>
+        <div class="category-item" onclick="document.getElementById('professionSearch').value='دهان'; document.getElementById('professionSearch').dispatchEvent(new Event('input'))">
+            <div class="cat-icon"><i class="fas fa-paint-roller"></i></div>
+            <span class="cat-name">دهان</span>
+        </div>
+        <div class="category-item" onclick="document.getElementById('professionSearch').value='تكييف'; document.getElementById('professionSearch').dispatchEvent(new Event('input'))">
+            <div class="cat-icon"><i class="fas fa-snowflake"></i></div>
+            <span class="cat-name">أجهزة وتكييف</span>
+        </div>
+    </div>
+
+    <!-- NEARBY PROFESSIONALS (JS Driven) -->
+    <div class="section-header">
+        <h2>مزودو الخدمة المميزون</h2>
+        <a href="#">الأقرب لك بناءً على موقعك</a>
+    </div>
+
+    <div id="loadingState" class="loading-state">
+        <div class="loading-spinner"></div>
+        جاري جلب قائمة بأفضل المهنيين لك...
+    </div>
+
+    <!-- HORIZONTAL SCROLL GRID FOR JS -->
+    <div id="professionalsGrid" class="professionals-grid"></div>
+
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <i class="fas fa-search" style="font-size: 32px; color: var(--border); margin-bottom: 12px;"></i>
+        لا يوجد نتائج مطابقة للبحث، جرب كلمة أخرى.
+    </div>
+
+    <!-- RATING MODAL (Required IDs) -->
+    <div id="ratingModal" class="rating-modal">
+        <div class="rating-modal-content">
+            <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">تقييم أداء <span id="ratingProfessionalName" style="color: var(--primary);"></span></h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">يرجى اختيار عدد النجوم لتقييم الخدمة المقدمة</p>
+            
+            <div class="rating-stars" id="ratingStars">
+                <i class="fas fa-star star" data-rating="5"></i>
+                <i class="fas fa-star star" data-rating="4"></i>
+                <i class="fas fa-star star" data-rating="3"></i>
+                <i class="fas fa-star star" data-rating="2"></i>
+                <i class="fas fa-star star" data-rating="1"></i>
+            </div>
+            <div id="ratingSelectedText" class="ratingSelectedText" style="text-align:center; color: #F59E0B; height: 20px; font-weight: 700; font-size: 14px; margin-bottom: 16px;"></div>
+
+            <textarea id="ratingComment" class="form-textarea" placeholder="اكتب مشاركتك ورأيك في الخدمة (اختياري)..." rows="3"></textarea>
+            
+            <div style="display: flex; gap: 12px;">
+                <button id="submitRating" class="btn-primary" style="flex: 2;">إرسال التقييم</button>
+                <button onclick="document.getElementById('ratingModal').classList.remove('show')" class="btn-primary" style="flex: 1; background: var(--surface); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border);">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPARE BAR (hidden by default, JS shows it when 2+ professionals selected) -->
+    <div id="compareBar" class="compare-bar" style="display:none;">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div style="background: rgba(255,255,255,0.2); width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:800;" id="compareCount">0</div>
+            <div>
+                <div style="font-weight:700; font-size:14px;">جاهز للمقارنة</div>
+                <div style="font-size:11px; opacity:0.8;">المهنيون المحددون لمقارنة ملفاتهم</div>
+            </div>
+        </div>
+        <a href="compare.html" class="compare-action-btn">المقارنة الآن</a>
+        <div id="compareItems" style="display:none;"></div>
+    </div>
+
+    <!-- REQUIRED BUT HIDDEN JS GLOBALS TO PREVENT ERRORS -->
+    <button id="favoritesBtn" style="display:none;"></button>
+    <div id="favoritesCount" style="display:none;"></div>
+    <!-- These are now our functional sidebar elements (not hidden) -->
+    <div id="hamburgerMenu" style="display:none;"></div>
+    <div id="hamburgerOverlay" style="display:none;"></div>
+    <div id="hamburgerFavorites" style="display:none;"><span class="link-text"></span><span class="link-icon"></span></div>
+    <div id="hamburgerAuth" style="display:none;"><span class="link-text"></span><span class="link-icon"></span></div>
+    <div id="hamburgerFavCount" style="display:none;"></div>
+
+    <!-- BOTTOM NAVIGATION BAR (Static links) -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="map.html" class="nav-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>الخريطة</span>
+        </a>
+        <a href="compare.html" class="nav-item">
+            <i class="fas fa-balance-scale"></i>
+            <span>مقارنة</span>
+        </a>
+        <a href="favorites.html" class="nav-item">
+            <i class="fas fa-heart"></i>
+            <span>المفضلة</span>
+        </a>
+        <a href="bookings.html" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>طلباتي</span>
+        </a>
+    </nav>
+    
+    <!-- Sidebar JavaScript -->
+    <script>
+        function openSidebar() {
+            document.getElementById('sidebarMenu').classList.add('show');
+            document.getElementById('sidebarOverlay').classList.add('show');
+            document.getElementById('hamburgerBtn').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            updateSidebarUser();
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebarMenu').classList.remove('show');
+            document.getElementById('sidebarOverlay').classList.remove('show');
+            document.getElementById('hamburgerBtn').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function updateSidebarUser() {
+            const usernameEl = document.getElementById('sidebarUsername');
+            const authLink = document.getElementById('sidebarAuthLink');
+            const logoutBtn = document.getElementById('sidebarLogoutBtn');
+            const favBadge = document.getElementById('sidebarFavBadge');
+
+            const userStatus = document.getElementById('userStatus');
+            const isLoggedIn = userStatus && userStatus.dataset.loggedIn === 'true';
+            const userName = userStatus && userStatus.dataset.userName;
+
+            if (isLoggedIn && userName) {
+                if (usernameEl) usernameEl.textContent = 'أهلاً، ' + userName;
+                if (authLink) authLink.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'flex';
+            } else {
+                if (usernameEl) usernameEl.textContent = 'أهلاً بك!';
+                if (authLink) authLink.style.display = 'flex';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+
+            const favCountEl = document.getElementById('hamburgerFavCount');
+            const count = favCountEl ? parseInt(favCountEl.textContent) || 0 : 0;
+            if (favBadge) {
+                if (count > 0) {
+                    favBadge.textContent = count;
+                    favBadge.style.display = 'inline-block';
+                } else {
+                    favBadge.style.display = 'none';
+                }
+            }
+        }
+
+        function handleSidebarLogout() {
+            closeSidebar();
+            if (typeof logout === 'function') {
+                logout();
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+
+        const favObserver = new MutationObserver(function() {
+            const favCountEl = document.getElementById('hamburgerFavCount');
+            const favBadge = document.getElementById('sidebarFavBadge');
+            if (favCountEl && favBadge) {
+                const count = parseInt(favCountEl.textContent) || 0;
+                if (count > 0) {
+                    favBadge.textContent = count;
+                    favBadge.style.display = 'inline-block';
+                } else {
+                    favBadge.style.display = 'none';
+                }
+            }
+        });
+        const favTarget = document.getElementById('hamburgerFavCount');
+        if (favTarget) favObserver.observe(favTarget, { childList: true, characterData: true, subtree: true });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeSidebar();
+        });
+    </script>

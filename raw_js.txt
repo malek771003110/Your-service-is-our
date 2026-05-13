@@ -1,0 +1,1323 @@
+﻿<script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            doc,
+            getDoc,
+            setDoc,
+            deleteDoc,
+            query,
+            where,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
+            authDomain: "home-services-app-a9c5e.firebaseapp.com",
+            projectId: "home-services-app-a9c5e",
+            storageBucket: "home-services-app-a9c5e.appspot.com",
+            messagingSenderId: "287028219636",
+            appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allProfessionals = [];
+        let filteredProfessionals = [];
+        let currentUser = null;
+        let currentRatingProfessional = null;
+        let selectedRating = 0;
+
+        // â‌¤ï¸ڈ Favorites System Variables
+        let userFavorites = new Set(); // Set of favorite professional IDs
+        let favoritesCount = 0;
+
+        // DOM Elements
+        const elements = {
+            loadingState: document.getElementById('loadingState'),
+            professionalsGrid: document.getElementById('professionalsGrid'),
+            emptyState: document.getElementById('emptyState'),
+            resultsCount: document.getElementById('resultsCount'),
+            professionSearch: document.getElementById('professionSearch'),
+            governorateSelect: document.getElementById('governorateSelect'),
+            userStatus: document.getElementById('userStatus'),
+            userWelcome: document.getElementById('userWelcome'),
+            userAction: document.getElementById('userAction'),
+            ratingModal: document.getElementById('ratingModal'),
+            ratingStars: document.getElementById('ratingStars'),
+            ratingComment: document.getElementById('ratingComment'),
+            ratingProfessionalName: document.getElementById('ratingProfessionalName')
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function () {
+            console.log('ًںڑ€ طھط­ظ…ظٹظ„ ط§ظ„طµظپط­ط© ط§ظ„ط±ط¦ظٹط³ظٹط©...');
+            checkUserLogin();
+            await loadProfessionals();
+            await loadUserFavorites(); // â‌¤ï¸ڈ Load favorites
+            setupEventListeners();
+            renderProfessionals();
+            startBackgroundRefresh();
+        });
+
+        function checkUserLogin() {
+            const isLoggedIn = localStorage.getItem('customerLoggedIn');
+            const customerName = localStorage.getItem('customerName');
+            const customerPhone = localStorage.getItem('customerPhone');
+
+            if (isLoggedIn === 'true' && customerName && customerPhone) {
+                currentUser = { name: customerName, phone: customerPhone };
+                updateUserStatus(true, customerName);
+            } else {
+                currentUser = null;
+                updateUserStatus(false);
+            }
+        }
+
+        function updateUserStatus(isLoggedIn, userName = '') {
+            if (isLoggedIn) {
+                elements.userStatus.classList.remove('guest');
+                elements.userWelcome.textContent = `ًں”“ ط£ظ‡ظ„ط§ظ‹ ${userName} - ظٹظ…ظƒظ†ظƒ ط§ظ„ط¢ظ† طھظ‚ظٹظٹظ… ط§ظ„ظ…ظ‡ظ†ظٹظٹظ†`;
+                elements.userAction.textContent = 'طھط³ط¬ظٹظ„ ط®ط±ظˆط¬';
+                elements.userAction.onclick = logout;
+                elements.userAction.removeAttribute('href');
+
+                // â‌¤ï¸ڈ Show favorites button
+                const favBtn = document.getElementById('favoritesBtn');
+                if (favBtn) favBtn.style.display = 'flex';
+            } else {
+                elements.userStatus.classList.add('guest');
+                elements.userWelcome.textContent = 'ًں”’ ط²ط§ط¦ط± - ظٹظ…ظƒظ†ظƒ ط§ظ„طھطµظپط­ ظپظ‚ط·';
+                elements.userAction.textContent = 'طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„';
+                elements.userAction.onclick = null;
+                elements.userAction.href = 'customer-auth-page.html';
+
+                // â‌¤ï¸ڈ Hide favorites button
+                const favBtn = document.getElementById('favoritesBtn');
+                if (favBtn) favBtn.style.display = 'none';
+            }
+
+            // âœ… ط¥ط®ظپط§ط، ط²ط± ط§ظ„طھط³ط¬ظٹظ„ ط§ظ„ط¹ط§ط¦ظ… ظ„ظ…ط§ ظٹظƒظˆظ† ظ…ط³ط¬ظ„ ط¯ط®ظˆظ„
+            const registerBanner = document.querySelector('.floating-register-banner');
+            if (registerBanner) {
+                registerBanner.style.display = isLoggedIn ? 'none' : 'flex';
+            }
+        }
+
+        function setupEventListeners() {
+            elements.professionSearch.addEventListener('input', debounce(searchProfessionals, 300));
+            elements.governorateSelect.addEventListener('change', searchProfessionals);
+
+            elements.ratingStars.addEventListener('click', handleStarClick);
+            elements.ratingModal.addEventListener('click', function (e) {
+                if (e.target === this) closeRatingModal();
+            });
+        }
+
+        async function loadProfessionals() {
+            try {
+                console.log('ًں”¥ ط¬ط§ط±ظٹ طھط­ظ…ظٹظ„ ط§ظ„ظ…ظ‡ظ†ظٹظٹظ† ظ…ظ† Firebase...');
+                showLoading(true);
+
+                const approvedSnapshot = await getDocs(collection(db, "approvedUsers"));
+
+                allProfessionals = [];
+                for (const docSnap of approvedSnapshot.docs) {
+                    const data = docSnap.data();
+                    const professional = {
+                        id: docSnap.id,
+                        name: data.name || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        job: data.job || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        city: data.city || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        phone: data.phone || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        bio: data.bio || 'ظ„ط§ ظٹظˆط¬ط¯ ظˆطµظپ',
+                        status: data.status || 'available',
+                        createdAt: data.createdAt,
+                        approvedAt: data.approvedAt,
+                        workStartTime: data.workStartTime || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        workEndTime: data.workEndTime || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        hourlyPrice: data.hourlyPrice || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        experienceYears: data.experienceYears || 'ط؛ظٹط± ظ…ط­ط¯ط¯'
+                    };
+
+                    professional.ratings = await loadProfessionalRatings(docSnap.id);
+                    allProfessionals.push(professional);
+                }
+
+                filteredProfessionals = [...allProfessionals];
+
+                console.log(`âœ… طھظ… طھط­ظ…ظٹظ„ ${allProfessionals.length} ظ…ظ‡ظ†ظٹ`);
+
+                renderProfessionals();
+                updateResultsCount();
+
+            } catch (error) {
+                console.error('â‌Œ ط®ط·ط£ ظپظٹ طھط­ظ…ظٹظ„ ط§ظ„ظ…ظ‡ظ†ظٹظٹظ†:', error);
+                showError('ظپط´ظ„ ظپظٹ طھط­ظ…ظٹظ„ ط§ظ„ط¨ظٹط§ظ†ط§طھ');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadProfessionalRatings(professionalId) {
+            try {
+                const ratingsSnapshot = await getDocs(
+                    query(
+                        collection(db, "ratings"),
+                        where("professionalId", "==", professionalId)
+                    )
+                );
+
+                const ratings = [];
+                let totalRating = 0;
+
+                ratingsSnapshot.forEach((doc) => {
+                    const rating = doc.data();
+                    ratings.push(rating);
+                    totalRating += rating.rating;
+                });
+
+                return {
+                    ratings: ratings,
+                    averageRating: ratings.length > 0 ? (totalRating / ratings.length) : 0,
+                    totalCount: ratings.length
+                };
+            } catch (error) {
+                console.error('ط®ط·ط£ ظپظٹ طھط­ظ…ظٹظ„ ط§ظ„طھظ‚ظٹظٹظ…ط§طھ:', error);
+                return { ratings: [], averageRating: 0, totalCount: 0 };
+            }
+        }
+
+        function renderProfessionals() {
+            const grid = elements.professionalsGrid;
+            grid.innerHTML = '';
+
+            if (filteredProfessionals.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            hideEmptyState();
+
+            filteredProfessionals.forEach(professional => {
+                const card = createProfessionalCard(professional);
+                grid.appendChild(card);
+            });
+        }
+
+        function createProfessionalCard(professional) {
+            const card = document.createElement('div');
+            card.className = 'professional-card';
+
+            const avatarLetter = professional.name.charAt(0).toUpperCase();
+            const isLoggedIn = currentUser !== null;
+            const displayPhone = isLoggedIn ? professional.phone : maskPhone(professional.phone);
+            const starsDisplay = generateStarsDisplay(professional.ratings.averageRating);
+
+            // â‌¤ï¸ڈ Check if this professional is in favorites
+            const isFavorite = userFavorites.has(professional.id);
+            const heartIcon = isFavorite ? 'â‌¤ï¸ڈ' : 'ًں¤چ';
+
+            card.innerHTML = `
+  <div class="professional-header">
+    <!-- â‌¤ï¸ڈ Favorite Heart Icon -->
+    <span class="favorite-icon" onclick="toggleFavorite('${professional.id}', '${professional.name}', '${professional.job}', '${professional.city}', event)" data-professional-id="${professional.id}">
+      ${isLoggedIn ? heartIcon : ''}
+    </span>
+    
+    <div class="professional-avatar">${avatarLetter}</div>
+    <div class="professional-info">
+      <h3>${professional.name}</h3>
+      <div class="profession">${professional.job}</div>
+      <div class="location">ًں“چ ${professional.city}</div>
+    </div>
+  </div>
+                
+                <div class="rating-section">
+                    <div class="rating-display">
+                        <div class="stars">${starsDisplay}</div>
+                        <span>${professional.ratings && professional.ratings.averageRating ? professional.ratings.averageRating.toFixed(1) : "0.0"}</span>
+                        <span class="rating-count">(${professional.ratings && professional.ratings.totalCount ? professional.ratings.totalCount : 0} طھظ‚ظٹظٹظ…)</span>
+                    </div>
+                    <div class="status ${professional.status === 'available' ? 'available' : 'busy'}">
+                        ${professional.status === 'available' ? 'ظ…طھط§ط­ ط§ظ„ط¢ظ†' : 'ظ…ط´ط؛ظˆظ„'}
+                    </div>
+                </div>
+                
+                <div class="professional-description">
+                    ${professional.bio || 'ظ„ط§ ظٹظˆط¬ط¯ ظˆطµظپ ظ…طھط§ط­'}
+                </div>
+                
+                <div class="contact-details">
+                    <div class="detail-item">
+                        <span class="detail-label">ط±ظ‚ظ… ط§ظ„ظ‡ط§طھظپ</span>
+                        <span class="detail-value">
+                            ${displayPhone}
+                            ${!isLoggedIn ? '<div class="masked-info">ط³ط¬ظ„ ط¯ط®ظˆظ„ظƒ ظ„ظ„ط±ظ‚ظ… ط§ظ„ظƒط§ظ…ظ„</div>' : ''}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">ط³ط§ط¹ط§طھ ط§ظ„ط¹ظ…ظ„</span>
+                        <span class="detail-value">${professional.workStartTime || "ط؛ظٹط± ظ…ط­ط¯ط¯"} - ${professional.workEndTime || "ط؛ظٹط± ظ…ط­ط¯ط¯"}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">ط§ظ„ط³ط¹ط± ط§ظ„ظ…ط¨ط¯ط¦ظٹ</span>
+                        <span class="detail-value">${professional.hourlyPrice ? professional.hourlyPrice + " ط¯.ط£ / ط³ط§ط¹ط©" : "ط؛ظٹط± ظ…ط­ط¯ط¯"}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">ط³ظ†ظˆط§طھ ط§ظ„ط®ط¨ط±ط©</span>
+                        <span class="detail-value">${professional.experienceYears || "ط؛ظٹط± ظ…ط­ط¯ط¯"} ط³ظ†ظˆط§طھ</span>
+                    </div>
+                </div>
+                
+                 <div class="professional-actions">
+    ${isLoggedIn ? `
+      <button class="action-btn btn-rate" onclick="openRatingModal('${professional.id}', '${professional.name}')">â­گ طھظ‚ظٹظٹظ…</button>
+      <button class="action-btn btn-call" onclick="callProfessional('${professional.phone}')">ًں“‍ ط§طھطµط§ظ„</button>
+      <button class="action-btn btn-whatsapp" onclick="whatsappProfessional('${professional.phone}')">ًں’¬ ظˆط§طھط³ط§ط¨</button>
+      <button class="action-btn btn-compare" onclick="toggleCompare('${professional.id}')" data-compare-id="${professional.id}">âڑ–ï¸ڈ ط¥ط¶ط§ظپط© ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©</button>
+    ` : `
+      <a href="customer-auth-page.html" class="action-btn btn-login">ًں”گ ط³ط¬ظ„ ط¯ط®ظˆظ„ظƒ ظ„ظ„طھظˆط§طµظ„ ظˆط§ظ„طھظ‚ظٹظٹظ…</a>
+    `}
+  </div>
+`;
+            return card;
+        }
+
+        function maskPhone(phone) {
+            if (!phone || phone.length < 10) return phone;
+            return phone.substring(0, 4) + 'x'.repeat(phone.length - 4);
+        }
+
+        function generateStarsDisplay(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating - fullStars >= 0.5;
+
+            for (let i = 0; i < 5; i++) {
+                if (i < fullStars) {
+                    stars += '<span class="star filled">â­گ</span>';
+                } else if (i === fullStars && hasHalfStar) {
+                    stars += '<span class="star filled">â­گ</span>';
+                } else {
+                    stars += '<span class="star">â­گ</span>';
+                }
+            }
+
+            return stars;
+        }
+
+        function searchProfessionals() {
+            const professionSearch = elements.professionSearch.value.toLowerCase().trim();
+            const governorateFilter = elements.governorateSelect.value;
+
+            filteredProfessionals = allProfessionals.filter(professional => {
+                const matchesProfession = !professionSearch ||
+                    professional.job.toLowerCase().includes(professionSearch) ||
+                    professional.name.toLowerCase().includes(professionSearch);
+
+                const matchesGovernorate = !governorateFilter || professional.city === governorateFilter;
+
+                return matchesProfession && matchesGovernorate;
+            });
+
+            renderProfessionals();
+            updateResultsCount();
+        }
+
+        function updateResultsCount() {
+            elements.resultsCount.textContent = `ط¹ط¯ط¯ ط§ظ„ظ†طھط§ط¦ط¬: ${filteredProfessionals.length}`;
+        }
+
+        function showLoading(show) {
+            elements.loadingState.style.display = show ? 'block' : 'none';
+            elements.professionalsGrid.style.display = show ? 'none' : 'grid';
+        }
+
+        function showEmptyState() {
+            elements.emptyState.style.display = 'block';
+            elements.professionalsGrid.style.display = 'none';
+        }
+
+        function hideEmptyState() {
+            elements.emptyState.style.display = 'none';
+            elements.professionalsGrid.style.display = 'grid';
+        }
+
+        function showError(message) {
+            elements.professionalsGrid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">â‌Œ</div>
+                    <h3>ط®ط·ط£ ظپظٹ ط§ظ„طھط­ظ…ظٹظ„</h3>
+                    <p>${message}</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 20px; cursor: pointer;">ط¥ط¹ط§ط¯ط© ط§ظ„ظ…ط­ط§ظˆظ„ط©</button>
+                </div>
+            `;
+        }
+
+        // â‌¤ï¸ڈ ========== FAVORITES SYSTEM FUNCTIONS ==========
+
+        // Load user's favorites from Firestore
+        async function loadUserFavorites() {
+            if (!currentUser) {
+                console.log('â‌¤ï¸ڈ ظ„ط§ ظٹظˆط¬ط¯ ظ…ط³طھط®ط¯ظ… ظ…ط³ط¬ظ„ ط¯ط®ظˆظ„ - طھط®ط·ظٹ طھط­ظ…ظٹظ„ ط§ظ„ظ…ظپط¶ظ„ط©');
+                return;
+            }
+
+            try {
+                const customerEmail = localStorage.getItem('customerEmail');
+                if (!customerEmail) return;
+
+                console.log('â‌¤ï¸ڈ ط¬ط§ط±ظٹ طھط­ظ…ظٹظ„ ط§ظ„ظ…ظپط¶ظ„ط©...');
+
+                const favoritesSnapshot = await getDocs(
+                    query(
+                        collection(db, "favorites"),
+                        where("customerEmail", "==", customerEmail)
+                    )
+                );
+
+                userFavorites.clear();
+                favoritesSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    userFavorites.add(data.professionalId);
+                });
+
+                favoritesCount = userFavorites.size;
+                updateFavoritesCount();
+
+                console.log(`â‌¤ï¸ڈ طھظ… طھط­ظ…ظٹظ„ ${favoritesCount} ظ…ظپط¶ظ„ط©`);
+            } catch (error) {
+                console.error('â‌Œ ط®ط·ط£ ظپظٹ طھط­ظ…ظٹظ„ ط§ظ„ظ…ظپط¶ظ„ط©:', error);
+            }
+        }
+
+        // Toggle favorite status
+        window.toggleFavorite = async function (professionalId, professionalName, professionalJob, professionalCity, event) {
+            event.stopPropagation();
+
+            if (!currentUser) {
+                showFavoriteToast('âڑ ï¸ڈ ظٹط¬ط¨ طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ ط£ظˆظ„ط§ظ‹');
+                setTimeout(() => {
+                    window.location.href = 'customer-auth-page.html';
+                }, 1500);
+                return;
+            }
+
+            const customerEmail = localStorage.getItem('customerEmail');
+            if (!customerEmail) {
+                showFavoriteToast('âڑ ï¸ڈ ط®ط·ط£ ظپظٹ ط§ظ„ط¨ظٹط§ظ†ط§طھ');
+                return;
+            }
+
+            const heartIcon = event.target;
+            const isFavorite = userFavorites.has(professionalId);
+
+            try {
+                const docId = `${customerEmail.replace(/\./g, '_')}_${professionalId}`;
+                const favoriteRef = doc(db, "favorites", docId);
+
+                if (isFavorite) {
+                    // Remove from favorites
+                    heartIcon.classList.add('removing');
+                    await deleteDoc(favoriteRef);
+                    userFavorites.delete(professionalId);
+                    heartIcon.textContent = 'ًں¤چ';
+                    showFavoriteToast('ًں’” طھظ…طھ ط§ظ„ط¥ط²ط§ظ„ط© ظ…ظ† ط§ظ„ظ…ظپط¶ظ„ط©');
+
+                    setTimeout(() => {
+                        heartIcon.classList.remove('removing');
+                    }, 500);
+                } else {
+                    // Add to favorites
+                    heartIcon.classList.add('active');
+                    await setDoc(favoriteRef, {
+                        customerEmail: customerEmail,
+                        professionalId: professionalId,
+                        professionalName: professionalName,
+                        professionalJob: professionalJob,
+                        professionalCity: professionalCity,
+                        addedAt: serverTimestamp(),
+                        lastUpdated: serverTimestamp()
+                    });
+                    userFavorites.add(professionalId);
+                    heartIcon.textContent = 'â‌¤ï¸ڈ';
+                    showFavoriteToast('âœ… طھظ…طھ ط§ظ„ط¥ط¶ط§ظپط© ظ„ظ„ظ…ظپط¶ظ„ط©');
+
+                    setTimeout(() => {
+                        heartIcon.classList.remove('active');
+                    }, 600);
+                }
+
+                favoritesCount = userFavorites.size;
+                updateFavoritesCount();
+
+            } catch (error) {
+                console.error('â‌Œ ط®ط·ط£ ظپظٹ طھط­ط¯ظٹط« ط§ظ„ظ…ظپط¶ظ„ط©:', error);
+                showFavoriteToast('â‌Œ ط­ط¯ط« ط®ط·ط£طŒ ط­ط§ظˆظ„ ظ…ط±ط© ط£ط®ط±ظ‰');
+            }
+        }
+
+        // Update favorites count in UI
+        function updateFavoritesCount() {
+            const countElement = document.getElementById('favoritesCount');
+            if (countElement) {
+                countElement.textContent = favoritesCount;
+            }
+        }
+
+        // Show toast notification
+        function showFavoriteToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'favorite-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50%) translateY(-20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // ========== END FAVORITES SYSTEM ==========
+
+        // âڑ–ï¸ڈ ========== COMPARE SYSTEM FUNCTIONS ==========
+
+        // Initialize compare list from localStorage
+        let compareList = JSON.parse(localStorage.getItem('compareList')) || [];
+
+        // Toggle compare status
+        window.toggleCompare = function (professionalId) {
+            // Find professional data
+            const professional = allProfessionals.find(p => p.id === professionalId) ||
+                filteredProfessionals.find(p => p.id === professionalId);
+
+            if (!professional) {
+                console.error('Professional not found:', professionalId);
+                return;
+            }
+
+            const index = compareList.findIndex(p => p.id === professionalId);
+            const btn = document.querySelector(`.btn-compare[data-compare-id="${professionalId}"]`);
+
+            if (index !== -1) {
+                // Remove from compare
+                removeFromCompare(professionalId);
+                if (btn) {
+                    btn.classList.remove('added');
+                    btn.innerHTML = 'âڑ–ï¸ڈ ط¥ط¶ط§ظپط© ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©';
+                }
+            } else {
+                // Add to compare
+                if (compareList.length >= 3) {
+                    showFavoriteToast('âڑ ï¸ڈ ظٹظ…ظƒظ†ظƒ ظ…ظ‚ط§ط±ظ†ط© 3 ظ…ظ‡ظ†ظٹظٹظ† ظƒط­ط¯ ط£ظ‚طµظ‰');
+                    return;
+                }
+
+                compareList.push(professional);
+                localStorage.setItem('compareList', JSON.stringify(compareList));
+
+                if (btn) {
+                    btn.classList.add('added');
+                    btn.innerHTML = 'âœ… ظ…ط¶ط§ظپ ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©';
+                }
+
+                updateCompareBar();
+                showFavoriteToast('âڑ–ï¸ڈ طھظ…طھ ط§ظ„ط¥ط¶ط§ظپط© ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©');
+            }
+        }
+
+        // Remove from compare list
+        window.removeFromCompare = function (professionalId) {
+            compareList = compareList.filter(p => p.id !== professionalId);
+            localStorage.setItem('compareList', JSON.stringify(compareList));
+            updateCompareBar();
+
+            // Update button state if visible
+            const btn = document.querySelector(`.btn-compare[data-compare-id="${professionalId}"]`);
+            if (btn) {
+                btn.classList.remove('added');
+                btn.innerHTML = 'âڑ–ï¸ڈ ط¥ط¶ط§ظپط© ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©';
+            }
+        }
+
+        // Clear all compare items
+        window.clearCompareSummary = function () {
+            compareList = [];
+            localStorage.setItem('compareList', JSON.stringify([]));
+            updateCompareBar();
+
+            // Reset all buttons
+            document.querySelectorAll('.btn-compare').forEach(btn => {
+                btn.classList.remove('added');
+                btn.innerHTML = 'âڑ–ï¸ڈ ط¥ط¶ط§ظپط© ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©';
+            });
+
+            showFavoriteToast('ًں—‘ï¸ڈ طھظ… ظ…ط³ط­ ظ‚ط§ط¦ظ…ط© ط§ظ„ظ…ظ‚ط§ط±ظ†ط©');
+        }
+
+        // Navigate to compare page
+        window.goToComparePage = function () {
+            if (compareList.length < 2) {
+                showFavoriteToast('âڑ ï¸ڈ ط§ط®طھط± ظ…ظ‡ظ†ظٹظٹظ† ط§ط«ظ†ظٹظ† ط¹ظ„ظ‰ ط§ظ„ط£ظ‚ظ„ ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©');
+                return;
+            }
+            window.location.href = 'compare.html';
+        }
+
+        // Update Floating Bar UI
+        function updateCompareBar() {
+            const bar = document.getElementById('compareBar');
+            const itemsContainer = document.getElementById('compareItems');
+            const countElement = document.getElementById('compareCount');
+
+            if (compareList.length === 0) {
+                bar.classList.remove('show');
+                return;
+            }
+
+            bar.classList.add('show');
+            countElement.textContent = `${compareList.length}/3`;
+
+            itemsContainer.innerHTML = compareList.map(prof => {
+                if (!prof || typeof prof !== 'object' || !prof.name) return '';
+                return `
+                <div class="compare-item">
+                    <div class="compare-item-avatar">${prof.name.charAt(0).toUpperCase()}</div>
+                    <div class="compare-item-info">
+                        <div class="compare-item-name">${prof.name}</div>
+                        <div class="compare-item-job">${prof.job}</div>
+                    </div>
+                    <div class="compare-item-remove" onclick="removeFromCompare('${prof.id}')">âœ•</div>
+                </div>
+            `}).join('');
+        }
+
+        // Update buttons on page load
+        function updateCompareButtons() {
+            compareList.forEach(prof => {
+                const btn = document.querySelector(`.btn-compare[data-compare-id="${prof.id}"]`);
+                if (btn) {
+                    btn.classList.add('added');
+                    btn.innerHTML = 'âœ… ظ…ط¶ط§ظپ ظ„ظ„ظ…ظ‚ط§ط±ظ†ط©';
+                }
+            });
+            updateCompareBar();
+        }
+
+        // Call update on load (add to init)
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateCompareButtons, 1000); // Wait for professionals to load
+        });
+
+        // ========== END COMPARE SYSTEM ==========
+
+        // Rating System Functions
+        function openRatingModal(professionalId, professionalName) {
+            if (!currentUser) {
+                alert('ظٹط¬ط¨ طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ ط£ظˆظ„ط§ظ‹ ظ„ط¥ط¶ط§ظپط© طھظ‚ظٹظٹظ…');
+                return;
+            }
+
+            currentRatingProfessional = professionalId;
+            selectedRating = 0;
+            elements.ratingProfessionalName.textContent = professionalName;
+            elements.ratingComment.value = '';
+
+            const stars = elements.ratingStars.querySelectorAll('.star');
+            stars.forEach(star => star.style.color = '#e0e0e0');
+
+            elements.ratingModal.style.display = 'flex';
+        }
+
+        function closeRatingModal() {
+            elements.ratingModal.style.display = 'none';
+            currentRatingProfessional = null;
+            selectedRating = 0;
+        }
+
+        function handleStarClick(e) {
+            if (e.target.classList.contains('star')) {
+                const rating = parseInt(e.target.dataset.rating);
+                selectedRating = rating;
+                updateStarDisplay(rating);
+
+                // ط¹ط±ط¶ ط±ط³ط§ظ„ط© طھظˆط¶ظٹط­ظٹط©
+                const ratingText = document.getElementById('ratingSelectedText');
+                const ratingTexts = [
+                    '',
+                    'â­گ طھظ‚ظٹظٹظ… ط¶ط¹ظٹظپ',
+                    'â­گâ­گ طھظ‚ظٹظٹظ… ظ…ظ‚ط¨ظˆظ„',
+                    'â­گâ­گâ­گ طھظ‚ظٹظٹظ… ط¬ظٹط¯',
+                    'â­گâ­گâ­گâ­گ طھظ‚ظٹظٹظ… ط¬ظٹط¯ ط¬ط¯ط§ظ‹',
+                    'â­گâ­گâ­گâ­گâ­گ طھظ‚ظٹظٹظ… ظ…ظ…طھط§ط²'
+                ];
+
+                ratingText.textContent = ratingTexts[rating];
+                ratingText.classList.add('show');
+            }
+        }
+
+        function updateStarDisplay(rating) {
+            const stars = elements.ratingStars.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.style.color = '#ffd700';
+                    star.classList.add('active');
+                } else {
+                    star.style.color = '#ccc';
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitRating() {
+            if (!currentUser || !currentRatingProfessional) {
+                alert('ط®ط·ط£ ظپظٹ ط§ظ„ظ†ط¸ط§ظ…');
+                return;
+            }
+
+            if (selectedRating === 0) {
+                alert('ظٹط±ط¬ظ‰ ط§ط®طھظٹط§ط± طھظ‚ظٹظٹظ… ط¨ط§ظ„ظ†ط¬ظˆظ…');
+                return;
+            }
+
+            const comment = elements.ratingComment.value.trim();
+
+            try {
+                const existingRatingQuery = query(
+                    collection(db, "ratings"),
+                    where("professionalId", "==", currentRatingProfessional),
+                    where("customerPhone", "==", currentUser.phone)
+                );
+
+                const existingRatings = await getDocs(existingRatingQuery);
+
+                if (!existingRatings.empty) {
+                    alert('ظ„ظ‚ط¯ ظ‚ظ…طھ ط¨طھظ‚ظٹظٹظ… ظ‡ط°ط§ ط§ظ„ظ…ظ‡ظ†ظٹ ظ…ط³ط¨ظ‚ط§ظ‹');
+                    closeRatingModal();
+                    return;
+                }
+
+                const ratingId = `${currentRatingProfessional}_${currentUser.phone}_${Date.now()}`;
+                const ratingData = {
+                    id: ratingId,
+                    professionalId: currentRatingProfessional,
+                    customerName: currentUser.name,
+                    customerPhone: currentUser.phone,
+                    rating: selectedRating,
+                    comment: comment,
+                    createdAt: serverTimestamp()
+                };
+
+                await setDoc(doc(db, "ratings", ratingId), ratingData);
+
+
+                // ًں”” ط¥ط±ط³ط§ظ„ ط¥ط´ط¹ط§ط± ظ„ظ„ظ…ظ‡ظ†ظٹ
+                await sendNotificationToProfessional(
+                    currentRatingProfessional,
+                    'â­گ طھظ‚ظٹظٹظ… ط¬ط¯ظٹط¯!',
+                    `${currentUser.name} ظ‚ط§ظ… ط¨طھظ‚ظٹظٹظ…ظƒ ط¨ظ€ ${selectedRating} ظ†ط¬ظˆظ…`
+                );
+                alert('طھظ… ط¥ط±ط³ط§ظ„ طھظ‚ظٹظٹظ…ظƒ ط¨ظ†ط¬ط§ط­! ط´ظƒط±ط§ظ‹ ظ„ظƒ');
+                closeRatingModal();
+
+                await loadProfessionals();
+
+            } catch (error) {
+                console.error('ط®ط·ط£ ظپظٹ ط¥ط±ط³ط§ظ„ ط§ظ„طھظ‚ظٹظٹظ…:', error);
+                alert('ط­ط¯ط« ط®ط·ط£ ظپظٹ ط¥ط±ط³ط§ظ„ ط§ظ„طھظ‚ظٹظٹظ…');
+            }
+        }
+
+        window.callProfessional = function (phone) {
+            if (!currentUser) {
+                alert('ظٹط¬ط¨ طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ ط£ظˆظ„ط§ظ‹ ظ„ظ„ط§طھطµط§ظ„');
+                return;
+            }
+
+            if (confirm('ظ‡ظ„ طھط±ظٹط¯ ط§ظ„ط§طھطµط§ظ„ ط¨ظ‡ط°ط§ ط§ظ„ظ…ظ‡ظ†ظٹ ط§ظ„ط¢ظ†طں')) {
+                window.open(`tel:${phone}`, '_self');
+            }
+        }
+
+        window.whatsappProfessional = function (phone) {
+            if (!currentUser) {
+                alert('ظٹط¬ط¨ طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ ط£ظˆظ„ط§ظ‹ ظ„ظ„طھظˆط§طµظ„ ط¹ط¨ط± ظˆط§طھط³ط§ط¨');
+                return;
+            }
+
+            const message = encodeURIComponent('ظ…ط±ط­ط¨ط§ظ‹طŒ ظˆط¬ط¯طھ ظ…ط¹ظ„ظˆظ…ط§طھظƒ ظپظٹ ط¯ظ„ظٹظ„ ط§ظ„ظ…ظ‡ظ†ظٹظٹظ† ظˆط£ط±ظٹط¯ ط§ظ„ط§ط³طھظپط³ط§ط± ط¹ظ† ط®ط¯ظ…ط§طھظƒ.');
+            const formattedPhone = '962' + phone.substring(1);
+            window.open(`https://wa.me/${formattedPhone}?text=${message}`, '_blank');
+        }
+
+        function logout() {
+            if (confirm('ظ‡ظ„ ط£ظ†طھ ظ…طھط£ظƒط¯ ظ…ظ† طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬طں')) {
+                localStorage.removeItem('customerLoggedIn');
+                localStorage.removeItem('customerName');
+                localStorage.removeItem('customerPhone');
+                localStorage.removeItem('loginTime');
+                currentUser = null;
+                updateUserStatus(false);
+                renderProfessionals();
+                alert('طھظ… طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬ ط¨ظ†ط¬ط§ط­');
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        window.searchProfessionals = searchProfessionals;
+        window.openRatingModal = openRatingModal;
+        window.closeRatingModal = closeRatingModal;
+        window.submitRating = submitRating;
+        window.callProfessional = callProfessional;
+        window.whatsappProfessional = whatsappProfessional;
+        window.logout = logout;
+
+        let backgroundRefreshInterval = null;
+        let isBackgroundRefreshing = false;
+
+        async function backgroundRefresh() {
+            if (isBackgroundRefreshing) return;
+
+            try {
+                isBackgroundRefreshing = true;
+                console.log('ًں”„ طھط­ط¯ظٹط« طµط§ظ…طھ ظ„ظ„ط¨ظٹط§ظ†ط§طھ...');
+
+                const approvedSnapshot = await getDocs(collection(db, "approvedUsers"));
+
+                const newProfessionals = [];
+                for (const docSnap of approvedSnapshot.docs) {
+                    const data = docSnap.data();
+                    const professional = {
+                        id: docSnap.id,
+                        name: data.name || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        job: data.job || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        city: data.city || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        phone: data.phone || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        bio: data.bio || 'ظ„ط§ ظٹظˆط¬ط¯ ظˆطµظپ',
+                        status: data.status || 'available',
+                        createdAt: data.createdAt,
+                        approvedAt: data.approvedAt,
+                        workStartTime: data.workStartTime || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        workEndTime: data.workEndTime || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        hourlyPrice: data.hourlyPrice || 'ط؛ظٹط± ظ…ط­ط¯ط¯',
+                        experienceYears: data.experienceYears || 'ط؛ظٹط± ظ…ط­ط¯ط¯'
+                    };
+
+                    professional.ratings = await loadProfessionalRatings(docSnap.id);
+                    newProfessionals.push(professional);
+                }
+
+                const hasChanges = checkForDataChanges(allProfessionals, newProfessionals);
+
+                if (hasChanges) {
+                    console.log('âœ… طھظ… ط§ظ„ط¹ط«ظˆط± ط¹ظ„ظ‰ طھط­ط¯ظٹط«ط§طھ ط¬ط¯ظٹط¯ط© - طھط­ط¯ظٹط« ط§ظ„ط¹ط±ط¶');
+                    allProfessionals = [...newProfessionals];
+                    applyCurrentFilters();
+                    renderProfessionals();
+                    updateResultsCount();
+                } else {
+                    console.log('ًں“ٹ ظ„ط§ طھظˆط¬ط¯ طھط­ط¯ظٹط«ط§طھ ط¬ط¯ظٹط¯ط©');
+                }
+
+            } catch (error) {
+                console.error('â‌Œ ط®ط·ط£ ظپظٹ ط§ظ„طھط­ط¯ظٹط« ط§ظ„طµط§ظ…طھ:', error);
+            } finally {
+                isBackgroundRefreshing = false;
+            }
+        }
+
+        function checkForDataChanges(oldData, newData) {
+            if (oldData.length !== newData.length) {
+                return true;
+            }
+
+            for (let i = 0; i < oldData.length; i++) {
+                const oldPro = oldData[i];
+                const newPro = newData.find(p => p.id === oldPro.id);
+
+                if (!newPro) return true;
+
+                if (oldPro.name !== newPro.name ||
+                    oldPro.job !== newPro.job ||
+                    oldPro.status !== newPro.status ||
+                    oldPro.phone !== newPro.phone ||
+                    oldPro.city !== newPro.city ||
+                    oldPro.hourlyPrice !== newPro.hourlyPrice ||
+                    oldPro.ratings?.totalCount !== newPro.ratings?.totalCount ||
+                    Math.abs((oldPro.ratings?.averageRating || 0) - (newPro.ratings?.averageRating || 0)) > 0.1) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function applyCurrentFilters() {
+            const professionSearch = elements.professionSearch.value.toLowerCase().trim();
+            const governorateFilter = elements.governorateSelect.value;
+
+            filteredProfessionals = allProfessionals.filter(professional => {
+                const matchesProfession = !professionSearch ||
+                    professional.job.toLowerCase().includes(professionSearch) ||
+                    professional.name.toLowerCase().includes(professionSearch);
+
+                const matchesGovernorate = !governorateFilter || professional.city === governorateFilter;
+
+                return matchesProfession && matchesGovernorate;
+            });
+        }
+
+        function startBackgroundRefresh() {
+            if (backgroundRefreshInterval) {
+                clearInterval(backgroundRefreshInterval);
+            }
+
+            backgroundRefreshInterval = setInterval(backgroundRefresh, 30000);
+            console.log('ًں”„ طھظ… طھظپط¹ظٹظ„ ط§ظ„طھط­ط¯ظٹط« ط§ظ„طھظ„ظ‚ط§ط¦ظٹ ط§ظ„طµط§ظ…طھ');
+        }
+
+        console.log('âœ… ط§ظ„طµظپط­ط© ط§ظ„ط±ط¦ظٹط³ظٹط© ط¬ط§ظ‡ط²ط© ظ…ط¹ ط§ظ„طھطµظ…ظٹظ… ط§ظ„ط¹طµط±ظٹ');
+
+
+
+        window.startChat = function (professionalId, professionalName) {
+            const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+
+            if (customerLoggedIn !== 'true') {
+                alert('ظٹط¬ط¨ طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ ط£ظˆظ„ط§ظ‹');
+                window.location.href = 'customer-auth-page.html';
+                return;
+            }
+
+            const customerEmail = localStorage.getItem('customerEmail');
+            const customerId = customerEmail.replace(/\./g, '_');
+
+        }
+
+    </script>
+
+
+
+
+    <script type="module">
+        import NotificationManager from './notifications.js';
+
+        const notificationManager = new NotificationManager();
+        let notificationsEnabled = false;
+        let currentUserId = null;
+
+        // ًں”‘ ظ…ظپطھط§ط­ LocalStorage
+        function getNotificationStateKey() {
+            const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+            if (customerLoggedIn === 'true') {
+                return `notifications_enabled_${localStorage.getItem('customerEmail')}`;
+            } else {
+                return `notifications_enabled_${localStorage.getItem('loggedNationalId')}`;
+            }
+        }
+
+        // ًں“¥ طھط­ظ…ظٹظ„ ط­ط§ظ„ط© ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ ظ…ظ† LocalStorage
+        function loadNotificationState() {
+            const key = getNotificationStateKey();
+            const savedState = localStorage.getItem(key);
+            return savedState === 'true';
+        }
+
+        // ًں’¾ ط­ظپط¸ ط­ط§ظ„ط© ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ ظپظٹ LocalStorage
+        function saveNotificationState(enabled) {
+            const key = getNotificationStateKey();
+            localStorage.setItem(key, enabled.toString());
+        }
+
+        // ط¥ط¸ظ‡ط§ط± ط§ظ„ط²ط± ظ„ظ„ظ…ط³طھط®ط¯ظ…ظٹظ† ط§ظ„ظ…ط³ط¬ظ„ظٹظ† ظپظ‚ط·
+        function checkAndShowNotificationButton() {
+            const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+            const professionalLoggedIn = localStorage.getItem('loggedNationalId');
+
+            if (customerLoggedIn === 'true' || professionalLoggedIn) {
+                const btn = document.getElementById('notificationBtn');
+                if (btn) {
+                    btn.style.display = 'flex';
+
+                    // âœ… طھط­ظ…ظٹظ„ ط§ظ„ط­ط§ظ„ط© ط§ظ„ظ…ط­ظپظˆط¸ط©
+                    const savedState = loadNotificationState();
+                    notificationsEnabled = savedState;
+
+                    // طھط­ظ‚ظ‚ ظ…ظ† ط­ط§ظ„ط© ط§ظ„ط¯ط¹ظ…
+                    if (!notificationManager.isSupported) {
+                        updateNotificationButton('not_supported');
+                    } else if (savedState) {
+                        // ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ ظƒط§ظ†طھ ظ…ظپط¹ظ„ط©طŒ ظ†ط¹ط±ط¶ ط§ظ„ط­ط§ظ„ط© ظپظ‚ط·
+                        updateNotificationButton('enabled');
+                    } else {
+                        // ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ ظ…ط¹ط·ظ„ط© ط£ظˆ ظ„ظ… ظٹطھظ… طھظپط¹ظٹظ„ظ‡ط§
+                        updateNotificationButton('disabled');
+                    }
+                }
+            }
+        }
+
+        window.toggleNotifications = async function () {
+            const btn = document.getElementById('notificationBtn');
+            const icon = document.getElementById('notificationIcon');
+            const text = document.getElementById('notificationText');
+
+            // ط§ظ„طھط­ظ‚ظ‚ ظ…ظ† ط§ظ„ط¯ط¹ظ… ط£ظˆظ„ط§ظ‹
+            if (!notificationManager.isSupported) {
+                const details = notificationManager.supportDetails;
+                let message = details.reason || 'ظ…طھطµظپط­ظƒ ظ„ط§ ظٹط¯ط¹ظ… ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ';
+
+                if (details.device === 'iOS Safari') {
+                    message = `
+          ًں“± iPhone/iPad - Safari ظ„ط§ ظٹط¯ط¹ظ… ط¥ط´ط¹ط§ط±ط§طھ ط§ظ„ظˆظٹط¨
+          
+          âœ… ط§ظ„ط­ظ„ظˆظ„ ط§ظ„ط¨ط¯ظٹظ„ط©:
+          1ï¸ڈâƒ£ ط§ط³طھط®ط¯ظ… Chrome ط¹ظ„ظ‰ Android
+          2ï¸ڈâƒ£ ط§ظپطھط­ ط§ظ„ظ…ظˆظ‚ط¹ ظپظٹ Chrome iOS (ظ…ط­ط¯ظˆط¯)
+          3ï¸ڈâƒ£ ط³ظ†ط±ط³ظ„ ظ„ظƒ ط±ط³ط§ط¦ظ„ SMS ط¨ط¯ظ„ط§ظ‹ ظ…ظ† ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ
+        `;
+                } else if (details.device === 'In-App Browser') {
+                    message = `
+          ًںŒگ ط£ظ†طھ طھط³طھط®ط¯ظ… ظ…طھطµظپط­ ط¯ط§ط®ظ„ ط§ظ„طھط·ط¨ظٹظ‚
+          
+          âœ… ط§ظ„ط­ظ„:
+          ط§ط¶ط؛ط· ط¹ظ„ظ‰ "â‹®" ط£ظˆ "..." ظˆط§ط®طھط± "ظپطھط­ ظپظٹ ط§ظ„ظ…طھطµظپط­"
+        `;
+                }
+
+                showDetailedMessage('ط؛ظٹط± ظ…ط¯ط¹ظˆظ…', message, 'warning');
+                return;
+            }
+
+            // âœ… ط¥ط°ط§ ظƒط§ظ†طھ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ ظ…ظپط¹ظ„ط©طŒ ظ†ط·ظپظٹظ‡ط§
+            if (notificationsEnabled) {
+                notificationsEnabled = false;
+                saveNotificationState(false); // ًں’¾ ط­ظپط¸ ط§ظ„ط­ط§ظ„ط©
+
+                updateNotificationButton('disabled');
+                showSuccessMessage('ًں”• طھظ… طھط¹ط·ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ');
+
+                return;
+            }
+
+            // âœ… طھظپط¹ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ
+            btn.disabled = true;
+            text.textContent = 'ط¬ط§ط±ظٹ ط§ظ„طھظپط¹ظٹظ„...';
+
+            let userId, userType;
+
+            const customerLoggedIn = localStorage.getItem('customerLoggedIn');
+            if (customerLoggedIn === 'true') {
+                userId = localStorage.getItem('customerEmail').replace(/\./g, '_');
+                userType = 'customer';
+            } else {
+                userId = localStorage.getItem('loggedNationalId');
+                userType = 'professional';
+            }
+
+            currentUserId = userId;
+            console.log('ًں”„ ظ…ط­ط§ظˆظ„ط© طھظپط¹ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ...');
+
+            const result = await notificationManager.initialize(userId, userType);
+
+            if (result.success) {
+                notificationsEnabled = true;
+                saveNotificationState(true); // ًں’¾ ط­ظپط¸ ط§ظ„ط­ط§ظ„ط©
+                updateNotificationButton('enabled');
+                showSuccessMessage('âœ… طھظ… طھظپط¹ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ ط¨ظ†ط¬ط§ط­!');
+            } else {
+                let errorMsg = 'ظپط´ظ„ طھظپط¹ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ';
+
+                switch (result.error) {
+                    case 'not_supported':
+                        errorMsg = result.details?.reason || 'ظ…طھطµظپط­ظƒ ظ„ط§ ظٹط¯ط¹ظ… ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ';
+                        break;
+                    case 'permission_denied':
+                        errorMsg = `
+            â‌Œ طھظ… ط±ظپط¶ ط§ظ„ط¥ط°ظ†
+            
+            ظ„طھظپط¹ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ:
+            1ï¸ڈâƒ£ ط§ط¶ط؛ط· ط¹ظ„ظ‰ ًں”’ ط¨ط¬ط§ظ†ط¨ ط¹ظ†ظˆط§ظ† ط§ظ„ظ…ظˆظ‚ط¹
+            2ï¸ڈâƒ£ ط§ط®طھط± "ط¥ط¹ط¯ط§ط¯ط§طھ ط§ظ„ظ…ظˆظ‚ط¹"
+            3ï¸ڈâƒ£ ط§ط³ظ…ط­ ط¨ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ
+            4ï¸ڈâƒ£ ط£ط¹ط¯ طھط­ظ…ظٹظ„ ط§ظ„طµظپط­ط©
+          `;
+                        break;
+                    case 'sw_registration_failed':
+                        errorMsg = 'ظپط´ظ„ طھط³ط¬ظٹظ„ Service Worker. طھط£ظƒط¯ ظ…ظ† ط§طھطµط§ظ„ظƒ ط¨ط§ظ„ط¥ظ†طھط±ظ†طھ';
+                        break;
+                    case 'no_token':
+                        errorMsg = 'ظپط´ظ„ ط§ظ„ط­طµظˆظ„ ط¹ظ„ظ‰ ط±ظ…ط² ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ. ط­ط§ظˆظ„ ظ…ط±ط© ط£ط®ط±ظ‰';
+                        break;
+                    default:
+                        errorMsg = result.message || 'ط­ط¯ط« ط®ط·ط£ ط؛ظٹط± ظ…طھظˆظ‚ط¹';
+                }
+
+                showErrorMessage(errorMsg);
+                btn.disabled = false;
+                text.textContent = 'طھظپط¹ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ';
+            }
+        }
+
+        function updateNotificationButton(state) {
+            const btn = document.getElementById('notificationBtn');
+            const icon = document.getElementById('notificationIcon');
+            const text = document.getElementById('notificationText');
+
+            if (!btn || !icon || !text) return;
+
+            btn.disabled = false;
+            btn.classList.remove('active', 'disabled');
+
+            switch (state) {
+                case 'enabled':
+                    btn.classList.add('active');
+                    icon.textContent = 'âœ…';
+                    text.textContent = 'ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ ظ…ظپط¹ظ„ط©';
+                    break;
+
+                case 'disabled':
+                    icon.textContent = 'ًں””';
+                    text.textContent = 'طھظپط¹ظٹظ„ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ';
+                    break;
+
+                case 'not_supported':
+                    btn.classList.add('disabled');
+                    icon.textContent = 'âڑ ï¸ڈ';
+                    text.textContent = 'ط؛ظٹط± ظ…ط¯ط¹ظˆظ…';
+                    btn.disabled = true;
+                    break;
+            }
+        }
+
+        function showSuccessMessage(message) {
+            showCustomAlert(message, 'success');
+        }
+
+        function showErrorMessage(message) {
+            showCustomAlert(message, 'error');
+        }
+
+        function showDetailedMessage(title, message, type) {
+            const alert = document.createElement('div');
+            alert.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      z-index: 10002;
+      max-width: 90%;
+      width: 400px;
+      text-align: center;
+    `;
+
+            alert.innerHTML = `
+      <div style="font-size: 3rem; margin-bottom: 15px;">
+        ${type === 'warning' ? 'âڑ ï¸ڈ' : type === 'error' ? 'â‌Œ' : 'â„¹ï¸ڈ'}
+      </div>
+      <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.3rem;">${title}</h3>
+      <p style="color: #666; line-height: 1.6; white-space: pre-line; font-size: 14px;">${message}</p>
+      <button onclick="this.parentElement.remove(); document.getElementById('overlay-notif').remove();" style="
+        margin-top: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+      ">ظپظ‡ظ…طھ</button>
+    `;
+
+            const overlay = document.createElement('div');
+            overlay.id = 'overlay-notif';
+            overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10001;
+    `;
+            overlay.onclick = () => {
+                overlay.remove();
+                alert.remove();
+            };
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(alert);
+        }
+
+        function showCustomAlert(message, type) {
+            const div = document.createElement('div');
+            const bgColor = type === 'success' ?
+                'linear-gradient(45deg, #27ae60, #2ecc71)' :
+                'linear-gradient(45deg, #e74c3c, #c0392b)';
+
+            div.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 50%;
+      transform: translateX(50%);
+      background: ${bgColor};
+      color: white;
+      padding: 15px 30px;
+      border-radius: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      z-index: 10001;
+      font-weight: 600;
+      animation: slideDown 0.5s ease-out;
+      max-width: 90%;
+      text-align: center;
+    `;
+            div.textContent = message;
+            document.body.appendChild(div);
+
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // طھط´ط؛ظٹظ„ ط¹ظ†ط¯ طھط­ظ…ظٹظ„ ط§ظ„طµظپط­ط©
+        document.addEventListener('DOMContentLoaded', function () {
+            checkAndShowNotificationButton();
+        });
+
+        // طھظ†ط¸ظٹظپ ط¹ظ†ط¯ طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬
+        window.addEventListener('beforeunload', function () {
+            // LocalStorage ط¨ط­ظپط¸ طھظ„ظ‚ط§ط¦ظٹط§ظ‹
+        });
+
+        const animationStyle = document.createElement('style');
+        animationStyle.textContent = `
+    @keyframes slideDown {
+      from { transform: translateX(50%) translateY(-100px); opacity: 0; }
+      to { transform: translateX(50%) translateY(0); opacity: 1; }
+    }
+  `;
+        document.head.appendChild(animationStyle);
+
+
+// âک° Hamburger Menu Functions
+window.toggleHamburgerMenu = function() {
+    const menu = document.getElementById('hamburgerMenu');
+    const overlay = document.getElementById('hamburgerOverlay');
+    
+    menu.classList.toggle('show');
+    overlay.classList.toggle('show');
+    
+    // Update favorites count in hamburger
+    updateHamburgerFavorites();
+}
+
+window.closeHamburgerMenu = function() {
+    const menu = document.getElementById('hamburgerMenu');
+    const overlay = document.getElementById('hamburgerOverlay');
+    
+    menu.classList.remove('show');
+    overlay.classList.remove('show');
+}
+
+window.scrollToContact = function() {
+    closeHamburgerMenu();
+    document.querySelector('.footer').scrollIntoView({ behavior: 'smooth' });
+}
+
+function updateHamburgerFavorites() {
+    const hamburgerFav = document.getElementById('hamburgerFavorites');
+    const hamburgerAuth = document.getElementById('hamburgerAuth');
+    const hamburgerFavCount = document.getElementById('hamburgerFavCount');
+    
+    if (currentUser) {
+        // Show favorites, hide auth
+        if (hamburgerFav) hamburgerFav.style.display = 'flex';
+        if (hamburgerAuth) {
+            hamburgerAuth.querySelector('.link-text').textContent = 'طھط³ط¬ظٹظ„ ط®ط±ظˆط¬';
+            hamburgerAuth.querySelector('.link-icon').textContent = 'ًںڑھ';
+            hamburgerAuth.onclick = (e) => {
+                e.preventDefault();
+                logout();
+                closeHamburgerMenu();
+            };
+            hamburgerAuth.removeAttribute('href');
+        }
+        
+        // Update count
+        if (hamburgerFavCount) {
+            hamburgerFavCount.textContent = favoritesCount;
+        }
+    } else {
+        // Hide favorites, show auth
+        if (hamburgerFav) hamburgerFav.style.display = 'none';
+        if (hamburgerAuth) {
+            hamburgerAuth.querySelector('.link-text').textContent = 'طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„';
+            hamburgerAuth.querySelector('.link-icon').textContent = 'ًں”گ';
+            hamburgerAuth.onclick = null;
+            hamburgerAuth.href = 'customer-auth-page.html';
+        }
+    }
+}
+
+// Update hamburger when favorites count changes
+const originalUpdateFavoritesCount = updateFavoritesCount;
+updateFavoritesCount = function() {
+    originalUpdateFavoritesCount();
+    const hamburgerFavCount = document.getElementById('hamburgerFavCount');
+    if (hamburgerFavCount) {
+        hamburgerFavCount.textContent = favoritesCount;
+    }
+}
+
+
+    </script>
+
+
+
+    <!-- âڑ–ï¸ڈ Floating Compare Bar -->
+    <div class="compare-bar" id="compareBar">
+        <div class="compare-bar-content">
+            <div class="compare-items" id="compareItems">
+                <!-- Compare items will be added here dynamically -->
+            </div>
+
+            <div class="compare-info">
+                <span class="compare-count" id="compareCount">0/3</span>
+            </div>
+
+            <div class="compare-actions">
+                <button class="compare-action-btn btn-compare-now" onclick="goToComparePage()">
+                    âڑ–ï¸ڈ ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط¢ظ†
+                </button>
+                <button class="compare-action-btn btn-clear-compare" onclick="clearCompareSummary()">
+                    ًں—‘ï¸ڈ ظ…ط³ط­ ط§ظ„ظƒظ„
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
