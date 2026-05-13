@@ -2454,18 +2454,21 @@
                             ${!isLoggedIn ? '<div class="masked-info">سجل دخولك للرقم الكامل</div>' : ''}
                         </span>
                     </div>
+                    ${(professional.workStartTime && professional.workEndTime) ? `
                     <div class="detail-item">
                         <span class="detail-label">ساعات العمل</span>
-                        <span class="detail-value">${professional.workStartTime || "غير محدد"} - ${professional.workEndTime || "غير محدد"}</span>
-                    </div>
+                        <span class="detail-value">${professional.workStartTime} - ${professional.workEndTime}</span>
+                    </div>` : ''}
+                    ${professional.hourlyPrice ? `
                     <div class="detail-item">
                         <span class="detail-label">السعر المبدئي</span>
-                        <span class="detail-value">${professional.hourlyPrice ? professional.hourlyPrice + " د.أ / ساعة" : "غير محدد"}</span>
-                    </div>
+                        <span class="detail-value">${professional.hourlyPrice} د.أ / ساعة</span>
+                    </div>` : ''}
+                    ${professional.experienceYears ? `
                     <div class="detail-item">
                         <span class="detail-label">سنوات الخبرة</span>
-                        <span class="detail-value">${professional.experienceYears || "غير محدد"} سنوات</span>
-                    </div>
+                        <span class="detail-value">${professional.experienceYears} سنوات</span>
+                    </div>` : ''}
                 </div>
                 
                  <div class="professional-actions">
@@ -2563,15 +2566,15 @@
             }
 
             try {
-                const customerEmail = localStorage.getItem('customerEmail');
-                if (!customerEmail) return;
+                const customerPhone = localStorage.getItem('customerPhone');
+                if (!customerPhone) return;
 
                 console.log('❤️ جاري تحميل المفضلة...');
 
                 const favoritesSnapshot = await getDocs(
                     query(
                         collection(db, "favorites"),
-                        where("customerEmail", "==", customerEmail)
+                        where("customerPhone", "==", customerPhone)
                     )
                 );
 
@@ -2602,9 +2605,9 @@
                 return;
             }
 
-            const customerEmail = localStorage.getItem('customerEmail');
-            if (!customerEmail) {
-                showFavoriteToast('⚠️ خطأ في البيانات');
+            const customerPhone = localStorage.getItem('customerPhone');
+            if (!customerPhone) {
+                showFavoriteToast('⚠️ خطأ في البيانات (يرجى تسجيل الدخول مجدداً)');
                 return;
             }
 
@@ -2612,7 +2615,7 @@
             const isFavorite = userFavorites.has(professionalId);
 
             try {
-                const docId = `${customerEmail.replace(/\./g, '_')}_${professionalId}`;
+                const docId = `${customerPhone}_${professionalId}`;
                 const favoriteRef = doc(db, "favorites", docId);
 
                 if (isFavorite) {
@@ -2630,7 +2633,7 @@
                     // Add to favorites
                     heartIcon.classList.add('active');
                     await setDoc(favoriteRef, {
-                        customerEmail: customerEmail,
+                        customerPhone: customerPhone,
                         professionalId: professionalId,
                         professionalName: professionalName,
                         professionalJob: professionalJob,
@@ -2912,12 +2915,14 @@
                 await setDoc(doc(db, "ratings", ratingId), ratingData);
 
 
-                // 🔔 إرسال إشعار للمهني
-                await sendNotificationToProfessional(
-                    currentRatingProfessional,
-                    '⭐ تقييم جديد!',
-                    `${currentUser.name} قام بتقييمك بـ ${selectedRating} نجوم`
-                );
+                // 🔔 إرسال إشعار للمهني (إن وجد الدالة)
+                if (typeof sendNotificationToProfessional === 'function') {
+                    await sendNotificationToProfessional(
+                        currentRatingProfessional,
+                        '⭐ تقييم جديد!',
+                        `${currentUser.name} قام بتقييمك بـ ${selectedRating} نجوم`
+                    );
+                }
                 alert('تم إرسال تقييمك بنجاح! شكراً لك');
                 closeRatingModal();
 
