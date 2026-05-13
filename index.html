@@ -2322,20 +2322,26 @@
                 allProfessionals = [];
                 for (const docSnap of approvedSnapshot.docs) {
                     const data = docSnap.data();
+                    
+                    // 🛑 تخطي الحسابات الوهمية أو اللي ما فيها اسم
+                    if (!data.name || data.name.trim() === '' || data.name === 'غير محدد') {
+                        continue;
+                    }
+
                     const professional = {
                         id: docSnap.id,
-                        name: data.name || 'غير محدد',
-                        job: data.job || 'غير محدد',
-                        city: data.city || 'غير محدد',
-                        phone: data.phone || 'غير محدد',
+                        name: data.name,
+                        job: data.job || '',
+                        city: data.city || '',
+                        phone: data.phone || '',
                         bio: data.bio || 'لا يوجد وصف',
                         status: data.status || 'available',
                         createdAt: data.createdAt,
                         approvedAt: data.approvedAt,
-                        workStartTime: data.workStartTime || 'غير محدد',
-                        workEndTime: data.workEndTime || 'غير محدد',
-                        hourlyPrice: data.hourlyPrice || 'غير محدد',
-                        experienceYears: data.experienceYears || 'غير محدد'
+                        workStartTime: data.workStartTime || '',
+                        workEndTime: data.workEndTime || '',
+                        hourlyPrice: data.hourlyPrice || '',
+                        experienceYears: data.experienceYears || ''
                     };
 
                     professional.ratings = await loadProfessionalRatings(docSnap.id);
@@ -3004,20 +3010,26 @@
                 const newProfessionals = [];
                 for (const docSnap of approvedSnapshot.docs) {
                     const data = docSnap.data();
+                    
+                    // 🛑 تخطي الحسابات الوهمية أو اللي ما فيها اسم
+                    if (!data.name || data.name.trim() === '' || data.name === 'غير محدد') {
+                        continue;
+                    }
+
                     const professional = {
                         id: docSnap.id,
-                        name: data.name || 'غير محدد',
-                        job: data.job || 'غير محدد',
-                        city: data.city || 'غير محدد',
-                        phone: data.phone || 'غير محدد',
+                        name: data.name,
+                        job: data.job || '',
+                        city: data.city || '',
+                        phone: data.phone || '',
                         bio: data.bio || 'لا يوجد وصف',
                         status: data.status || 'available',
                         createdAt: data.createdAt,
                         approvedAt: data.approvedAt,
-                        workStartTime: data.workStartTime || 'غير محدد',
-                        workEndTime: data.workEndTime || 'غير محدد',
-                        hourlyPrice: data.hourlyPrice || 'غير محدد',
-                        experienceYears: data.experienceYears || 'غير محدد'
+                        workStartTime: data.workStartTime || '',
+                        workEndTime: data.workEndTime || '',
+                        hourlyPrice: data.hourlyPrice || '',
+                        experienceYears: data.experienceYears || ''
                     };
 
                     professional.ratings = await loadProfessionalRatings(docSnap.id);
