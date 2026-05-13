@@ -2572,15 +2572,15 @@
             }
 
             try {
-                const customerPhone = localStorage.getItem('customerPhone');
-                if (!customerPhone) return;
+                const customerEmail = localStorage.getItem('customerEmail');
+                if (!customerEmail) return;
 
                 console.log('❤️ جاري تحميل المفضلة...');
 
                 const favoritesSnapshot = await getDocs(
                     query(
                         collection(db, "favorites"),
-                        where("customerPhone", "==", customerPhone)
+                        where("customerEmail", "==", customerEmail)
                     )
                 );
 
@@ -2611,8 +2611,8 @@
                 return;
             }
 
-            const customerPhone = localStorage.getItem('customerPhone');
-            if (!customerPhone) {
+            const customerEmail = localStorage.getItem('customerEmail');
+            if (!customerEmail) {
                 showFavoriteToast('⚠️ خطأ في البيانات (يرجى تسجيل الدخول مجدداً)');
                 return;
             }
@@ -2621,7 +2621,7 @@
             const isFavorite = userFavorites.has(professionalId);
 
             try {
-                const docId = `${customerPhone}_${professionalId}`;
+                const docId = `${customerEmail.replace(/\./g, '_')}_${professionalId}`;
                 const favoriteRef = doc(db, "favorites", docId);
 
                 if (isFavorite) {
@@ -2639,7 +2639,7 @@
                     // Add to favorites
                     heartIcon.classList.add('active');
                     await setDoc(favoriteRef, {
-                        customerPhone: customerPhone,
+                        customerEmail: customerEmail,
                         professionalId: professionalId,
                         professionalName: professionalName,
                         professionalJob: professionalJob,

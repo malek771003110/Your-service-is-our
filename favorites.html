@@ -583,10 +583,10 @@
             try {
                 showLoading(true);
 
-                const customerPhone = localStorage.getItem('customerPhone');
-                console.log('📱 Phone:', customerPhone);
+                const customerEmail = localStorage.getItem('customerEmail');
+                console.log('📧 Email:', customerEmail);
 
-                if (!customerPhone) {
+                if (!customerEmail) {
                     showLoading(false);
                     showEmptyState();
                     return;
@@ -595,7 +595,7 @@
                 const favoritesSnapshot = await getDocs(
                     query(
                         collection(db, "favorites"),
-                        where("customerPhone", "==", customerPhone)
+                        where("customerEmail", "==", customerEmail)
                     )
                 );
 
