@@ -2322,12 +2322,31 @@
 
         async function loadProfessionals() {
             try {
-                console.log('🔥 جاري تحميل المهنيين من Firebase...');
-                showLoading(true);
+                // 1. محاولة تحميل البيانات من الذاكرة المؤقتة (Cache) لتجربة فورية
+                const cachedData = localStorage.getItem('cachedProfessionals');
+                if (cachedData) {
+                    try {
+                        console.log('⚡ تم العثور على بيانات في الذاكرة المؤقتة، جاري العرض الفوري');
+                        allProfessionals = JSON.parse(cachedData);
+                        filteredProfessionals = [...allProfessionals];
+                        // تطبيق فلاتر البحث إذا كانت موجودة
+                        applyCurrentFilters ? applyCurrentFilters() : null; 
+                        renderProfessionals();
+                        updateResultsCount();
+                        showLoading(false); // تأكيد إخفاء التحميل
+                    } catch (e) {
+                        console.error('خطأ في قراءة الذاكرة المؤقتة', e);
+                        showLoading(true);
+                    }
+                } else {
+                    // إذا لم تكن هناك بيانات مخزنة، نعرض التحميل
+                    console.log('🔥 جاري تحميل المهنيين لأول مرة من Firebase...');
+                    showLoading(true);
+                }
 
                 const approvedSnapshot = await getDocs(collection(db, "approvedUsers"));
 
-                allProfessionals = [];
+                const freshProfessionals = [];
                 for (const docSnap of approvedSnapshot.docs) {
                     const data = docSnap.data();
                     
@@ -2353,19 +2372,38 @@
                     };
 
                     professional.ratings = await loadProfessionalRatings(docSnap.id);
-                    allProfessionals.push(professional);
+                    freshProfessionals.push(professional);
                 }
 
-                filteredProfessionals = [...allProfessionals];
+                // تحديث الذاكرة المؤقتة بالبيانات الجديدة
+                localStorage.setItem('cachedProfessionals', JSON.stringify(freshProfessionals));
 
-                console.log(`✅ تم تحميل ${allProfessionals.length} مهني`);
+                // التحقق من وجود تغييرات حقيقية قبل إعادة العرض
+                // (تجنب الوميض إذا كانت البيانات لم تتغير)
+                let hasChanges = true;
+                if (cachedData && typeof checkForDataChanges === 'function') {
+                     hasChanges = checkForDataChanges(allProfessionals, freshProfessionals);
+                }
 
-                renderProfessionals();
-                updateResultsCount();
+                if (hasChanges || !cachedData) {
+                    console.log('✅ تم جلب أحدث البيانات من السيرفر - جاري تحديث الواجهة');
+                    allProfessionals = [...freshProfessionals];
+                    
+                    if (typeof applyCurrentFilters === 'function') {
+                        applyCurrentFilters();
+                    } else {
+                        filteredProfessionals = [...allProfessionals];
+                    }
+                    
+                    renderProfessionals();
+                    updateResultsCount();
+                }
 
             } catch (error) {
                 console.error('❌ خطأ في تحميل المهنيين:', error);
-                showError('فشل في تحميل البيانات');
+                if (allProfessionals.length === 0) {
+                    showError('فشل في تحميل البيانات');
+                }
             } finally {
                 showLoading(false);
             }
