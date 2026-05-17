@@ -661,12 +661,24 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="nationalId">الرقم الوطني <span class="required">*</span></label>
-                        <input type="text" id="nationalId" class="form-control" placeholder="1234567890" maxlength="10" required>
-                        <div class="form-help">لضمان الأمان ومنع التسجيل المكرر</div>
-                        <div class="error-message" id="nationalIdError"></div>
-                        <div class="success-message" id="nationalIdSuccess"></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nationalId">الرقم الوطني <span class="required">*</span></label>
+                            <input type="text" id="nationalId" class="form-control" placeholder="1234567890" maxlength="10" required>
+                            <div class="form-help">لضمان الأمان ومنع التسجيل المكرر</div>
+                            <div class="error-message" id="nationalIdError"></div>
+                            <div class="success-message" id="nationalIdSuccess"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>موقعك الفعلي (للخريطة)</label>
+                            <button type="button" class="form-control" id="getLocationBtn" onclick="requestLocation()" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; width: 100%;">
+                                📍 اضغط لتحديد موقعك الحالي
+                            </button>
+                            <div class="form-help" id="locationStatus" style="margin-top: 8px;">سيتم عرض موقعك للعملاء على الخريطة لتسهيل الوصول إليك.</div>
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
+                        </div>
                     </div>
                 </div>
 
@@ -1253,7 +1265,9 @@
                 hourlyPrice: parseFloat(document.getElementById('hourlyPrice').value),
                 workStartTime: document.getElementById('workStartTime').value,
                 workEndTime: document.getElementById('workEndTime').value,
-                description: document.getElementById('description').value.trim() || 'لا يوجد وصف'
+                description: document.getElementById('description').value.trim() || 'لا يوجد وصف',
+                latitude: document.getElementById('latitude').value,
+                longitude: document.getElementById('longitude').value
             };
         }
 
@@ -1321,6 +1335,8 @@ const approvedSnap = await getDoc(approvedRef);
                 workStartTime: formData.workStartTime,
                 workEndTime: formData.workEndTime,
                 bio: formData.description,
+                latitude: formData.latitude || '',
+                longitude: formData.longitude || '',
                 status: 'pending',
                 createdAt: serverTimestamp(),
                 lastUpdated: serverTimestamp(),
@@ -1378,6 +1394,43 @@ const approvedSnap = await getDoc(approvedRef);
                 }
             }, 300);
         }
+
+        window.requestLocation = function() {
+            const btn = document.getElementById('getLocationBtn');
+            const status = document.getElementById('locationStatus');
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+
+            btn.innerHTML = 'جاري التحديد... ⏳';
+            btn.style.opacity = '0.8';
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        latInput.value = position.coords.latitude;
+                        lngInput.value = position.coords.longitude;
+                        btn.innerHTML = '✅ تم التحديد بنجاح';
+                        btn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+                        btn.style.opacity = '1';
+                        status.textContent = 'إحداثيات: ' + position.coords.latitude.toFixed(4) + ', ' + position.coords.longitude.toFixed(4);
+                        status.style.color = '#27ae60';
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
+                        btn.innerHTML = '❌ فشل التحديد، حاول مجدداً';
+                        btn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+                        btn.style.opacity = '1';
+                        status.textContent = 'يرجى تفعيل الـ GPS والسماح للمتصفح بمعرفة موقعك.';
+                        status.style.color = '#e74c3c';
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                status.textContent = "المتصفح لا يدعم تحديد الموقع.";
+                status.style.color = '#e74c3c';
+                btn.innerHTML = '❌ غير مدعوم';
+            }
+        };
 
         // Global Functions
         window.nextStep = nextStep;
