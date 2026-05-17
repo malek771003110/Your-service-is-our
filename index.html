@@ -2717,6 +2717,15 @@
             if (countElement) {
                 countElement.textContent = favoritesCount;
             }
+            
+            // 💡 تحديث المتغير العالمي لقائمة الهامبرغر
+            window._khedmtekFavCount = favoritesCount;
+            
+            // 💡 تحديث مباشر لعداد الهامبرغر لتجنب أي تأخير
+            const hamburgerFavCount = document.getElementById('hamburgerFavCount');
+            if (hamburgerFavCount) {
+                hamburgerFavCount.textContent = favoritesCount;
+            }
         }
 
         // Show toast notification
