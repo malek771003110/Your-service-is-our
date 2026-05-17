@@ -405,11 +405,18 @@
                 maxZoom: 19
             }).addTo(window.map);
 
-            // Add Markers
-            window.professionals.forEach(prof => addMarker(prof));
+            // Add Markers safely
+            window.professionals.forEach(prof => {
+                try {
+                    addMarker(prof);
+                } catch(e) {
+                    console.error('Error adding marker:', e, prof);
+                }
+            });
 
             // Hide Loading Screen
-            document.getElementById('loading').style.display = 'none';
+            const loadingEl = document.getElementById('loading');
+            if(loadingEl) loadingEl.style.display = 'none';
         }
 
         // Load Professionals from Firebase
@@ -428,14 +435,23 @@
 
                 window.professionals = rawData.map(data => {
                     // Mock Location if missing (Randomize around Amman for demo purposes)
-                    const lat = 31.9539 + (Math.random() - 0.5) * 0.1;
-                    const lng = 35.9106 + (Math.random() - 0.5) * 0.1;
+                    let finalLat = 31.9539 + (Math.random() - 0.5) * 0.1;
+                    let finalLng = 35.9106 + (Math.random() - 0.5) * 0.1;
+                    
+                    if (data.latitude !== undefined && data.latitude !== null && data.latitude !== '' && data.latitude !== 'غير محدد') {
+                        const parsedLat = parseFloat(data.latitude);
+                        if (!isNaN(parsedLat)) finalLat = parsedLat;
+                    }
+                    if (data.longitude !== undefined && data.longitude !== null && data.longitude !== '' && data.longitude !== 'غير محدد') {
+                        const parsedLng = parseFloat(data.longitude);
+                        if (!isNaN(parsedLng)) finalLng = parsedLng;
+                    }
 
                     return {
                         ...data,
                         location: {
-                            lat: data.latitude || lat,
-                            lng: data.longitude || lng
+                            lat: finalLat,
+                            lng: finalLng
                         }
                     };
                 });
@@ -443,67 +459,61 @@
                 initMap();
             } catch (error) {
                 console.error("Error loading map data:", error);
-                document.getElementById('loading').innerHTML = `<h3>⚠️ خطأ في تحميل البيانات</h3><button onclick="location.reload()" style="margin-top:10px;padding:8px 15px;cursor:pointer;">إعادة المحاولة</button>`;
+                const loadingEl = document.getElementById('loading');
+                if(loadingEl) {
+                    loadingEl.innerHTML = `<h3>⚠️ خطأ في تحميل البيانات</h3><button onclick="location.reload()" style="margin-top:10px;padding:8px 15px;cursor:pointer;">إعادة المحاولة</button>`;
+                }
             }
         }
 
         // Add Marker
         function addMarker(prof) {
-            if(!prof.name || prof.name === 'غير محدد') return;
+            if(!prof || !prof.name || prof.name === 'غير محدد') return;
 
             const isAvailable = prof.status === 'available';
             const pinColor = isAvailable ? "#2ecc71" : "#e74c3c"; // Green or Red
 
-            // Custom Leaflet DivIcon
-            const markerHtmlStyles = \`
-              background-color: \${pinColor};
-              width: 20px;
-              height: 20px;
-              display: block;
-              left: -10px;
-              top: -10px;
-              position: relative;
-              border-radius: 50%;
-              border: 3px solid #FFFFFF;
-              box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            \`;
+            // Custom Leaflet DivIcon - single line to avoid parsing issues
+            const markerHtmlStyles = `background-color: ${pinColor}; width: 20px; height: 20px; display: block; left: -10px; top: -10px; position: relative; border-radius: 50%; border: 3px solid #FFFFFF; box-shadow: 0 2px 5px rgba(0,0,0,0.5);`;
 
             const customIcon = L.divIcon({
               className: "my-custom-pin",
               iconAnchor: [0, 10],
               popupAnchor: [0, -10],
-              html: \`<span style="\${markerHtmlStyles}" />\`
+              html: `<span style="${markerHtmlStyles}"></span>`
             });
+
+            if (isNaN(prof.location.lat) || isNaN(prof.location.lng)) return;
 
             const marker = L.marker([prof.location.lat, prof.location.lng], { icon: customIcon }).addTo(window.map);
 
             // Info Window Content
-            const contentString = \`
+            const contentString = `
                 <div class="active-window">
                     <div class="window-header">
-                        <div class="window-avatar">\${prof.name.charAt(0).toUpperCase()}</div>
+                        <div class="window-avatar">${prof.name.charAt(0).toUpperCase()}</div>
                         <div class="window-info">
-                            <div class="window-title">\${prof.name}</div>
-                            <div class="window-job">\${prof.job || 'مهني'} | \${prof.city || ''}</div>
+                            <div class="window-title">${prof.name}</div>
+                            <div class="window-job">${prof.job || 'مهني'} | ${prof.city || ''}</div>
                         </div>
                     </div>
                     <div class="window-body">
                         <div class="window-stat">
                             <span>💰 السعر</span>
-                            <span>\${prof.hourlyPrice ? prof.hourlyPrice + ' د.أ / ساعة' : 'غير محدد'}</span>
+                            <span>${prof.hourlyPrice ? prof.hourlyPrice + ' د.أ / ساعة' : 'غير محدد'}</span>
                         </div>
                         <div class="window-stat">
                             <span>📅 الحالة</span>
-                            <span style="color: \${isAvailable ? '#2ecc71' : '#e74c3c'}">\${isAvailable ? 'متاح الآن' : 'مشغول'}</span>
+                            <span style="color: ${isAvailable ? '#2ecc71' : '#e74c3c'}">${isAvailable ? 'متاح الآن' : 'مشغول'}</span>
                         </div>
                         
                         <div class="window-actions">
-                            <a href="tel:\${prof.phone}" class="window-btn btn-green">📞 اتصال</a>
+                            <a href="tel:${prof.phone}" class="window-btn btn-green">📞 اتصال</a>
                             <a href="index.html" class="window-btn btn-blue">👤 الملف</a>
                         </div>
                     </div>
                 </div>
-            \`;
+            `;
 
             marker.bindPopup(contentString, {
                 className: 'custom-popup'
