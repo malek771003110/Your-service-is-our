@@ -2368,7 +2368,9 @@
                         workStartTime: data.workStartTime || '',
                         workEndTime: data.workEndTime || '',
                         hourlyPrice: data.hourlyPrice || '',
-                        experienceYears: data.experienceYears || ''
+                        experienceYears: data.experienceYears || '',
+                        latitude: data.latitude || '',
+                        longitude: data.longitude || ''
                     };
 
                     professional.ratings = await loadProfessionalRatings(docSnap.id);
