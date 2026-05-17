@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>خريطة المهنيين 🗺️ | خدمتك عنا</title>
+    
+    <!-- Leaflet CSS for OpenStreetMap -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
     <style>
         * {
             margin: 0;
@@ -29,7 +33,7 @@
         /* Glassmorphism Overlays */
         .map-overlay {
             position: absolute;
-            z-index: 10;
+            z-index: 1000;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(15px);
             border-radius: 20px;
@@ -149,21 +153,36 @@
             transform: scale(1.05);
         }
 
-        /* Info Window Styling */
-        .gm-style-iw {
-            padding: 0 !important;
-            border-radius: 15px !important;
-            overflow: hidden !important;
-        }
-
-        .gm-style .gm-style-iw-c {
+        /* Leaflet Popup Styling Customization */
+        .custom-popup .leaflet-popup-content-wrapper {
             padding: 0;
             border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .custom-popup .leaflet-popup-content {
+            margin: 0;
+            width: 280px !important;
+            direction: rtl;
+        }
+        
+        .custom-popup .leaflet-popup-close-button {
+            color: white !important;
+            z-index: 10;
+            top: 10px !important;
+            right: auto !important;
+            left: 10px !important;
+            background: rgba(0,0,0,0.2) !important;
+            border-radius: 50%;
+            width: 24px !important;
+            height: 24px !important;
+            line-height: 24px !important;
+            text-align: center;
         }
 
         .active-window {
-            width: 280px;
-            direction: rtl;
+            width: 100%;
         }
 
         .window-header {
@@ -173,6 +192,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            padding-right: 20px;
         }
 
         .window-avatar {
@@ -185,6 +205,7 @@
             justify-content: center;
             color: #764ba2;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
         .window-info {
@@ -278,7 +299,7 @@
             width: 100%;
             height: 100%;
             background: rgba(255, 255, 255, 0.9);
-            z-index: 1000;
+            z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -296,24 +317,8 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .api-warning {
-            color: #c0392b;
-            text-align: center;
-            max-width: 500px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            border: 1px solid #e74c3c;
-            display: none;
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -324,11 +329,6 @@
     <div id="loading" class="loading-overlay">
         <div class="spinner"></div>
         <h3>جاري تحميل الخريطة...</h3>
-        <div id="apiWarning" class="api-warning">
-            ⚠️ <strong>تنبيه:</strong> مفتاح API غير موجود أو غير صالح.
-            <br>يرجى إضافة مفتاح Google Maps API صالح في الكود لتعمل الخريطة.
-            <br>تم استخدام بيانات وهمية للتجربة.
-        </div>
     </div>
 
     <!-- UI Overlay: Top -->
@@ -362,10 +362,13 @@
     <!-- Map Container -->
     <div id="map"></div>
 
-    <!-- Firebase Config (Same as index.html) -->
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Firebase Config -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
         // Firebase Setup
         const firebaseConfig = {
@@ -386,18 +389,49 @@
         window.professionals = [];
         window.userLocation = { lat: 31.9539, lng: 35.9106 }; // Default: Amman
 
+        // Initialize Map
+        function initMap() {
+            // Create Leaflet map
+            window.map = L.map('map', {
+                zoomControl: false // We'll position it manually
+            }).setView([window.userLocation.lat, window.userLocation.lng], 13);
+            
+            // Move zoom control to bottom right so it doesn't overlap with our top UI
+            L.control.zoom({ position: 'bottomright' }).addTo(window.map);
+
+            // Add OpenStreetMap tiles (Free & No API Key required!)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(window.map);
+
+            // Add Markers
+            window.professionals.forEach(prof => addMarker(prof));
+
+            // Hide Loading Screen
+            document.getElementById('loading').style.display = 'none';
+        }
+
         // Load Professionals from Firebase
         async function loadMapData() {
             try {
-                const snapshot = await getDocs(collection(db, 'professionals'));
-                window.professionals = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    // Mock Location if missing (Randomize around Amman)
+                // محاولة القراءة من الكاش أولاً للسرعة
+                const cached = localStorage.getItem('cachedProfessionals');
+                let rawData = [];
+                
+                if (cached) {
+                    rawData = JSON.parse(cached);
+                } else {
+                    const snapshot = await getDocs(collection(db, 'approvedUsers'));
+                    rawData = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                }
+
+                window.professionals = rawData.map(data => {
+                    // Mock Location if missing (Randomize around Amman for demo purposes)
                     const lat = 31.9539 + (Math.random() - 0.5) * 0.1;
                     const lng = 35.9106 + (Math.random() - 0.5) * 0.1;
 
                     return {
-                        id: doc.id,
                         ...data,
                         location: {
                             lat: data.latitude || lat,
@@ -406,159 +440,110 @@
                     };
                 });
 
-                initMap(); // Init map after data load
+                initMap();
             } catch (error) {
                 console.error("Error loading map data:", error);
-                document.getElementById('loading').innerHTML = `<h3>⚠️ خطأ في تحميل البيانات</h3>`;
+                document.getElementById('loading').innerHTML = `<h3>⚠️ خطأ في تحميل البيانات</h3><button onclick="location.reload()" style="margin-top:10px;padding:8px 15px;cursor:pointer;">إعادة المحاولة</button>`;
             }
         }
 
-        // Initialize Map
-        window.initMap = function () {
-            try {
-                const mapOptions = {
-                    zoom: 13,
-                    center: window.userLocation,
-                    mapId: 'DEMO_MAP_ID', // Using Demo ID for custom markers
-                    disableDefaultUI: true, // Clean look
-                    zoomControl: true,
-                };
-
-                window.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-                // Add Markers
-                window.professionals.forEach(prof => addMarker(prof));
-
-                document.getElementById('loading').style.display = 'none';
-
-            } catch (e) {
-                console.error("Map Init Error:", e);
-                document.getElementById('apiWarning').style.display = 'block';
-            }
-        };
-
         // Add Marker
         function addMarker(prof) {
-            // Determine Color based on status
+            if(!prof.name || prof.name === 'غير محدد') return;
+
             const isAvailable = prof.status === 'available';
             const pinColor = isAvailable ? "#2ecc71" : "#e74c3c"; // Green or Red
 
-            const marker = new google.maps.Marker({
-                position: prof.location,
-                map: window.map,
-                title: prof.name,
-                animation: google.maps.Animation.DROP,
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 10,
-                    fillColor: pinColor,
-                    fillOpacity: 1,
-                    strokeColor: "white",
-                    strokeWeight: 2,
-                }
+            // Custom Leaflet DivIcon
+            const markerHtmlStyles = \`
+              background-color: \${pinColor};
+              width: 20px;
+              height: 20px;
+              display: block;
+              left: -10px;
+              top: -10px;
+              position: relative;
+              border-radius: 50%;
+              border: 3px solid #FFFFFF;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            \`;
+
+            const customIcon = L.divIcon({
+              className: "my-custom-pin",
+              iconAnchor: [0, 10],
+              popupAnchor: [0, -10],
+              html: \`<span style="\${markerHtmlStyles}" />\`
             });
 
+            const marker = L.marker([prof.location.lat, prof.location.lng], { icon: customIcon }).addTo(window.map);
+
             // Info Window Content
-            const contentString = `
+            const contentString = \`
                 <div class="active-window">
                     <div class="window-header">
-                        <div class="window-avatar">${prof.name.charAt(0).toUpperCase()}</div>
+                        <div class="window-avatar">\${prof.name.charAt(0).toUpperCase()}</div>
                         <div class="window-info">
-                            <div class="window-title">${prof.name}</div>
-                            <div class="window-job">${prof.job} | ${prof.city}</div>
+                            <div class="window-title">\${prof.name}</div>
+                            <div class="window-job">\${prof.job || 'مهني'} | \${prof.city || ''}</div>
                         </div>
                     </div>
                     <div class="window-body">
                         <div class="window-stat">
-                            <span>⭐ التقييم</span>
-                            <span>${prof.ratings?.averageRating?.toFixed(1) || 'جديد'} (${prof.ratings?.totalCount || 0})</span>
-                        </div>
-                        <div class="window-stat">
                             <span>💰 السعر</span>
-                            <span>${prof.hourlyPrice} د.أ / ساعة</span>
+                            <span>\${prof.hourlyPrice ? prof.hourlyPrice + ' د.أ / ساعة' : 'غير محدد'}</span>
                         </div>
                         <div class="window-stat">
                             <span>📅 الحالة</span>
-                            <span style="color: ${isAvailable ? '#2ecc71' : '#e74c3c'}">${isAvailable ? 'متاح الآن' : 'مشغول'}</span>
+                            <span style="color: \${isAvailable ? '#2ecc71' : '#e74c3c'}">\${isAvailable ? 'متاح الآن' : 'مشغول'}</span>
                         </div>
                         
                         <div class="window-actions">
-                            <a href="tel:${prof.phone}" class="window-btn btn-green">📞 اتصال</a>
-                            <a href="index.html#booking" class="window-btn btn-blue">📅 حجز</a>
+                            <a href="tel:\${prof.phone}" class="window-btn btn-green">📞 اتصال</a>
+                            <a href="index.html" class="window-btn btn-blue">👤 الملف</a>
                         </div>
                     </div>
                 </div>
-            `;
+            \`;
 
-            const infoWindow = new google.maps.InfoWindow({
-                content: contentString,
-                maxWidth: 300
-            });
-
-            marker.addListener("click", () => {
-                // Close other windows
-                window.markers.forEach(m => m.infoWindow.close());
-                infoWindow.open({
-                    anchor: marker,
-                    map: window.map,
-                });
+            marker.bindPopup(contentString, {
+                className: 'custom-popup'
             });
 
             // Store marker for filtering
             window.markers.push({
                 marker,
-                infoWindow,
-                category: prof.job,
+                category: prof.job || '',
                 name: prof.name
             });
         }
 
-        // Search Near Me
+        // Search Near Me (Geolocation)
         window.findNearby = function () {
-            if (navigator.geolocation) {
-                // Show loading state
-                const btn = document.querySelector('.nearby-btn');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = 'جاري التحديد...';
+            const btn = document.querySelector('.nearby-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'جاري التحديد...';
 
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        };
+            window.map.locate({setView: true, maxZoom: 15});
 
-                        // User Marker
-                        new google.maps.Marker({
-                            position: pos,
-                            map: window.map,
-                            title: "موقعك الحالي",
-                            icon: {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: 8,
-                                fillColor: "#3498db",
-                                fillOpacity: 1,
-                                strokeColor: "white",
-                                strokeWeight: 3,
-                            }
-                        });
+            window.map.once('locationfound', function(e) {
+                // User Marker
+                L.marker(e.latlng, {
+                    icon: L.divIcon({
+                        className: "user-pin",
+                        iconAnchor: [0, 8],
+                        html: '<span style="background-color: #3498db; width: 16px; height: 16px; display: block; left: -8px; top: -8px; position: relative; border-radius: 50%; border: 3px solid #FFFFFF; box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);"></span>'
+                    })
+                }).addTo(window.map).bindPopup("📍 موقعك الحالي").openPopup();
 
-                        window.map.setCenter(pos);
-                        window.map.setZoom(15);
+                btn.innerHTML = '✅ تم التحديد';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
 
-                        // Show success
-                        btn.innerHTML = '✅ تم تحديد الموقع';
-                        setTimeout(() => btn.innerHTML = originalText, 2000);
-                    },
-                    (error) => {
-                        alert("تعذر تحديد موقعك. يرجى تفعيل الـ GPS.");
-                        console.error('GPS Error', error);
-                        btn.innerHTML = originalText;
-                    }
-                );
-            } else {
-                alert("المتصفح لا يدعم تحديد الموقع.");
-            }
+            window.map.once('locationerror', function(e) {
+                alert("تعذر تحديد موقعك. يرجى تفعيل الـ GPS في متصفحك.");
+                console.error('GPS Error', e);
+                btn.innerHTML = originalText;
+            });
         };
 
         // Filtering Logic
@@ -588,15 +573,22 @@
                 let matchSearch = item.name.toLowerCase().includes(searchText);
 
                 if (matchCategory && matchSearch) {
-                    item.marker.setMap(window.map);
+                    // Add back to map if not present
+                    if (!window.map.hasLayer(item.marker)) {
+                        item.marker.addTo(window.map);
+                    }
                 } else {
-                    item.marker.setMap(null);
+                    // Remove from map
+                    if (window.map.hasLayer(item.marker)) {
+                        item.marker.remove();
+                    }
                 }
             });
         }
 
         // Helper to map Arabic View Types to English filters
         function mapCategory(arabicJob) {
+            if (!arabicJob) return 'other';
             if (arabicJob.includes('نجار')) return 'carpenter';
             if (arabicJob.includes('سباك') || arabicJob.includes('مواسرجي')) return 'plumber';
             if (arabicJob.includes('كهرب')) return 'electrician';
@@ -608,12 +600,5 @@
         loadMapData();
 
     </script>
-
-    <!-- Google Maps API Script -->
-    <!-- REPLACE YOUR_API_KEY_HERE WITH YOUR ACTUAL KEY -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&libraries=places&callback=initMap"
-        defer></script>
-
 </body>
-
 </html>
