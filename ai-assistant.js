@@ -1,27 +1,26 @@
 // ai-assistant.js
-// Logic for Khedmtek AI Assistant — powered by Groq via secure Cloudflare Worker Proxy
+// Logic for Khedmtek AI Assistant — powered by secure Netlify Serverless Function
 
-// ✅ المفتاح السري محمي داخل Cloudflare Worker ولا يظهر هنا أبداً
-const GROQ_PROXY_URL = 'https://long-river-59c4.himour-mk.workers.dev';
-const GROQ_MODEL     = 'llama-3.3-70b-versatile';
+// المفتاح السري محمي ومخفي داخل Netlify Functions ولا يظهر في الكود أبداً
+const AI_PROXY_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+    ? 'https://khedmtek.netlify.app/.netlify/functions/ai-assistant'
+    : '/.netlify/functions/ai-assistant';
 
 const SYSTEM_PROMPT = `أنت "المعلم الذكي" 🛠️، المساعد الخبير والعبقري لمنصة "خدمتك" الأردنية 🇯🇴.
 مع كل رسالة، سيرفق لك النظام قائمة بالمهنيين المتوفرين.
 تعليماتك الصارمة جداً:
-1. 🎨 استخدم الإيموجي (Emojis) بشكل جميل.
-2. ⚠️ تحذير هام جداً: لا تقم أبداً بترشيح أو ذكر أي مهني من القائمة إذا كان سؤال المستخدم عن كيفية استخدام التطبيق (مثل تسجيل الدخول، المفضلة، كلمة السر). أجب على سؤاله فقط وبشكل مختصر!
-3. 💡 للتشخيص الفني (فقط إذا سأل عن مشكلة بالمنزل): أعطه تشخيصاً ذكياً ومفصلاً بـ 5-7 أسطر يشرح الأسباب المحتملة والحلول الممكنة بشكل احترافي ووافي، ثم رشح له أفضل مهني واحد أو اثنين فقط من القائمة المرفقة ليساعده في الحل. لا تسرد كل القائمة أبداً.
+1. 🎨 استخدم الإيموجي (Emojis) بشكل جميل ومناسب.
+2. ⚠️ تحذير هام جداً: لا تقم أبداً بترشيح أو ذكر أي مهني من القائمة إذا كان سؤال المستخدم عن كيفية استخدام التطبيق أو الموقع (مثل تسجيل الدخول، المفضلة، كلمة السر). أجب على سؤاله فقط وبشكل مختصر!
+3. 💡 للتشخيص الفني (فقط إذا سأل عن مشكلة بالمنزل أو عطل): أعطه تشخيصاً ذكياً ومفصلاً بـ 3-5 أسطر يشرح الأسباب المحتملة والحلول الممكنة بشكل احترافي ووافي، ثم رشح له أفضل مهني واحد أو اثنين فقط من القائمة المرفقة ليساعده في الحل. لا تسرد كل القائمة أبداً.
 4. 📱 لدعم استخدام الموقع والتطبيق (أجب باختصار وبدون ذكر مهنيين):
    - كيف أحجز؟: "اضغط على زر 'اتصال' 📞 أو 'واتساب' 💬 الموجود ببطاقة المهني."
    - كيف أضيف للمفضلة؟: "اكبس على قلب الحب ❤️ اللي على بطاقة المهني."
    - كيف أقيم مهني؟: "اكبس على زر 'تقييم' ⭐ من بطاقته."
    - نسيت كلمة السر / تعديل الحساب: "من صفحة 'حسابي' أو شاشة تسجيل الدخول بتقدر تعدل بياناتك أو تسترجع كلمة السر بسهولة."
-5. 🇯🇴 تحدث بلهجة أردنية محببة وقريبة للقلب.
-6. 🎯 كن مباشراً ومختصراً جداً. لا تكرر الكلام ولا تطل في الشرح.`;
+5. 🇯🇴 تحدث بلهجة أردنية محببة وقريبة للقلب ومحترمة.
+6. 🎯 كن مباشراً ومختصراً. لا تكرر الكلام ولا تطل في الشرح.`;
 
-let chatHistory = [
-    { role: "system", content: SYSTEM_PROMPT }
-];
+let chatHistory = [];
 
 let chatWidget, chatWindow, chatMessages, chatInput, chatToggleBtn, closeChatBtn;
 
@@ -36,15 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
     closeChatBtn  = document.getElementById('aiCloseChat');
     const sendBtn = document.getElementById('aiSendBtn');
 
-    chatToggleBtn.addEventListener('click', toggleChat);
-    closeChatBtn.addEventListener('click', toggleChat);
-    sendBtn.addEventListener('click', handleSend);
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleSend();
-    });
+    if (chatToggleBtn) chatToggleBtn.addEventListener('click', toggleChat);
+    if (closeChatBtn)  closeChatBtn.addEventListener('click', toggleChat);
+    if (sendBtn)       sendBtn.addEventListener('click', handleSend);
+    if (chatInput) {
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    }
 
     setTimeout(() => {
-        addMessage("model", "يا هلا! أنا مساعدك الذكي من 'خدمتك'. بقدر أنصحك فنياً وأرشحلك أفضل مهني من اللي قدامك! كيف أخدمك؟ 😊");
+        addMessage("model", "يا هلا! أنا مساعدك الذكي من 'خدمتك' 🤖. بقدر أنصحك فنياً وأرشحلك أفضل مهني من اللي قدامك! كيف أخدمك اليوم؟ 😊");
     }, 600);
 });
 
@@ -52,22 +53,22 @@ function injectChatUI() {
     if (document.getElementById('aiChatWidget')) return;
     document.body.insertAdjacentHTML('beforeend', `
         <div id="aiChatWidget" class="ai-chat-widget">
-            <button id="aiChatToggle" class="ai-chat-toggle">
+            <button id="aiChatToggle" class="ai-chat-toggle" title="المساعد الذكي">
                 <span class="ai-icon">🤖</span>
-                <span class="ai-tooltip">احتاج مساعدة؟</span>
+                <span class="ai-tooltip">محتاج مساعدة؟</span>
             </button>
             <div id="aiChatWindow" class="ai-chat-window hidden">
                 <div class="ai-chat-header">
                     <div class="ai-header-info">
                         <span class="ai-avatar">🤖</span>
-                        <div class="ai-title">مساعد خدمتك</div>
+                        <div class="ai-title">مساعد خدمتك الذكي</div>
                     </div>
                     <button id="aiCloseChat" class="ai-close-btn">&times;</button>
                 </div>
                 <div id="aiChatMessages" class="ai-chat-messages"></div>
                 <div class="ai-chat-input-area">
                     <input type="text" id="aiChatInput" placeholder="اكتب سؤالك هنا..." autocomplete="off">
-                    <button id="aiSendBtn" class="ai-send-btn">
+                    <button id="aiSendBtn" class="ai-send-btn" title="إرسال">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
                         </svg>
@@ -79,6 +80,7 @@ function injectChatUI() {
 }
 
 function toggleChat() {
+    if (!chatWindow) return;
     chatWindow.classList.toggle('hidden');
     if (!chatWindow.classList.contains('hidden')) {
         chatInput.focus();
@@ -103,7 +105,7 @@ async function handleSend() {
         if (cards && cards.length > 0) {
             let proCount = 0;
             cards.forEach((card) => {
-                if (proCount < 15) { // Pass up to 15 pros
+                if (proCount < 15) {
                     const name = card.querySelector('h3')?.innerText.trim() || 'مجهول';
                     const job = card.querySelector('.profession')?.innerText.trim() || '';
                     const city = card.querySelector('.location')?.innerText.replace('📍', '').trim() || '';
@@ -119,24 +121,33 @@ async function handleSend() {
 
     const enhancedText = `[بيانات النظام المخفية]\n${currentContext}\n[رسالة المستخدم الفعلية]\n${text}`;
 
-    // Keep history short (system + last 6 messages) to avoid token overflow
-    if (chatHistory.length > 7) {
-        chatHistory = [chatHistory[0], ...chatHistory.slice(-6)];
+    // Keep history manageable
+    if (chatHistory.length > 6) {
+        chatHistory = chatHistory.slice(-6);
     }
-    chatHistory.push({ role: "user", content: enhancedText });
+    chatHistory.push({
+        role: "user",
+        parts: [{ text: enhancedText }]
+    });
 
     try {
-        const response = await fetch(GROQ_PROXY_URL, {
+        const payload = {
+            system_instruction: {
+                parts: [{ text: SYSTEM_PROMPT }]
+            },
+            contents: chatHistory,
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 2048
+            }
+        };
+
+        const response = await fetch(AI_PROXY_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                model: GROQ_MODEL,
-                messages: chatHistory,
-                temperature: 0.7,
-                max_tokens: 500
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
@@ -147,19 +158,22 @@ async function handleSend() {
             throw new Error(errMsg);
         }
 
-        const reply = data.choices?.[0]?.message?.content;
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (reply) {
-            chatHistory.push({ role: "assistant", content: reply });
+            chatHistory.push({
+                role: "model",
+                parts: [{ text: reply }]
+            });
             addMessage("model", reply);
         } else {
-            throw new Error('empty response');
+            throw new Error('لم يتم استلام رد من المساعد.');
         }
 
     } catch (error) {
         removeElement(typingId);
-        chatHistory.pop();
-        addMessage("model", `عذراً، حدث خطأ: ${error.message}`);
-        console.error('AI Error:', error);
+        chatHistory.pop(); // Remove the last user message on failure
+        addMessage("model", `عذراً، حدث خطأ أثناء الاتصال بالمساعد الذكي 😕\n(${error.message})`);
+        console.error('AI Gemini Error:', error);
     } finally {
         chatInput.disabled = false;
         chatInput.focus();
