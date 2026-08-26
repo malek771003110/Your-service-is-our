@@ -150,13 +150,21 @@ async function handleSend() {
             body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
-        removeElement(typingId);
-
         if (!response.ok) {
-            const errMsg = data?.error?.message || `خطأ ${response.status}`;
+            let errMsg = `خطأ في الاتصال (${response.status})`;
+            try {
+                const errData = await response.json();
+                if (errData?.error?.message) errMsg = errData.error.message;
+            } catch(e) {
+                if (response.status === 404) {
+                    errMsg = 'لم يتم رفع ونشر ملفات Netlify بعد. يرجى عمل Git Push لتفعيل السيرفر.';
+                }
+            }
             throw new Error(errMsg);
         }
+
+        const data = await response.json();
+        removeElement(typingId);
 
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (reply) {
