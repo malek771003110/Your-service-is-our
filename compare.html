@@ -1,487 +1,306 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مقارنة المهنيين ⚖️ | خدمتك عنا</title>
-    <meta name="description" content="قارن بين أفضل المهنيين لاختيار الأنسب لك">
+    <title>مقارنة المهنيين ⚖️ | منصة خدمتك 🇯🇴</title>
+    
+    <!-- Fonts & Core Stylesheet -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            direction: rtl;
-            line-height: 1.6;
-            color: #333;
-            padding-bottom: 40px;
-        }
-
-        /* Animated Background Particles */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            animation: float 20s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-            33% { transform: translateY(-100px) translateX(50px) rotate(120deg); }
-            66% { transform: translateY(-200px) translateX(-50px) rotate(240deg); }
-        }
-
-        .container {
+        .compare-page-layout {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
+            padding: 80px 15px 60px;
         }
 
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 30px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .compare-header-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 35px 25px;
             text-align: center;
-            animation: fadeInDown 0.8s ease-out;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-glass);
             position: relative;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-            font-weight: 900;
-        }
-
-        .header p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Back Button */
-        .back-btn {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
+        .compare-icon-bubble {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--grad-amber);
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            justify-content: center;
+            font-size: 28px;
+            color: #0b091a;
+            margin: 0 auto 12px;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
         }
 
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateX(-5px);
+        .compare-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--text-pure);
+            margin-bottom: 6px;
         }
 
-        /* Comparison Grid Container */
-        .comparison-grid {
+        .compare-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .compare-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
+            align-items: stretch;
         }
 
-        /* Professional Card */
-        .professional-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 25px;
+        .compare-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
             padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-card);
             position: relative;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .professional-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-            border-color: rgba(102, 126, 234, 0.5);
+        .compare-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-amber);
+            box-shadow: var(--shadow-glass);
         }
 
-        /* Remove Button */
-        .remove-btn {
+        .btn-remove-compare {
             position: absolute;
             top: 15px;
             left: 15px;
-            width: 35px;
-            height: 35px;
-            background: rgba(231, 76, 60, 0.3);
-            color: white;
-            border: 1px solid rgba(231, 76, 60, 0.5);
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-            z-index: 10;
-        }
-
-        .remove-btn:hover {
-            background: #e74c3c;
-            transform: rotate(90deg) scale(1.1);
-        }
-
-        /* Card Header */
-        .card-header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .card-avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 0 auto 15px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
-            position: relative;
+            transition: var(--transition);
         }
 
-        .card-avatar::after {
-            content: '';
-            position: absolute;
-            inset: -5px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .btn-remove-compare:hover {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fb7185;
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+
+        .compare-avatar-circle {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            z-index: -1;
-            opacity: 0.3;
-            animation: avatarPulse 2s infinite;
-        }
-
-        @keyframes avatarPulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.6; }
-        }
-
-        .card-name {
-            font-size: 1.5rem;
-            font-weight: bold;
+            background: var(--grad-primary);
             color: white;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 900;
+            margin: 0 auto 12px;
+            box-shadow: 0 4px 20px var(--accent-glow);
         }
 
-        .card-job {
-            color: #f39c12;
-            font-size: 1rem;
-            font-weight: 600;
+        .compare-pro-name {
+            font-size: 19px;
+            font-weight: 900;
+            color: var(--text-pure);
+            text-align: center;
+            margin-bottom: 4px;
         }
 
-        /* Card Details */
-        .card-details {
-            display: grid;
-            gap: 12px;
+        .compare-pro-job {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent-primary);
             margin-bottom: 20px;
         }
 
-        .detail-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+        .compare-attributes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 25px;
         }
 
-        .detail-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(5px);
+        .compare-attr-row {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .detail-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 5px;
+        .compare-attr-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .compare-attr-value {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-pure);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .detail-value {
-            color: white;
-            font-weight: bold;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .badge-best {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            font-size: 10.5px;
+            font-weight: 900;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
         }
 
-        /* Best Badge */
-        .best-badge {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.4);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        /* Card Actions */
-        .card-actions {
+        .compare-actions-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
-        .action-btn {
+        .btn-compare-contact {
             padding: 12px;
-            border-radius: 15px;
-            border: none;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 800;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 0.9rem;
-        }
-
-        .btn-call {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
-        }
-
-        .btn-whatsapp {
-            background: linear-gradient(135deg, #25D366, #128C7E);
-            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
-        }
-
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 100px 20px;
-            color: white;
-            display: none;
-        }
-
-        .empty-state .icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
-            opacity: 0.7;
-        }
-
-        .btn-browse {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 25px;
+            gap: 6px;
             text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
-        .btn-browse:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(243, 156, 18, 0.4);
+        .btn-compare-contact.phone {
+            background: var(--grad-emerald);
+            color: #0b091a;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .header {
-                padding: 20px 15px;
-                border-radius: 20px;
-            }
-
-            .header h1 {
-                font-size: 1.5rem;
-            }
-
-            .header p {
-                font-size: 0.9rem;
-            }
-
-            .back-btn {
-                top: 15px;
-                left: 15px;
-                width: 40px;
-                height: 40px;
-                padding: 0;
-                justify-content: center;
-                border-radius: 50%;
-            }
-
-            .back-btn span:not(:first-child) {
-                display: none;
-            }
-
-            .comparison-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .professional-card {
-                padding: 20px;
-            }
-
-            .card-avatar {
-                width: 80px;
-                height: 80px;
-                font-size: 2.5rem;
-            }
-
-            .card-name {
-                font-size: 1.3rem;
-            }
-
-            .detail-item {
-                padding: 12px;
-            }
-
-            .detail-value {
-                font-size: 1rem;
-            }
-
-            .card-actions {
-                gap: 8px;
-            }
-
-            .action-btn {
-                padding: 10px;
-                font-size: 0.85rem;
-            }
+        .btn-compare-contact.whatsapp {
+            background: rgba(37, 211, 102, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(37, 211, 102, 0.4);
         }
 
-        @media (max-width: 400px) {
-            .card-avatar {
-                width: 70px;
-                height: 70px;
-                font-size: 2rem;
-            }
+        .btn-compare-contact:hover {
+            transform: translateY(-2px);
+        }
 
-            .card-name {
-                font-size: 1.2rem;
-            }
+        .empty-compare-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 60px 20px;
+            text-align: center;
+            grid-column: 1 / -1;
+            box-shadow: var(--shadow-glass);
+        }
 
-            .card-actions {
+        .top-back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--bg-glass-heavy);
+            border: 1px solid var(--border-color);
+            color: var(--text-pure);
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .top-back-btn:hover {
+            background: var(--grad-primary);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 480px) {
+            .compare-grid {
                 grid-template-columns: 1fr;
             }
-        }
-
-        /* For 2 cards side by side on tablet */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .comparison-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .compare-actions-grid {
+                grid-template-columns: 1fr;
             }
-        }
-
-        /* For 3 cards on desktop */
-        @media (min-width: 1025px) {
-            .comparison-grid {
-                grid-template-columns: repeat(3, 1fr);
+            .top-back-btn {
+                top: 10px;
+                right: 10px;
+                font-size: 12px;
+                padding: 6px 12px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="particles" id="particles"></div>
+    <a href="index.html" class="top-back-btn">
+        <span>←</span>
+        <span>العودة للرئيسية</span>
+    </a>
 
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-btn">
-                <span>🏠</span>
-                <span>الرئيسية</span>
+    <div class="compare-page-layout">
+        <div class="compare-header-card">
+            <div class="compare-icon-bubble">⚖️</div>
+            <h1 class="compare-title">مقارنة المهنيين</h1>
+            <p class="compare-subtitle">قارن بين الأسعار وسنوات الخبرة والتقييمات لاختيار المهني الأنسب لاحتياجاتك</p>
+        </div>
+
+        <div class="compare-grid" id="comparisonGrid"></div>
+
+        <div class="empty-compare-card" id="emptyState" style="display: none;">
+            <div style="font-size: 50px; margin-bottom: 12px;">⚖️</div>
+            <h2 style="color: var(--text-pure); font-size: 20px; font-weight: 900; margin-bottom: 8px;">لا يوجد مهنيين في قائمة المقارنة</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 25px;">
+                قم بإضافة مهنيين (حتى 3 مهنيين) من الصفحة الرئيسية للمقارنة بينهم جنباً إلى جنب.
+            </p>
+            <a href="index.html" class="btn-nav-register" style="display: inline-flex; padding: 12px 30px; font-size: 14px;">
+                🔍 تصفح دليل المهنيين
             </a>
-            <h1>⚖️ مقارنة المهنيين</h1>
-            <p>قارن بين المهنيين جنباً إلى جنب لاختيار الأفضل</p>
         </div>
-
-        <div class="empty-state" id="emptyState">
-            <div class="icon">⚖️</div>
-            <h2>لا يوجد مهنيين للمقارنة</h2>
-            <p>قم بإضافة مهنيين من القائمة الرئيسية للمقارنة بينهم (حد أقصى 3)</p>
-            <a href="index.html" class="btn-browse">تصفح المهنيين</a>
-        </div>
-
-        <div class="comparison-grid" id="comparisonGrid"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             loadComparison();
-            createParticles();
         });
 
         function loadComparison() {
@@ -497,121 +316,102 @@
 
             emptyState.style.display = 'none';
             grid.style.display = 'grid';
+            grid.innerHTML = '';
 
-            // Find best values for comparison
             const bestRating = Math.max(...compareList.map(p => p.ratings?.averageRating || 0));
             const bestPrice = Math.min(...compareList.map(p => p.hourlyPrice || Infinity).filter(p => p !== Infinity));
             const bestExperience = Math.max(...compareList.map(p => parseInt(p.experienceYears) || 0));
 
-            // Create cards
             compareList.forEach(prof => {
-                const card = createProfessionalCard(prof, {
-                    bestRating,
-                    bestPrice,
-                    bestExperience
-                });
+                const card = createProCard(prof, { bestRating, bestPrice, bestExperience });
                 grid.appendChild(card);
             });
         }
 
-        function createProfessionalCard(prof, bestValues) {
+        function createProCard(prof, best) {
             const card = document.createElement('div');
-            card.className = 'professional-card';
+            card.className = 'compare-card';
 
             const rating = prof.ratings?.averageRating || 0;
             const price = prof.hourlyPrice || 0;
-            const experience = parseInt(prof.experienceYears) || 0;
+            const exp = parseInt(prof.experienceYears) || 0;
+            const phone = prof.phone || '';
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
 
-            const isBestRating = rating > 0 && rating === bestValues.bestRating;
-            const isBestPrice = price > 0 && price === bestValues.bestPrice;
-            const isBestExperience = experience > 0 && experience === bestValues.bestExperience;
+            const isBestRating = rating > 0 && rating === best.bestRating;
+            const isBestPrice = price > 0 && price === best.bestPrice;
+            const isBestExp = exp > 0 && exp === best.bestExperience;
 
             card.innerHTML = `
-                <button class="remove-btn" onclick="removeFromCompare('${prof.id}')">✖</button>
-                
-                <div class="card-header">
-                    <div class="card-avatar">${prof.name.charAt(0).toUpperCase()}</div>
-                    <div class="card-name">${prof.name}</div>
-                    <div class="card-job">${prof.job}</div>
+                <div>
+                    <button class="btn-remove-compare" onclick="removeFromCompare('${prof.id}')" title="إزالة من المقارنة">✕</button>
+                    
+                    <div class="compare-avatar-circle">${prof.name.charAt(0).toUpperCase()}</div>
+                    <h3 class="compare-pro-name">${prof.name}</h3>
+                    <div class="compare-pro-job">${prof.job}</div>
+
+                    <div class="compare-attributes-list">
+                        <div class="compare-attr-row">
+                            <span class="compare-attr-label">📍 المحافظة</span>
+                            <span class="compare-attr-value">${prof.city || 'عمان'}</span>
+                        </div>
+
+                        <div class="compare-attr-row">
+                            <span class="compare-attr-label">⭐ التقييم العام</span>
+                            <span class="compare-attr-value">
+                                <span>⭐ ${rating > 0 ? rating.toFixed(1) : '5.0'}</span>
+                                ${isBestRating ? '<span class="badge-best">الأعلى ⭐</span>' : ''}
+                            </span>
+                        </div>
+
+                        <div class="compare-attr-row">
+                            <span class="compare-attr-label">💰 سعر الساعة</span>
+                            <span class="compare-attr-value">
+                                <span>${price > 0 ? price + ' د.أ' : 'حسب الاتفاق'}</span>
+                                ${isBestPrice ? '<span class="badge-best">الأفضل سعراً 💰</span>' : ''}
+                            </span>
+                        </div>
+
+                        <div class="compare-attr-row">
+                            <span class="compare-attr-label">⏳ سنوات الخبرة</span>
+                            <span class="compare-attr-value">
+                                <span>${exp > 0 ? exp + ' سنوات' : 'متمرس'}</span>
+                                ${isBestExp ? '<span class="badge-best">الأكثر خبرة 🎖️</span>' : ''}
+                            </span>
+                        </div>
+
+                        <div class="compare-attr-row">
+                            <span class="compare-attr-label">⏰ ساعات العمل</span>
+                            <span class="compare-attr-value">${(prof.workStartTime && prof.workEndTime) ? prof.workStartTime + ' - ' + prof.workEndTime : 'طوال اليوم'}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="card-details">
-                    <div class="detail-item">
-                        <div class="detail-label">📍 المدينة</div>
-                        <div class="detail-value">${prof.city}</div>
-                    </div>
-
-                    <div class="detail-item">
-                        <div class="detail-label">⭐ التقييم</div>
-                        <div class="detail-value">
-                            ${generateStars(rating)} (${prof.ratings?.totalCount || 0})
-                            ${isBestRating ? '<span class="best-badge">✅ الأفضل</span>' : ''}
-                        </div>
-                    </div>
-
-                    <div class="detail-item">
-                        <div class="detail-label">💰 السعر / ساعة</div>
-                        <div class="detail-value">
-                            ${price ? price + ' د.أ' : 'غير محدد'}
-                            ${isBestPrice && price > 0 ? '<span class="best-badge">✅ الأرخص</span>' : ''}
-                        </div>
-                    </div>
-
-                    <div class="detail-item">
-                        <div class="detail-label">📚 سنوات الخبرة</div>
-                        <div class="detail-value">
-                            ${experience} سنوات
-                            ${isBestExperience && experience > 0 ? '<span class="best-badge">✅ الأكثر</span>' : ''}
-                        </div>
-                    </div>
-
-                    <div class="detail-item">
-                        <div class="detail-label">🕐 ساعات العمل</div>
-                        <div class="detail-value">${prof.workStartTime || '?'} - ${prof.workEndTime || '?'}</div>
-                    </div>
-                </div>
-
-                <div class="card-actions">
-                    <a href="tel:${prof.phone}" class="action-btn btn-call">
-                        📞 اتصال
-                    </a>
-                    <a href="https://wa.me/962${prof.phone.substring(1)}" target="_blank" class="action-btn btn-whatsapp">
-                        💬 واتساب
-                    </a>
+                <div class="compare-actions-grid">
+                    ${phone ? `
+                        <a href="tel:${cleanPhone}" class="btn-compare-contact phone">
+                            📞 اتصال
+                        </a>
+                        <a href="https://wa.me/962${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}" target="_blank" class="btn-compare-contact whatsapp">
+                            💬 واتساب
+                        </a>
+                    ` : `
+                        <a href="index.html" class="btn-compare-contact phone" style="grid-column: span 2;">
+                            🌐 عرض الملف
+                        </a>
+                    `}
                 </div>
             `;
 
             return card;
         }
 
-        function generateStars(rating) {
-            if (!rating || rating === 0) return '☆☆☆☆☆';
-            const fullStars = Math.floor(rating);
-            const emptyStars = 5 - fullStars;
-            return '⭐'.repeat(fullStars) + '☆'.repeat(emptyStars);
-        }
-
-        function removeFromCompare(id) {
+        window.removeFromCompare = function(id) {
             let list = JSON.parse(localStorage.getItem('compareList')) || [];
             list = list.filter(p => p.id !== id);
             localStorage.setItem('compareList', JSON.stringify(list));
-            location.reload();
-        }
-
-        function createParticles() {
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 30; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.top = Math.random() * 100 + '%';
-                p.style.animationDelay = Math.random() * 5 + 's';
-                p.style.opacity = Math.random() * 0.5 + 0.1;
-                p.style.width = p.style.height = (Math.random() * 5 + 2) + 'px';
-                container.appendChild(p);
-            }
-        }
+            loadComparison();
+        };
     </script>
 </body>
-
 </html>
