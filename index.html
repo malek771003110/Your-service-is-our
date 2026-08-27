@@ -65,14 +65,15 @@
                     <span id="navAuthIcon">🔐</span>
                     <span id="navAuthText">تسجيل الدخول</span>
                 </a>
-                <button class="nav-hamburger-btn" id="hamburgerBtn" onclick="toggleHamburgerMenu()" aria-label="القائمة">
-                    <span>☰</span>
+                <button class="nav-hamburger-btn" id="hamburgerBtn" onclick="toggleHamburgerMenu()" aria-label="القائمة الرئيسية">
+                    <span class="nav-hamburger-icon">☰</span>
+                    <span>القائمة</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- ☰ Mobile Hamburger Drawer -->
+    <!-- ☰ Modern Sliding Hamburger Drawer -->
     <div class="hamburger-overlay" id="hamburgerOverlay" onclick="closeHamburgerMenu()"></div>
     <aside class="hamburger-drawer" id="hamburgerDrawer">
         <div>
@@ -80,14 +81,19 @@
                 <div class="drawer-title">
                     <span>🛠️ منصة خدمتك</span>
                 </div>
-                <button class="close-drawer-btn" onclick="closeHamburgerMenu()">✕</button>
+                <button class="close-drawer-btn" onclick="closeHamburgerMenu()" title="إغلاق">✕</button>
             </div>
 
+            <!-- 📍 القسم الأول: الخدمات والتصفح -->
+            <div class="drawer-section-title">
+                <span>📍</span>
+                <span>الخدمات والاستكشاف</span>
+            </div>
             <ul class="drawer-links">
                 <li>
                     <a href="index.html" class="drawer-link" onclick="closeHamburgerMenu()">
                         <div class="drawer-link-content">
-                            <span>🏠</span>
+                            <span class="drawer-link-icon">🏠</span>
                             <span>الرئيسية</span>
                         </div>
                     </a>
@@ -95,15 +101,16 @@
                 <li>
                     <a href="map.html" class="drawer-link">
                         <div class="drawer-link-content">
-                            <span>🗺️</span>
-                            <span>خريطة المهنيين</span>
+                            <span class="drawer-link-icon">🗺️</span>
+                            <span>الخريطة التفاعلية</span>
                         </div>
+                        <span class="drawer-badge">مواقع المهنيين</span>
                     </a>
                 </li>
                 <li id="drawerFavoritesItem">
                     <a href="favorites.html" class="drawer-link">
                         <div class="drawer-link-content">
-                            <span>❤️</span>
+                            <span class="drawer-link-icon">❤️</span>
                             <span>مفضلتي المحفوظة</span>
                         </div>
                         <span class="nav-badge" id="drawerFavCount">0</span>
@@ -112,41 +119,68 @@
                 <li>
                     <a href="compare.html" class="drawer-link">
                         <div class="drawer-link-content">
-                            <span>⚖️</span>
+                            <span class="drawer-link-icon">⚖️</span>
                             <span>مقارنة المهنيين</span>
                         </div>
+                        <span class="drawer-badge">جنباً إلى جنب</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- 💼 القسم الثاني: بوابة المهنيين -->
+            <div class="drawer-section-title">
+                <span>💼</span>
+                <span>بوابة المهنيين</span>
+            </div>
+            <ul class="drawer-links">
+                <li>
+                    <a href="register.html" class="drawer-link">
+                        <div class="drawer-link-content">
+                            <span class="drawer-link-icon">✨</span>
+                            <span>انضم لشبكة المهنيين</span>
+                        </div>
+                        <span class="drawer-badge" style="color: var(--accent-emerald);">تسجيل جديد</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="login.html" class="drawer-link">
+                        <div class="drawer-link-content">
+                            <span class="drawer-link-icon">🔐</span>
+                            <span>لوحة تحكم المهنيين</span>
+                        </div>
+                        <span class="drawer-badge">دخول المهني</span>
                     </a>
                 </li>
                 <li>
                     <a href="verify.html" class="drawer-link">
                         <div class="drawer-link-content">
-                            <span>📋</span>
-                            <span>حالة الطلبات والاشتراك</span>
+                            <span class="drawer-link-icon">📋</span>
+                            <span>تتبع حالة طلبك</span>
                         </div>
                     </a>
                 </li>
-                <li>
-                    <a href="register.html" class="drawer-link">
-                        <div class="drawer-link-content">
-                            <span>💼</span>
-                            <span>سجل مهنتك الآن</span>
-                        </div>
-                    </a>
-                </li>
+            </ul>
+
+            <!-- 📞 القسم الثالث: الدعم والمساعدة -->
+            <div class="drawer-section-title">
+                <span>📞</span>
+                <span>المساعدة والدعم</span>
+            </div>
+            <ul class="drawer-links">
                 <li>
                     <a href="#contact" class="drawer-link" onclick="scrollToContact()">
                         <div class="drawer-link-content">
-                            <span>📞</span>
-                            <span>تواصل معنا</span>
+                            <span class="drawer-link-icon">💬</span>
+                            <span>خدمة العملاء (24/7)</span>
                         </div>
                     </a>
                 </li>
             </ul>
         </div>
 
-        <div style="padding-top: 20px; border-top: 1px solid var(--border-color);">
+        <div style="padding-top: 15px; border-top: 1px solid var(--border-color); margin-top: 15px;">
             <a href="customer-auth-page.html" class="btn-nav-register" id="drawerAuthBtn" style="justify-content: center; width: 100%;">
-                <span>🔐</span>
+                <span id="drawerAuthIcon">🔐</span>
                 <span id="drawerAuthText">تسجيل الدخول</span>
             </a>
         </div>
@@ -483,6 +517,8 @@
 
                 // Drawer Auth update
                 if (elements.drawerAuthText) elements.drawerAuthText.textContent = 'تسجيل خروج';
+                const drawerAuthIcon = document.getElementById('drawerAuthIcon');
+                if (drawerAuthIcon) drawerAuthIcon.textContent = '🚪';
                 if (elements.drawerAuthBtn) {
                     elements.drawerAuthBtn.onclick = logout;
                     elements.drawerAuthBtn.removeAttribute('href');
@@ -507,6 +543,8 @@
 
                 // Drawer Auth update
                 if (elements.drawerAuthText) elements.drawerAuthText.textContent = 'تسجيل الدخول';
+                const drawerAuthIcon = document.getElementById('drawerAuthIcon');
+                if (drawerAuthIcon) drawerAuthIcon.textContent = '🔐';
                 if (elements.drawerAuthBtn) {
                     elements.drawerAuthBtn.onclick = null;
                     elements.drawerAuthBtn.href = 'customer-auth-page.html';
