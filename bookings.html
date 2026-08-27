@@ -3,560 +3,550 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حجز موعد - خدمات منزلية</title>
+  <title>حجز موعد صيانة | منصة خدمتك 🇯🇴</title>
+  
+  <!-- Fonts & Core Stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      direction: rtl;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 1000px;
+    .booking-page-layout {
+      max-width: 1100px;
       margin: 0 auto;
+      padding: 80px 15px 60px;
     }
 
-    .header {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    .booking-header-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 35px 25px;
       text-align: center;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow-glass);
+      position: relative;
     }
 
-    .header h1 {
-      color: #2c3e50;
-      font-size: 2rem;
-      margin-bottom: 10px;
+    .booking-icon-bubble {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 12px;
+      box-shadow: 0 4px 20px var(--accent-glow);
     }
 
-    .header p {
-      color: #7f8c8d;
-      font-size: 1rem;
+    .booking-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text-pure);
+      margin-bottom: 6px;
     }
 
-    .booking-grid {
+    .booking-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .booking-grid-2col {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 25px;
+      margin-bottom: 30px;
+      align-items: start;
     }
 
-    .calendar-section, .booking-form {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    .booking-section-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(30px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 30px 25px;
+      box-shadow: var(--shadow-glass);
     }
 
-    .section-title {
-      color: #2c3e50;
-      font-size: 1.5rem;
+    .card-section-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text-pure);
       margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-
-    /* Calendar Styles */
-    .calendar {
-      background: #f8f9fa;
-      border-radius: 15px;
-      padding: 20px;
-    }
-
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .calendar-header h3 {
-      color: #2c3e50;
-      font-size: 1.2rem;
-    }
-
-    .calendar-nav {
-      display: flex;
-      gap: 10px;
-    }
-
-    .nav-btn {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      border: none;
-      background: white;
-      color: #667eea;
-      cursor: pointer;
-      font-size: 1.2rem;
-      transition: all 0.3s;
-    }
-
-    .nav-btn:hover {
-      background: #667eea;
-      color: white;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
       gap: 8px;
     }
 
-    .calendar-day-header {
-      text-align: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: #7f8c8d;
-      padding: 8px;
+    /* Calendar */
+    .calendar-container-modern {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 20px;
     }
 
-    .calendar-day {
+    .calendar-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .calendar-top-header h3 {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text-pure);
+    }
+
+    .cal-nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-pure);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .cal-nav-btn:hover {
+      background: var(--accent-primary);
+      border-color: transparent;
+    }
+
+    .calendar-grid-modern {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .cal-day-name {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      padding: 6px 0;
+    }
+
+    .cal-day-num {
       aspect-ratio: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-pure);
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s;
-      border: 2px solid transparent;
+      border: 1px solid transparent;
+      transition: var(--transition);
     }
 
-    .calendar-day:hover {
-      background: #e8ecf9;
+    .cal-day-num:hover:not(.disabled) {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--accent-primary);
     }
 
-    .calendar-day.disabled {
-      color: #bdc3c7;
+    .cal-day-num.disabled {
+      color: rgba(255, 255, 255, 0.15);
       cursor: not-allowed;
     }
 
-    .calendar-day.disabled:hover {
-      background: transparent;
+    .cal-day-num.today {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
     }
 
-    .calendar-day.selected {
-      background: linear-gradient(45deg, #667eea, #764ba2);
+    .cal-day-num.selected {
+      background: var(--grad-primary);
       color: white;
-    }
-
-    .calendar-day.today {
-      border-color: #667eea;
-    }
-
-    .calendar-day.has-booking {
-      position: relative;
-    }
-
-    .calendar-day.has-booking::after {
-      content: '';
-      position: absolute;
-      bottom: 3px;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: #e74c3c;
+      font-weight: 900;
+      box-shadow: 0 4px 15px var(--accent-glow);
     }
 
     /* Time Slots */
-    .time-slots {
-      margin-top: 20px;
+    .time-slots-wrapper {
+      margin-top: 15px;
+      display: none;
     }
 
-    .time-slots h4 {
-      color: #2c3e50;
-      font-size: 1.1rem;
-      margin-bottom: 15px;
-    }
-
-    .slots-grid {
+    .time-slots-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
     }
 
-    .time-slot {
-      padding: 12px;
-      border: 2px solid #e1e8ed;
-      border-radius: 10px;
+    .time-slot-chip {
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
       text-align: center;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 600;
-      font-size: 14px;
+      transition: var(--transition);
     }
 
-    .time-slot:hover {
-      border-color: #667eea;
-      background: #e8ecf9;
+    .time-slot-chip:hover:not(.disabled) {
+      border-color: var(--accent-primary);
+      color: var(--text-pure);
     }
 
-    .time-slot.selected {
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      color: white;
+    .time-slot-chip.selected {
+      background: var(--grad-primary);
       border-color: transparent;
+      color: white;
+      box-shadow: 0 4px 12px var(--accent-glow);
     }
 
-    .time-slot.disabled {
-      background: #f8f9fa;
-      color: #bdc3c7;
+    .time-slot-chip.disabled {
+      opacity: 0.3;
       cursor: not-allowed;
-      border-color: #ecf0f1;
     }
 
-    .time-slot.disabled:hover {
-      border-color: #ecf0f1;
-      background: #f8f9fa;
-    }
-
-    /* Booking Form */
-    .form-group {
+    /* Booking Summary Chip */
+    .booking-summary-box {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 16px;
       margin-bottom: 20px;
+    }
+
+    .booking-summary-box h4 {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #a5b4fc;
+      margin-bottom: 10px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .summary-row span:first-child {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .summary-row span:last-child {
+      color: var(--text-pure);
+      font-weight: 800;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
     }
 
     .form-group label {
       display: block;
-      color: #2c3e50;
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 15px;
-      border: 2px solid #e1e8ed;
-      border-radius: 10px;
-      font-size: 14px;
-      transition: all 0.3s;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
-    }
-
-    textarea.form-control {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    .booking-summary {
-      background: #f8f9fa;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .booking-summary h4 {
-      color: #2c3e50;
-      margin-bottom: 15px;
-      font-size: 1.1rem;
-    }
-
-    .summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #e1e8ed;
-    }
-
-    .summary-item:last-child {
-      border-bottom: none;
-    }
-
-    .summary-label {
-      color: #7f8c8d;
-      font-size: 14px;
-    }
-
-    .summary-value {
-      color: #2c3e50;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 18px;
-      border: none;
-      border-radius: 15px;
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      color: white;
-      font-size: 16px;
+      color: var(--text-primary);
+      font-size: 13px;
       font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s;
+      margin-bottom: 6px;
     }
 
-    .submit-btn:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-    }
-
-    .submit-btn:disabled {
-      background: #95a5a6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Bookings List */
-    .my-bookings {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      margin-top: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .booking-card {
-      background: #f8f9fa;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 15px;
-      border: 2px solid #e1e8ed;
-      transition: all 0.3s;
-    }
-
-    .booking-card:hover {
-      border-color: #667eea;
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
-    }
-
-    .booking-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .booking-status {
-      padding: 6px 15px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .status-pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .status-confirmed {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-cancelled {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .booking-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .detail-item {
+    .booking-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(10, 9, 28, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-pure);
+      font-family: inherit;
       font-size: 14px;
-    }
-
-    .detail-label {
-      color: #7f8c8d;
-      font-size: 12px;
-    }
-
-    .detail-value {
-      color: #2c3e50;
       font-weight: 600;
+      transition: var(--transition);
     }
 
-    .booking-actions {
+    .booking-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--cyan-glow);
+    }
+
+    .btn-submit-booking {
+      width: 100%;
+      padding: 14px;
+      background: var(--grad-primary);
+      border: none;
+      border-radius: var(--radius-md);
+      color: white;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px var(--accent-glow);
       display: flex;
-      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit-booking:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+    }
+
+    .btn-submit-booking:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* My Bookings Section */
+    .my-bookings-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(30px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 30px 25px;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .bookings-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
       margin-top: 15px;
     }
 
-    .action-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
+    .single-booking-item {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    .booking-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .booking-item-header h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-pure);
+    }
+
+    .btn-cancel-booking {
+      padding: 6px 12px;
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      border-radius: var(--radius-md);
+      color: #fb7185;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.3s;
+      transition: var(--transition);
     }
 
-    .btn-confirm {
-      background: #27ae60;
-      color: white;
+    .btn-cancel-booking:hover {
+      background: rgba(244, 63, 94, 0.3);
     }
 
-    .btn-cancel {
-      background: #e74c3c;
-      color: white;
-    }
-
-    .btn-reschedule {
-      background: #3498db;
-      color: white;
-    }
-
-    .action-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .booking-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .slots-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .booking-details {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Alert */
     .alert {
-      padding: 15px;
-      border-radius: 10px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 700;
       margin-bottom: 20px;
-      font-size: 14px;
+      text-align: center;
       display: none;
     }
 
-    .alert.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+    .alert.error {
+      background: var(--error-bg);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      display: block;
     }
 
-    .alert.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
+    .alert.success {
+      background: var(--success-bg);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      display: block;
+    }
+
+    .top-back-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: var(--bg-glass-heavy);
+      border: 1px solid var(--border-color);
+      color: var(--text-pure);
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      transition: var(--transition);
+    }
+
+    .top-back-btn:hover {
+      background: var(--grad-primary);
+      border-color: transparent;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .booking-grid-2col {
+        grid-template-columns: 1fr;
+      }
+      .top-back-btn {
+        top: 10px;
+        right: 10px;
+        font-size: 12px;
+        padding: 6px 12px;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>📅 حجز موعد</h1>
-      <p>اختر التاريخ والوقت المناسب لك</p>
+  <a href="index.html" class="top-back-btn">
+    <span>←</span>
+    <span>العودة للرئيسية</span>
+  </a>
+
+  <div class="booking-page-layout">
+    <div class="booking-header-card">
+      <div class="booking-icon-bubble">📅</div>
+      <h1 class="booking-title">حجز موعد صيانة وخدمات</h1>
+      <p class="booking-subtitle">حدد التاريخ والوقت المناسب لطلب الخدمة من المهني المعتمد</p>
     </div>
 
-    <div class="alert" id="alertMessage"></div>
+    <div id="alertMessage" class="alert"></div>
 
-    <div class="booking-grid">
-      <!-- Calendar Section -->
-      <div class="calendar-section">
-        <h2 class="section-title">📆 اختر التاريخ</h2>
-        
-        <div class="calendar">
-          <div class="calendar-header">
-            <h3 id="currentMonth"></h3>
-            <div class="calendar-nav">
-              <button class="nav-btn" onclick="previousMonth()">›</button>
-              <button class="nav-btn" onclick="nextMonth()">‹</button>
-            </div>
-          </div>
-
-          <div class="calendar-grid" id="calendarGrid"></div>
+    <div class="booking-grid-2col">
+      <!-- Left: Calendar & Time Slots -->
+      <section class="booking-section-card">
+        <div class="card-section-title">
+          <span>📅</span>
+          <span>اختر التاريخ والوقت المناسب</span>
         </div>
 
-        <div class="time-slots" id="timeSlots" style="display: none;">
-          <h4>⏰ اختر الوقت</h4>
-          <div class="slots-grid" id="slotsGrid"></div>
+        <div class="calendar-container-modern">
+          <div class="calendar-top-header">
+            <button class="cal-nav-btn" onclick="previousMonth()">→</button>
+            <h3 id="currentMonth">الشهر والسنة</h3>
+            <button class="cal-nav-btn" onclick="nextMonth()">←</button>
+          </div>
+
+          <div class="calendar-grid-modern" id="calendarGrid"></div>
         </div>
-      </div>
 
-      <!-- Booking Form -->
-      <div class="booking-form">
-        <h2 class="section-title">📝 تفاصيل الحجز</h2>
+        <div class="time-slots-wrapper" id="timeSlots">
+          <h4 style="font-size: 13.5px; font-weight: 800; color: var(--text-pure); margin-bottom: 6px;">⏰ اختر الساعة المناسبة:</h4>
+          <div class="time-slots-grid" id="slotsGrid"></div>
+        </div>
+      </section>
 
-        <div class="booking-summary">
-          <h4>ملخص الحجز</h4>
-          <div class="summary-item">
-            <span class="summary-label">التاريخ:</span>
-            <span class="summary-value" id="summaryDate">لم يتم الاختيار</span>
+      <!-- Right: Booking Form -->
+      <section class="booking-section-card">
+        <div class="card-section-title">
+          <span>📝</span>
+          <span>تفاصيل الحجز والطلب</span>
+        </div>
+
+        <div class="booking-summary-box">
+          <h4>ملخص الموعد المحدد</h4>
+          <div class="summary-row">
+            <span>التاريخ:</span>
+            <span id="summaryDate">لم يتم التحديد</span>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">الوقت:</span>
-            <span class="summary-value" id="summaryTime">لم يتم الاختيار</span>
+          <div class="summary-row">
+            <span>الوقت:</span>
+            <span id="summaryTime">لم يتم التحديد</span>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">المهني:</span>
-            <span class="summary-value" id="summaryProfessional">اسم المهني</span>
+          <div class="summary-row">
+            <span>المهني:</span>
+            <span id="summaryProfessional">عام</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label>نوع الخدمة</label>
-          <select class="form-control" id="serviceType">
+          <label for="serviceType">نوع الخدمة المطلوبة *</label>
+          <select class="booking-input" id="serviceType" required>
             <option value="">اختر نوع الخدمة</option>
-            <option value="صيانة">صيانة</option>
-            <option value="تركيب">تركيب</option>
-            <option value="إصلاح">إصلاح</option>
-            <option value="استشارة">استشارة</option>
-            <option value="أخرى">أخرى</option>
+            <option value="صيانة دورية">صيانة دورية</option>
+            <option value="تركيب أجهزة / أدوات">تركيب أجهزة / أدوات</option>
+            <option value="إصلاح عطل طارئ">إصلاح عطل طارئ</option>
+            <option value="معاينة واستشارة">معاينة واستشارة</option>
+            <option value="خدمة أخرى">خدمة أخرى</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>وصف المشكلة أو العمل المطلوب</label>
-          <textarea class="form-control" id="description" placeholder="اشرح بالتفصيل ما تحتاجه..."></textarea>
+          <label for="description">وصف العمل أو العطل المطلوب *</label>
+          <textarea class="booking-input" id="description" rows="3" placeholder="اشرح باختصار المشكلة أو الخدمة المطلوبة..." required></textarea>
         </div>
 
         <div class="form-group">
-          <label>عنوان الموقع</label>
-          <input type="text" class="form-control" id="location" placeholder="أدخل العنوان الكامل">
+          <label for="location">عنوان وموقع العمل *</label>
+          <input type="text" class="booking-input" id="location" placeholder="المحافظة، المنطقة، اسم الشارع..." required>
         </div>
 
         <div class="form-group">
-          <label>رقم الهاتف للتواصل</label>
-          <input type="tel" class="form-control" id="phone" placeholder="07XXXXXXXX">
+          <label for="phone">رقم الهاتف للتواصل *</label>
+          <input type="tel" class="booking-input" id="phone" placeholder="07XXXXXXXX" required>
         </div>
 
-        <button class="submit-btn" id="submitBtn" onclick="submitBooking()" disabled>
-          تأكيد الحجز
+        <button class="btn-submit-booking" id="submitBtn" onclick="submitBooking()" disabled>
+          <span>✅</span>
+          <span>تأكيد وإرسال طلب الحجز</span>
         </button>
-      </div>
+      </section>
     </div>
 
-    <!-- My Bookings -->
-    <div class="my-bookings">
-      <h2 class="section-title">📋 حجوزاتي</h2>
+    <!-- My Bookings List -->
+    <section class="my-bookings-card">
+      <div class="card-section-title">
+        <span>📋</span>
+        <span>سجل حجوزاتي السابقة والنشطة</span>
+      </div>
+
       <div id="bookingsList">
-        <div style="text-align: center; padding: 40px; color: #95a5a6;">
-          <div style="font-size: 3rem; margin-bottom: 15px;">📅</div>
-          <p>لا توجد حجوزات بعد</p>
+        <div style="text-align: center; padding: 40px;">
+          <div style="font-size: 40px; margin-bottom: 10px;">📅</div>
+          <p style="color: var(--text-muted); font-size: 13.5px;">لا توجد حجوزات مسجلة بعد</p>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 
+  <!-- Firebase Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
     import { 
@@ -591,16 +581,17 @@
     let currentUser = null;
     let professionalId = null;
 
-    // Initialize
-    checkAuth();
-    getProfessionalFromURL();
-    renderCalendar();
-    loadBookings();
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      getProfessionalFromURL();
+      renderCalendar();
+      loadBookings();
+    });
 
     function checkAuth() {
       const customerLoggedIn = localStorage.getItem('customerLoggedIn');
       if (customerLoggedIn !== 'true') {
-        alert('يجب تسجيل الدخول كعميل أولاً');
+        alert('⚠️ يجب تسجيل الدخول كعميل أولاً لحجز موعد');
         window.location.href = 'customer-auth-page.html';
         return;
       }
@@ -611,13 +602,14 @@
         phone: localStorage.getItem('customerPhone')
       };
 
-      document.getElementById('phone').value = currentUser.phone;
+      if (currentUser.phone) {
+        document.getElementById('phone').value = currentUser.phone;
+      }
     }
 
     function getProfessionalFromURL() {
       const params = new URLSearchParams(window.location.search);
       professionalId = params.get('professional');
-      
       if (professionalId) {
         loadProfessionalInfo(professionalId);
       }
@@ -631,61 +623,50 @@
           document.getElementById('summaryProfessional').textContent = data.name;
         }
       } catch (error) {
-        console.error('Error loading professional:', error);
+        console.error('Error loading pro info:', error);
       }
     }
 
-    // Render Calendar
     function renderCalendar() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
 
       document.getElementById('currentMonth').textContent = 
-        new Date(year, month).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long' });
+        new Date(year, month).toLocaleDateString('ar-JO', { year: 'numeric', month: 'long' });
 
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = '';
 
-      // Day headers
       const days = ['س', 'ج', 'خ', 'ر', 'ث', 'ن', 'ح'];
-      days.forEach(day => {
-        const header = document.createElement('div');
-        header.className = 'calendar-day-header';
-        header.textContent = day;
-        grid.appendChild(header);
+      days.forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'cal-day-name';
+        h.textContent = d;
+        grid.appendChild(h);
       });
 
-      // First day of month
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // Empty cells
       for (let i = 0; i < firstDay; i++) {
         grid.appendChild(document.createElement('div'));
       }
 
-      // Days
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day';
+        dayEl.className = 'cal-day-num';
         dayEl.textContent = day;
 
         if (date < today) {
           dayEl.classList.add('disabled');
         } else {
           dayEl.onclick = () => selectDate(date);
-          
-          if (date.getTime() === today.getTime()) {
-            dayEl.classList.add('today');
-          }
-
-          if (selectedDate && date.getTime() === selectedDate.getTime()) {
-            dayEl.classList.add('selected');
-          }
+          if (date.getTime() === today.getTime()) dayEl.classList.add('today');
+          if (selectedDate && date.getTime() === selectedDate.getTime()) dayEl.classList.add('selected');
         }
 
         grid.appendChild(dayEl);
@@ -703,30 +684,19 @@
     function generateTimeSlots() {
       const slotsContainer = document.getElementById('timeSlots');
       const slotsGrid = document.getElementById('slotsGrid');
-      
       slotsContainer.style.display = 'block';
       slotsGrid.innerHTML = '';
 
-      // Generate slots from 8 AM to 8 PM
       for (let hour = 8; hour < 20; hour++) {
-        const slot = document.createElement('div');
-        slot.className = 'time-slot';
-        
         const time = `${hour.toString().padStart(2, '0')}:00`;
-        slot.textContent = time;
-        
-        // Random availability for demo
-        if (Math.random() > 0.3) {
-          slot.onclick = () => selectTime(time);
-          
-          if (selectedTime === time) {
-            slot.classList.add('selected');
-          }
-        } else {
-          slot.classList.add('disabled');
-        }
+        const chip = document.createElement('div');
+        chip.className = 'time-slot-chip';
+        chip.textContent = time;
 
-        slotsGrid.appendChild(slot);
+        chip.onclick = () => selectTime(time);
+        if (selectedTime === time) chip.classList.add('selected');
+
+        slotsGrid.appendChild(chip);
       }
     }
 
@@ -739,35 +709,33 @@
 
     function updateSummary() {
       document.getElementById('summaryDate').textContent = 
-        selectedDate ? selectedDate.toLocaleDateString('ar-SA') : 'لم يتم الاختيار';
-      
-      document.getElementById('summaryTime').textContent = 
-        selectedTime || 'لم يتم الاختيار';
+        selectedDate ? selectedDate.toLocaleDateString('ar-JO') : 'لم يتم التحديد';
+      document.getElementById('summaryTime').textContent = selectedTime || 'لم يتم التحديد';
     }
 
     window.nextMonth = function() {
       currentDate.setMonth(currentDate.getMonth() + 1);
       renderCalendar();
-    }
+    };
 
     window.previousMonth = function() {
       currentDate.setMonth(currentDate.getMonth() - 1);
       renderCalendar();
-    }
+    };
 
     window.submitBooking = async function() {
       if (!selectedDate || !selectedTime) {
-        showAlert('يرجى اختيار التاريخ والوقت', 'error');
+        showAlert('يرجى اختيار التاريخ والوقت المناسب', 'error');
         return;
       }
 
       const serviceType = document.getElementById('serviceType').value;
-      const description = document.getElementById('description').value;
-      const location = document.getElementById('location').value;
-      const phone = document.getElementById('phone').value;
+      const description = document.getElementById('description').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const phone = document.getElementById('phone').value.trim();
 
       if (!serviceType || !description || !location || !phone) {
-        showAlert('يرجى تعبئة جميع الحقول', 'error');
+        showAlert('يرجى تعبئة كافة الحقول المطلوبة', 'error');
         return;
       }
 
@@ -775,7 +743,7 @@
         customerId: currentUser.email.replace(/\./g, '_'),
         customerName: currentUser.name,
         customerPhone: phone,
-        professionalId: professionalId,
+        professionalId: professionalId || 'general',
         professionalName: document.getElementById('summaryProfessional').textContent,
         date: selectedDate.toISOString(),
         time: selectedTime,
@@ -790,9 +758,8 @@
         const bookingId = `booking_${Date.now()}`;
         await setDoc(doc(db, "bookings", bookingId), bookingData);
 
-        showAlert('تم إرسال طلب الحجز بنجاح! في انتظار تأكيد المهني', 'success');
-        
-        // Reset form
+        showAlert('🎉 تم إرسال طلب الحجز بنجاح!', 'success');
+
         document.getElementById('serviceType').value = '';
         document.getElementById('description').value = '';
         document.getElementById('location').value = '';
@@ -803,131 +770,92 @@
         document.getElementById('submitBtn').disabled = true;
         updateSummary();
 
-        // Reload bookings
-        setTimeout(loadBookings, 2000);
+        setTimeout(loadBookings, 1500);
 
-      } catch (error) {
-        console.error('Booking error:', error);
-        showAlert('حدث خطأ في الحجز، يرجى المحاولة مرة أخرى', 'error');
+      } catch (err) {
+        console.error("Booking error:", err);
+        showAlert("حدث خطأ أثناء الحجز، حاول مجدداً", "error");
       }
-    }
+    };
 
     async function loadBookings() {
       try {
+        if (!currentUser) return;
         const customerId = currentUser.email.replace(/\./g, '_');
-        const bookingsQuery = query(
+        const q = query(
           collection(db, "bookings"),
-          where("customerId", "==", customerId),
-          orderBy("createdAt", "desc")
+          where("customerId", "==", customerId)
         );
 
-        const snapshot = await getDocs(bookingsQuery);
+        const snapshot = await getDocs(q);
         const container = document.getElementById('bookingsList');
         container.innerHTML = '';
 
         if (snapshot.empty) {
           container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: #95a5a6;">
-              <div style="font-size: 3rem; margin-bottom: 15px;">📅</div>
-              <p>لا توجد حجوزات بعد</p>
+            <div style="text-align: center; padding: 40px;">
+              <div style="font-size: 40px; margin-bottom: 10px;">📅</div>
+              <p style="color: var(--text-muted); font-size: 13.5px;">لا توجد حجوزات مسجلة بعد</p>
             </div>
           `;
           return;
         }
 
-        snapshot.forEach((doc) => {
-          const booking = doc.data();
-          const card = createBookingCard(doc.id, booking);
-          container.appendChild(card);
+        const grid = document.createElement('div');
+        grid.className = 'bookings-list-grid';
+
+        snapshot.forEach((d) => {
+          const b = d.data();
+          const card = document.createElement('div');
+          card.className = 'single-booking-item';
+          const bDate = new Date(b.date);
+
+          card.innerHTML = `
+            <div class="booking-item-header">
+              <h4>${b.professionalName || 'مهني'}</h4>
+              <span class="badge-status ${b.status === 'confirmed' ? 'approved' : b.status === 'cancelled' ? 'rejected' : 'pending'}">
+                ${b.status === 'confirmed' ? 'مؤكد ✅' : b.status === 'cancelled' ? 'ملغي ❌' : 'قيد الانتظار ⏳'}
+              </span>
+            </div>
+            <div style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">
+              <div>📅 <strong>التاريخ:</strong> ${bDate.toLocaleDateString('ar-JO')} الساعة ${b.time}</div>
+              <div>🛠️ <strong>الخدمة:</strong> ${b.serviceType}</div>
+              <div>📍 <strong>العنوان:</strong> ${b.location}</div>
+            </div>
+            ${b.status === 'pending' ? `
+              <button class="btn-cancel-booking" onclick="cancelBooking('${d.id}')">إلغاء الحجز ✕</button>
+            ` : ''}
+          `;
+          grid.appendChild(card);
         });
 
-      } catch (error) {
-        console.error('Load bookings error:', error);
+        container.appendChild(grid);
+
+      } catch (err) {
+        console.error("Load bookings error:", err);
       }
-    }
-
-    function createBookingCard(id, booking) {
-      const card = document.createElement('div');
-      card.className = 'booking-card';
-
-      const statusClass = {
-        'pending': 'status-pending',
-        'confirmed': 'status-confirmed',
-        'cancelled': 'status-cancelled'
-      }[booking.status] || 'status-pending';
-
-      const statusText = {
-        'pending': 'قيد الانتظار',
-        'confirmed': 'مؤكد',
-        'cancelled': 'ملغي'
-      }[booking.status] || booking.status;
-
-      const date = new Date(booking.date);
-
-      card.innerHTML = `
-        <div class="booking-header">
-          <h4>${booking.professionalName}</h4>
-          <span class="booking-status ${statusClass}">${statusText}</span>
-        </div>
-
-        <div class="booking-details">
-          <div class="detail-item">
-            <div class="detail-label">التاريخ</div>
-            <div class="detail-value">${date.toLocaleDateString('ar-SA')}</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">الوقت</div>
-            <div class="detail-value">${booking.time}</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">نوع الخدمة</div>
-            <div class="detail-value">${booking.serviceType}</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">العنوان</div>
-            <div class="detail-value">${booking.location}</div>
-          </div>
-        </div>
-
-        <div class="booking-actions">
-          ${booking.status === 'pending' ? `
-            <button class="action-btn btn-cancel" onclick="cancelBooking('${id}')">
-              إلغاء الحجز
-            </button>
-          ` : ''}
-        </div>
-      `;
-
-      return card;
     }
 
     window.cancelBooking = async function(bookingId) {
       if (!confirm('هل أنت متأكد من إلغاء هذا الحجز؟')) return;
-
       try {
         await updateDoc(doc(db, "bookings", bookingId), {
           status: 'cancelled',
           cancelledAt: serverTimestamp()
         });
-
         showAlert('تم إلغاء الحجز بنجاح', 'success');
         loadBookings();
-
-      } catch (error) {
-        console.error('Cancel error:', error);
-        showAlert('حدث خطأ في الإلغاء', 'error');
+      } catch (err) {
+        showAlert('فشل إلغاء الحجز', 'error');
       }
-    }
+    };
 
-    function showAlert(message, type) {
+    function showAlert(msg, type) {
       const alert = document.getElementById('alertMessage');
       alert.className = `alert ${type}`;
-      alert.textContent = message;
+      alert.textContent = msg;
       alert.style.display = 'block';
-
-      setTimeout(() => {
-        alert.style.display = 'none';
-      }, 5000);
+      setTimeout(() => alert.style.display = 'none', 4000);
     }
   </script>
 </body>

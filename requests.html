@@ -3,489 +3,801 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة الطلبات - لوحة التحكم</title>
+    <title>لوحة إدارة الطلبات والمهنيين | منصة خدمتك 🇯🇴</title>
+    
+    <!-- Fonts & Core Stylesheet -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            direction: rtl;
-            padding: 10px;
-        }
-
-        .container {
-            max-width: 1200px;
+        .admin-dashboard-layout {
+            max-width: 1280px;
             margin: 0 auto;
+            padding: 20px 15px 60px;
         }
 
-        /* Header */
-        .header {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        /* Top Admin Navbar */
+        .admin-top-bar {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 18px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-glass);
         }
 
-        .header h1 {
-            color: #333;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .header-actions {
+        .admin-brand {
             display: flex;
-            gap: 10px;
             align-items: center;
+            gap: 12px;
         }
 
-        .logout-btn, .refresh-btn {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
+        .admin-brand-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--grad-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .admin-brand h1 {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--text-pure);
+            margin-bottom: 2px;
+        }
+
+        .admin-brand span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .admin-top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-admin-action {
+            padding: 9px 16px;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-pure);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
             text-decoration: none;
         }
 
-        .refresh-btn {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+        .btn-admin-action:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
         }
 
-        .logout-btn:hover, .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .btn-admin-action.logout {
+            background: rgba(244, 63, 94, 0.15);
+            border-color: rgba(244, 63, 94, 0.3);
+            color: #fb7185;
         }
 
-        /* Stats */
-        .stats-grid {
+        .btn-admin-action.logout:hover {
+            background: rgba(244, 63, 94, 0.3);
+        }
+
+        /* Stats Grid */
+        .admin-stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .stat-card.pending {
-            border-top: 4px solid #f39c12;
-        }
-
-        .stat-card.approved {
-            border-top: 4px solid #27ae60;
-        }
-
-        .stat-card.rejected {
-            border-top: 4px solid #e74c3c;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .stat-number.pending { color: #f39c12; }
-        .stat-number.approved { color: #27ae60; }
-        .stat-number.rejected { color: #e74c3c; }
-
-        .stat-label {
-            color: #666;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        /* Main Content */
-        .main-content {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Search & Filter */
-        .search-section {
-            display: flex;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
-            flex-wrap: wrap;
         }
 
-        .search-input, .filter-select {
-            padding: 12px 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .search-input:focus, .filter-select:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
-        }
-
-        /* Requests Table */
-        .requests-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
+        .admin-stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
         }
 
-        .requests-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .admin-stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-focus);
         }
 
-        .requests-table th {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px 12px;
-            text-align: center;
+        .stat-meta h3 {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-pure);
+            margin-bottom: 4px;
+        }
+
+        .stat-meta p {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .stat-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon-wrapper.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .stat-icon-wrapper.approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-icon-wrapper.rejected {
+            background: rgba(244, 63, 94, 0.15);
+            color: #f43f5e;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .stat-icon-wrapper.total {
+            background: rgba(99, 102, 241, 0.15);
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        /* Filter Controls */
+        .admin-filter-bar {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-field-admin {
+            flex: 2;
+            min-width: 240px;
+            padding: 12px 18px;
+            background: rgba(10, 9, 28, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-pure);
+            font-family: inherit;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 13px;
         }
 
-        .requests-table td {
-            padding: 15px 12px;
-            border-bottom: 1px solid #f0f0f0;
-            text-align: center;
-            font-size: 13px;
+        .search-field-admin:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--cyan-glow);
         }
 
-        .requests-table tr:hover {
-            background-color: #f8f9fa;
+        .select-field-admin {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 16px;
+            background: rgba(10, 9, 28, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-pure);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
-        /* Request Cards for Mobile */
-        .request-card {
-            background: white;
-            border: 1px solid #e1e8ed;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .select-field-admin:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        /* Content Table / Cards */
+        .admin-content-box {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow-glass);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            text-align: right;
+        }
+
+        .admin-table th {
+            padding: 12px 16px;
+            color: var(--text-muted);
+            font-size: 12.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-table tbody tr {
+            background: rgba(0, 0, 0, 0.25);
+            transition: var(--transition);
+        }
+
+        .admin-table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .admin-table td {
+            padding: 14px 16px;
+            color: var(--text-pure);
+            font-size: 13.5px;
+            font-weight: 600;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-table td:first-child {
+            border-right: 1px solid var(--border-color);
+            border-top-right-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+        }
+
+        .admin-table td:last-child {
+            border-left: 1px solid var(--border-color);
+            border-top-left-radius: var(--radius-md);
+            border-bottom-left-radius: var(--radius-md);
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 11.5px;
+            font-weight: 800;
+        }
+
+        .badge-status.pending {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+        }
+
+        .badge-status.approved {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .badge-status.rejected {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #fb7185;
+        }
+
+        .btn-table-action {
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-table-action.view {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-table-action.view:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-table-action.accept {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-table-action.accept:hover {
+            background: #10b981;
+            color: #0b091a;
+        }
+
+        .btn-table-action.reject {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(244, 63, 94, 0.4);
+        }
+
+        .btn-table-action.reject:hover {
+            background: #f43f5e;
+            color: white;
+        }
+
+        /* Mobile Card list */
+        .mobile-requests-grid {
             display: none;
+            grid-template-columns: 1fr;
+            gap: 15px;
         }
 
-        .request-card h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+        .mobile-req-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            position: relative;
         }
 
-        .request-info {
+        .mobile-req-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mobile-req-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-pure);
+        }
+
+        .mobile-req-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
+            font-size: 12.5px;
+            color: var(--text-secondary);
             margin-bottom: 15px;
-            font-size: 13px;
         }
 
-        .info-label {
-            color: #666;
-            font-weight: 600;
+        .mobile-req-info-grid span strong {
+            color: var(--text-pure);
         }
 
-        .info-value {
-            color: #333;
-        }
-
-        /* Action Buttons */
-        .actions {
+        .mobile-req-actions {
             display: flex;
             gap: 8px;
-            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-accept {
-            background: linear-gradient(45deg, #27ae60, #2ecc71);
-            color: white;
-        }
-
-        .btn-reject {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-        }
-
-        .btn-view {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Status Badge */
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .status-pending {
-            background: linear-gradient(45deg, #f39c12, #e67e22);
-        }
-
-        /* Loading & Empty States */
-        .loading-state, .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f0f0f0;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .empty-state .icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        /* Success/Error Messages */
-        .message {
+        /* 📋 Detail Modal */
+        .modal-overlay-drawer {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 9, 26, 0.85);
+            backdrop-filter: blur(25px);
             z-index: 1000;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            max-width: 300px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        .message.show {
-            transform: translateX(0);
+        .modal-card-drawer {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-glass);
+            animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
 
-        .message.success {
-            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        .modal-header-drawer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .message.error {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        .modal-header-title h2 {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--text-pure);
+            margin-bottom: 4px;
         }
 
-        /* Mobile Responsive */
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fb7185;
+        }
+
+        .detail-section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .detail-box-single {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+        }
+
+        .detail-box-single.full-width {
+            grid-column: span 2;
+        }
+
+        .detail-box-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .detail-box-value {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-pure);
+        }
+
+        .modal-action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-modal-action {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-modal-action.accept {
+            background: var(--grad-emerald);
+            color: #0b091a;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-modal-action.reject {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(244, 63, 94, 0.4);
+        }
+
+        .btn-modal-action.delete {
+            background: rgba(100, 116, 139, 0.2);
+            color: #cbd5e1;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-quick-contact {
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 6px;
+        }
+
         @media (max-width: 768px) {
-            .header {
-                text-align: center;
-            }
-            
-            .header h1 {
-                font-size: 1.4rem;
-            }
-            
-            .search-section {
-                flex-direction: column;
-            }
-            
-            .search-input {
-                min-width: auto;
-            }
-            
-            .requests-table {
+            .table-responsive {
                 display: none;
             }
-            
-            .request-card {
-                display: block;
+            .mobile-requests-grid {
+                display: grid;
             }
-            
-            .stat-number {
-                font-size: 1.5rem;
+            .detail-section-grid {
+                grid-template-columns: 1fr;
             }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+            .detail-box-single.full-width {
+                grid-column: span 1;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .admin-filter-bar {
+                flex-direction: column;
             }
-        }
-
-        .container > * {
-            animation: fadeIn 0.5s ease-out;
+            .search-field-admin, .select-field-admin {
+                width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🛠️ لوحة إدارة الطلبات</h1>
-            <div class="header-actions">
-                <button class="refresh-btn" onclick="refreshData()">🔄 تحديث</button>
-                <button class="logout-btn" onclick="logout()">خروج</button>
-            </div>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card pending">
-                <div class="stat-number pending" id="pendingCount">0</div>
-                <div class="stat-label">طلبات معلقة</div>
-            </div>
-            <div class="stat-card approved">
-                <div class="stat-number approved" id="approvedCount">0</div>
-                <div class="stat-label">طلبات مقبولة</div>
-            </div>
-            <div class="stat-card rejected">
-                <div class="stat-number rejected" id="rejectedCount">0</div>
-                <div class="stat-label">طلبات مرفوضة</div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Search & Filter -->
-            <div class="search-section">
-                <input type="text" class="search-input" placeholder="🔍 البحث بالاسم أو الهاتف..." id="searchInput">
-                <select class="filter-select" id="governorateFilter">
-                    <option value="">جميع المحافظات</option>
-                    <option value="عمان">عمان</option>
-                    <option value="الزرقاء">الزرقاء</option>
-                    <option value="إربد">إربد</option>
-                    <option value="البلقاء">البلقاء</option>
-                    <option value="المفرق">المفرق</option>
-                    <option value="الكرك">الكرك</option>
-                    <option value="معان">معان</option>
-                    <option value="الطفيلة">الطفيلة</option>
-                    <option value="العقبة">العقبة</option>
-                    <option value="السلط">السلط</option>
-                    <option value="مادبا">مادبا</option>
-                </select>
-                <select class="filter-select" id="statusFilter">
-                    <option value="">جميع الحالات</option>
-                    <option value="pending">معلق</option>
-                    <option value="approved">مقبول</option>
-                    <option value="rejected">مرفوض</option>
-                </select>
-            </div>
-
-            <!-- Requests Section -->
-            <div class="requests-section">
-                <h2>📋 قائمة الطلبات</h2>
-                
-                <!-- Loading State -->
-                <div class="loading-state" id="loadingState">
-                    <div class="loading-spinner"></div>
-                    <h3>جاري تحميل البيانات...</h3>
-                    <p>يرجى الانتظار</p>
+    <div class="admin-dashboard-layout">
+        
+        <!-- Top Admin Header -->
+        <header class="admin-top-bar">
+            <div class="admin-brand">
+                <div class="admin-brand-badge">🛡️</div>
+                <div>
+                    <h1>لوحة تحكم المشرفين</h1>
+                    <span>إدارة ومراجعة طلبات انضمام المهنيين 🇯🇴</span>
                 </div>
-                
-                <!-- Desktop Table -->
-                <table class="requests-table" id="requestsTable" style="display: none;">
+            </div>
+
+            <div class="admin-top-actions">
+                <a href="index.html" class="btn-admin-action">
+                    <span>🏠</span>
+                    <span>عرض الموقع</span>
+                </a>
+                <button class="btn-admin-action" onclick="refreshData()" title="تحديث فوري">
+                    <span>🔄</span>
+                    <span>تحديث البيانات</span>
+                </button>
+                <button class="btn-admin-action logout" onclick="logout()" title="خروج">
+                    <span>🚪</span>
+                    <span>خروج</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Overview Cards -->
+        <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+                <div class="stat-meta">
+                    <h3 id="pendingCount">0</h3>
+                    <p>طلبات قيد الانتظار</p>
+                </div>
+                <div class="stat-icon-wrapper pending">⏳</div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="stat-meta">
+                    <h3 id="approvedCount">0</h3>
+                    <p>مهنيين معتمدين ونشطين</p>
+                </div>
+                <div class="stat-icon-wrapper approved">✅</div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="stat-meta">
+                    <h3 id="rejectedCount">0</h3>
+                    <p>طلبات مرفوضة</p>
+                </div>
+                <div class="stat-icon-wrapper rejected">❌</div>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="stat-meta">
+                    <h3 id="totalCount">0</h3>
+                    <p>إجمالي السجلات</p>
+                </div>
+                <div class="stat-icon-wrapper total">📊</div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="admin-filter-bar">
+            <input type="text" class="search-field-admin" id="searchInput" placeholder="🔍 ابحث بالاسم، رقم الهاتف، الرقم الوطني، أو التخصص...">
+            
+            <select class="select-field-admin" id="statusFilter">
+                <option value="">جميع الحالات</option>
+                <option value="pending">⏳ قيد الانتظار</option>
+                <option value="approved">✅ المقبولة</option>
+                <option value="rejected">❌ المرفوضة</option>
+            </select>
+
+            <select class="select-field-admin" id="governorateFilter">
+                <option value="">جميع المحافظات</option>
+                <option value="عمان">عمان</option>
+                <option value="الزرقاء">الزرقاء</option>
+                <option value="إربد">إربد</option>
+                <option value="البلقاء">البلقاء</option>
+                <option value="المفرق">المفرق</option>
+                <option value="الكرك">الكرك</option>
+                <option value="معان">معان</option>
+                <option value="الطفيلة">الطفيلة</option>
+                <option value="العقبة">العقبة</option>
+                <option value="السلط">السلط</option>
+                <option value="مادبا">مادبا</option>
+                <option value="عجلون">عجلون</option>
+                <option value="جرش">جرش</option>
+            </select>
+        </div>
+
+        <!-- Content Area -->
+        <div class="admin-content-box">
+            <!-- Loading Indicator -->
+            <div id="loadingState" style="text-align: center; padding: 40px;">
+                <div class="loading-spinner" style="margin: 0 auto 12px;"></div>
+                <p style="color: var(--text-secondary); font-weight: 700;">جاري مزامنة بيانات المهنيين والطلبات...</p>
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="table-responsive">
+                <table class="admin-table" id="requestsTable" style="display: none;">
                     <thead>
                         <tr>
-                            <th>الاسم</th>
+                            <th>الاسم الكامل</th>
                             <th>المهنة</th>
                             <th>المحافظة</th>
-                            <th>الهاتف</th>
-                            <th>التاريخ</th>
+                            <th>رقم الهاتف</th>
+                            <th>الرقم الوطني</th>
+                            <th>تاريخ التقديم</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="requestsTableBody">
-                        <!-- سيتم ملء البيانات هنا -->
-                    </tbody>
+                    <tbody id="requestsTableBody"></tbody>
                 </table>
+            </div>
 
-                <!-- Mobile Cards -->
-                <div id="requestsCardView">
-                    <!-- سيتم ملء البطاقات هنا -->
-                </div>
+            <!-- Mobile Adaptive Grid View -->
+            <div class="mobile-requests-grid" id="requestsCardView"></div>
 
-                <!-- Empty State -->
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    <div class="icon">📋</div>
-                    <h3>لا توجد طلبات</h3>
-                    <p>لا توجد طلبات حالياً أو لا توجد نتائج تطابق البحث</p>
-                </div>
+            <!-- Empty State View -->
+            <div id="emptyState" style="display: none; text-align: center; padding: 50px 20px;">
+                <div style="font-size: 44px; margin-bottom: 10px;">📋</div>
+                <h3 style="color: var(--text-pure); font-size: 17px; margin-bottom: 6px;">لا توجد طلبات مطابقة</h3>
+                <p style="color: var(--text-muted); font-size: 13px;">جرب تغيير معايير البحث أو الفلاتر أعلاه.</p>
             </div>
         </div>
     </div>
 
+    <!-- 📋 Full Details Modal -->
+    <div class="modal-overlay-drawer" id="detailModal">
+        <div class="modal-card-drawer">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <h2 id="modalProName">اسم المهني</h2>
+                    <span id="modalProJobBadge" class="badge-status pending">المهنة</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeDetailModal()">✕</button>
+            </div>
+
+            <div class="detail-section-grid">
+                <div class="detail-box-single">
+                    <span class="detail-box-label">🪪 الرقم الوطني</span>
+                    <span class="detail-box-value" id="modalNationalId">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📍 المحافظة</span>
+                    <span class="detail-box-value" id="modalCity">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📱 رقم الهاتف والتواصل</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+                        <span class="detail-box-value" id="modalPhone">-</span>
+                        <div id="modalContactLinks"></div>
+                    </div>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📧 البريد الإلكتروني</span>
+                    <span class="detail-box-value" id="modalEmail">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">⏳ سنوات الخبرة</span>
+                    <span class="detail-box-value" id="modalExperience">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">💰 السعر المبدئي للساعة</span>
+                    <span class="detail-box-value" id="modalPrice">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">⏰ أوقات وساعات العمل</span>
+                    <span class="detail-box-value" id="modalHours">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📅 تاريخ ووقت التقديم</span>
+                    <span class="detail-box-value" id="modalDate">-</span>
+                </div>
+
+                <div class="detail-box-single full-width" id="modalLocationBox" style="display: none;">
+                    <span class="detail-box-label">🗺️ الإحداثيات الجغرافية (GPS)</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="detail-box-value" id="modalGpsCoords">-</span>
+                        <a id="modalMapLink" href="#" target="_blank" class="btn-quick-contact" style="background: rgba(6, 182, 212, 0.2); color: #38bdf8; border: 1px solid rgba(6, 182, 212, 0.3);">
+                            فتح بالخريطة ↗
+                        </a>
+                    </div>
+                </div>
+
+                <div class="detail-box-single full-width">
+                    <span class="detail-box-label">📝 نبذة ووصف الخدمات</span>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-top: 4px;" id="modalBio">-</p>
+                </div>
+
+                <div class="detail-box-single full-width" id="modalRejectReasonBox" style="display: none; background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3);">
+                    <span class="detail-box-label" style="color: #fb7185;">❌ سبب الرفض المسجل</span>
+                    <span class="detail-box-value" id="modalRejectReason" style="color: #fecdd3;">-</span>
+                </div>
+            </div>
+
+            <!-- Direct Actions inside Modal -->
+            <div class="modal-action-buttons" id="modalActionButtons"></div>
+        </div>
+    </div>
+
+    <!-- Firebase Script -->
     <script type="module">
-        // Firebase Configuration
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
         import { 
             getFirestore, 
@@ -507,20 +819,19 @@
             appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let allRequests = [];
-        let filteredRequests = [];
-
-        // Check admin authentication
-        const isAdmin = sessionStorage.getItem("adminLoggedIn");
-        if (!isAdmin || isAdmin !== "true") {
+        // Security check
+        const isAuth = sessionStorage.getItem("adminLoggedIn") || localStorage.getItem("adminLoggedIn");
+        if (!isAuth || isAuth !== "true") {
             window.location.href = "admin-login.html";
         }
 
-        // DOM Elements
+        let allRequests = [];
+        let filteredRequests = [];
+        let activeModalRequestId = null;
+
         const elements = {
             loadingState: document.getElementById('loadingState'),
             requestsTable: document.getElementById('requestsTable'),
@@ -530,21 +841,20 @@
             pendingCount: document.getElementById('pendingCount'),
             approvedCount: document.getElementById('approvedCount'),
             rejectedCount: document.getElementById('rejectedCount'),
+            totalCount: document.getElementById('totalCount'),
             searchInput: document.getElementById('searchInput'),
             governorateFilter: document.getElementById('governorateFilter'),
-            statusFilter: document.getElementById('statusFilter')
+            statusFilter: document.getElementById('statusFilter'),
+            detailModal: document.getElementById('detailModal')
         };
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 تهيئة لوحة الإدارة...');
-            await loadAllData();
             setupEventListeners();
-            renderRequests();
+            await loadAllData();
         });
 
         function setupEventListeners() {
-            elements.searchInput.addEventListener('input', debounce(filterRequests, 300));
+            elements.searchInput.addEventListener('input', filterRequests);
             elements.governorateFilter.addEventListener('change', filterRequests);
             elements.statusFilter.addEventListener('change', filterRequests);
         }
@@ -552,10 +862,7 @@
         async function loadAllData() {
             try {
                 showLoading(true);
-                console.log('📥 جاري تحميل البيانات من Firebase...');
-
-                // Load all collections
-                const [pendingSnapshot, approvedSnapshot, rejectedSnapshot] = await Promise.all([
+                const [pendingSnap, approvedSnap, rejectedSnap] = await Promise.all([
                     getDocs(collection(db, "pendingUsers")),
                     getDocs(collection(db, "approvedUsers")),
                     getDocs(collection(db, "rejectedUsers"))
@@ -563,42 +870,25 @@
 
                 allRequests = [];
 
-                // Process pending users
-                pendingSnapshot.forEach((doc) => {
-                    allRequests.push({ 
-                        id: doc.id, 
-                        ...doc.data(), 
-                        status: 'pending' 
-                    });
+                pendingSnap.forEach((d) => {
+                    allRequests.push({ id: d.id, ...d.data(), status: 'pending' });
                 });
 
-                // Process approved users
-                approvedSnapshot.forEach((doc) => {
-                    allRequests.push({ 
-                        id: doc.id, 
-                        ...doc.data(), 
-                        status: 'approved' 
-                    });
+                approvedSnap.forEach((d) => {
+                    allRequests.push({ id: d.id, ...d.data(), status: 'approved' });
                 });
 
-                // Process rejected users
-                rejectedSnapshot.forEach((doc) => {
-                    allRequests.push({ 
-                        id: doc.id, 
-                        ...doc.data(), 
-                        status: 'rejected' 
-                    });
+                rejectedSnap.forEach((d) => {
+                    allRequests.push({ id: d.id, ...d.data(), status: 'rejected' });
                 });
 
                 filteredRequests = [...allRequests];
                 updateStats();
-                
-                console.log(`✅ تم تحميل ${allRequests.length} طلب بنجاح`);
-                showMessage('تم التحديث', 'تم تحميل البيانات بنجاح', 'success');
+                renderRequests();
 
-            } catch (error) {
-                console.error('❌ خطأ في تحميل البيانات:', error);
-                showMessage('خطأ في التحميل', 'فشل في تحميل البيانات من الخادم', 'error');
+            } catch (err) {
+                console.error("Error loading data:", err);
+                alert("حدث خطأ أثناء تحميل البيانات من الخادم");
             } finally {
                 showLoading(false);
             }
@@ -612,23 +902,25 @@
             elements.pendingCount.textContent = pending;
             elements.approvedCount.textContent = approved;
             elements.rejectedCount.textContent = rejected;
+            elements.totalCount.textContent = allRequests.length;
         }
 
         function filterRequests() {
-            const searchTerm = elements.searchInput.value.toLowerCase().trim();
-            const governorateFilter = elements.governorateFilter.value;
-            const statusFilter = elements.statusFilter.value;
+            const query = elements.searchInput.value.toLowerCase().trim();
+            const gov = elements.governorateFilter.value;
+            const status = elements.statusFilter.value;
 
-            filteredRequests = allRequests.filter(request => {
-                const matchesSearch = !searchTerm || 
-                    (request.name && request.name.toLowerCase().includes(searchTerm)) ||
-                    (request.phone && request.phone.includes(searchTerm)) ||
-                    (request.job && request.job.toLowerCase().includes(searchTerm));
-                
-                const matchesGovernorate = !governorateFilter || request.city === governorateFilter;
-                const matchesStatus = !statusFilter || request.status === statusFilter;
+            filteredRequests = allRequests.filter(req => {
+                const matchesQuery = !query || 
+                    (req.name && req.name.toLowerCase().includes(query)) ||
+                    (req.phone && req.phone.includes(query)) ||
+                    (req.nationalId && req.nationalId.includes(query)) ||
+                    (req.job && req.job.toLowerCase().includes(query));
 
-                return matchesSearch && matchesGovernorate && matchesStatus;
+                const matchesGov = !gov || req.city === gov;
+                const matchesStatus = !status || req.status === status;
+
+                return matchesQuery && matchesGov && matchesStatus;
             });
 
             renderRequests();
@@ -637,274 +929,319 @@
         function renderRequests() {
             const tableBody = elements.requestsTableBody;
             const cardView = elements.requestsCardView;
-            
-            // Clear existing content
             tableBody.innerHTML = '';
             cardView.innerHTML = '';
 
             if (filteredRequests.length === 0) {
-                showEmptyState();
+                elements.emptyState.style.display = 'block';
+                elements.requestsTable.style.display = 'none';
                 return;
             }
 
-            hideEmptyState();
+            elements.emptyState.style.display = 'none';
+            elements.requestsTable.style.display = 'table';
 
-            filteredRequests.forEach(request => {
-                // Desktop table row
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${request.name || 'غير محدد'}</strong></td>
-                    <td>${request.job || 'غير محدد'}</td>
-                    <td>${request.city || 'غير محدد'}</td>
-                    <td>${request.phone || 'غير محدد'}</td>
-                    <td>${formatDate(request.createdAt)}</td>
-                    <td><span class="status-badge status-${request.status}">${getStatusText(request.status)}</span></td>
+            filteredRequests.forEach(req => {
+                const statusBadge = getStatusBadgeHtml(req.status);
+                const nationalId = req.nationalId || req.id;
+
+                // Table Row
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${req.name || 'غير محدد'}</strong></td>
+                    <td>${req.job || 'غير محدد'}</td>
+                    <td>${req.city || 'غير محدد'}</td>
+                    <td dir="ltr" style="text-align: right;">${req.phone || 'غير محدد'}</td>
+                    <td>${nationalId}</td>
+                    <td>${formatDate(req.createdAt)}</td>
+                    <td>${statusBadge}</td>
                     <td>
-                        <div class="actions">
-                            ${request.status === 'pending' ? `
-                                <button class="btn btn-accept" onclick="acceptRequest('${request.id}')">قبول</button>
-                                <button class="btn btn-reject" onclick="rejectRequest('${request.id}')">رفض</button>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="btn-table-action view" onclick="openRequestDetails('${req.id}')">عرض التفاصيل 🔍</button>
+                            ${req.status === 'pending' ? `
+                                <button class="btn-table-action accept" onclick="quickAccept('${req.id}')">قبول ✓</button>
+                                <button class="btn-table-action reject" onclick="quickReject('${req.id}')">رفض ✕</button>
                             ` : ''}
-                            <button class="btn btn-view" onclick="viewRequest('${request.id}')">عرض</button>
                         </div>
                     </td>
                 `;
-                tableBody.appendChild(row);
+                tableBody.appendChild(tr);
 
-                // Mobile card
+                // Mobile Card
                 const card = document.createElement('div');
-                card.className = 'request-card';
+                card.className = 'mobile-req-card';
                 card.innerHTML = `
-                    <h3>${request.name || 'غير محدد'}</h3>
-                    <div class="request-info">
-                        <div><span class="info-label">المهنة:</span> <span class="info-value">${request.job || 'غير محدد'}</span></div>
-                        <div><span class="info-label">المحافظة:</span> <span class="info-value">${request.city || 'غير محدد'}</span></div>
-                        <div><span class="info-label">الهاتف:</span> <span class="info-value">${request.phone || 'غير محدد'}</span></div>
-                        <div><span class="info-label">التاريخ:</span> <span class="info-value">${formatDate(request.createdAt)}</span></div>
-                        <div><span class="info-label">الحالة:</span> <span class="info-value">${getStatusText(request.status)}</span></div>
+                    <div class="mobile-req-header">
+                        <span class="mobile-req-name">${req.name || 'غير محدد'}</span>
+                        ${statusBadge}
                     </div>
-                    <div class="actions">
-                        ${request.status === 'pending' ? `
-                            <button class="btn btn-accept" onclick="acceptRequest('${request.id}')">قبول</button>
-                            <button class="btn btn-reject" onclick="rejectRequest('${request.id}')">رفض</button>
+                    <div class="mobile-req-info-grid">
+                        <span>المهنة: <strong>${req.job || '-'}</strong></span>
+                        <span>المحافظة: <strong>${req.city || '-'}</strong></span>
+                        <span>الهاتف: <strong>${req.phone || '-'}</strong></span>
+                        <span>الرقم الوطني: <strong>${nationalId}</strong></span>
+                    </div>
+                    <div class="mobile-req-actions">
+                        <button class="btn-table-action view" style="flex: 1; padding: 10px;" onclick="openRequestDetails('${req.id}')">التفاصيل الكاملة 🔍</button>
+                        ${req.status === 'pending' ? `
+                            <button class="btn-table-action accept" style="flex: 1; padding: 10px;" onclick="quickAccept('${req.id}')">قبول ✓</button>
+                            <button class="btn-table-action reject" style="flex: 1; padding: 10px;" onclick="quickReject('${req.id}')">رفض ✕</button>
                         ` : ''}
-                        <button class="btn btn-view" onclick="viewRequest('${request.id}')">عرض</button>
                     </div>
                 `;
                 cardView.appendChild(card);
             });
         }
 
+        function getStatusBadgeHtml(status) {
+            if (status === 'pending') return `<span class="badge-status pending">⏳ قيد الانتظار</span>`;
+            if (status === 'approved') return `<span class="badge-status approved">✅ مقبول ومعتمد</span>`;
+            if (status === 'rejected') return `<span class="badge-status rejected">❌ مرفوض</span>`;
+            return status;
+        }
+
         function formatDate(timestamp) {
             if (!timestamp) return 'غير محدد';
-            
             let date;
-            if (timestamp.toDate) {
-                date = timestamp.toDate();
-            } else if (timestamp instanceof Date) {
-                date = timestamp;
-            } else {
-                date = new Date(timestamp);
-            }
-            
-            return date.toLocaleDateString('ar-SA', {
+            if (timestamp.toDate) date = timestamp.toDate();
+            else if (timestamp instanceof Date) date = timestamp;
+            else date = new Date(timestamp);
+
+            return date.toLocaleDateString('ar-JO', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric'
             });
         }
 
-        function getStatusText(status) {
-            const statusMap = {
-                'pending': 'معلق',
-                'approved': 'مقبول',
-                'rejected': 'مرفوض'
-            };
-            return statusMap[status] || status;
-        }
-
         function showLoading(show) {
             elements.loadingState.style.display = show ? 'block' : 'none';
-            elements.requestsTable.style.display = show ? 'none' : 'table';
-        }
-
-        function showEmptyState() {
-            elements.emptyState.style.display = 'block';
-            elements.requestsTable.style.display = 'none';
-        }
-
-        function hideEmptyState() {
-            elements.emptyState.style.display = 'none';
-            elements.requestsTable.style.display = 'table';
-        }
-
-        function showMessage(title, message, type) {
-            const messageEl = document.createElement('div');
-            messageEl.className = `message ${type}`;
-            messageEl.innerHTML = `<strong>${title}:</strong> ${message}`;
-            
-            document.body.appendChild(messageEl);
-            
-            setTimeout(() => messageEl.classList.add('show'), 100);
-            
-            setTimeout(() => {
-                messageEl.classList.remove('show');
-                setTimeout(() => document.body.removeChild(messageEl), 300);
-            }, 3000);
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        // Global Functions
-       window.acceptRequest = async function(nationalId) {
-            if (confirm('هل أنت متأكد من قبول هذا الطلب؟')) {
-                try {
-                    showMessage('معالجة', 'جاري قبول الطلب...', 'success');
-                    
-                    const pendingDoc = await getDoc(doc(db, "pendingUsers", nationalId));
-                    
-                    if (pendingDoc.exists()) {
-                        const userData = pendingDoc.data();
-                        
-                        // Move to approved users
-                        await setDoc(doc(db, "approvedUsers", nationalId), {
-                            ...userData,
-                            status: 'available',
-                            approvedAt: serverTimestamp(),
-                            lastUpdated: serverTimestamp()
-                        });
-                        
-                        // Remove from pending users
-                        await deleteDoc(doc(db, "pendingUsers", nationalId));
-                        
-                        // 🔔 إرسال إشعار للمهني
-                        if (userData.fcmToken) {
-                            await sendNotificationToUser(userData.fcmToken, {
-                                title: '🎉 تم قبول طلبك!',
-                                body: `مبروك ${userData.name}! أنت الآن جزء من شبكة المهنيين`,
-                                url: '/Your-service-is-our/profile.html'
-                            });
-                        }
-                        
-                        showMessage('نجح', 'تم قبول الطلب بنجاح!', 'success');
-                        await loadAllData();
-                        renderRequests();
-                    }
-                } catch (error) {
-                    console.error("خطأ في قبول الطلب:", error);
-                    showMessage('خطأ', 'فشل في قبول الطلب', 'error');
-                }
+            if (show) {
+                elements.requestsTable.style.display = 'none';
+                elements.emptyState.style.display = 'none';
             }
         }
 
-        // دالة إرسال الإشعارات (تحتاج Firebase Cloud Functions)
-        async function sendNotificationToUser(fcmToken, notification) {
-            // هذه الدالة تحتاج Firebase Cloud Functions
-            // يمكن تفعيلها لاحقاً من Firebase Console
-            console.log('📤 إرسال إشعار:', notification);
-        }
+        // Modal Handler: Show ALL Request Details
+        window.openRequestDetails = function(nationalId) {
+            const req = allRequests.find(r => r.id === nationalId);
+            if (!req) return;
 
-        window.rejectRequest = async function(nationalId) {
-            const reason = prompt('يرجى إدخال سبب الرفض:');
+            activeModalRequestId = nationalId;
+
+            document.getElementById('modalProName').textContent = req.name || 'غير محدد';
             
-            if (reason && reason.trim() !== '') {
-                if (confirm('هل أنت متأكد من رفض هذا الطلب؟')) {
-                    try {
-                        showMessage('معالجة', 'جاري رفض الطلب...', 'success');
-                        
-                        const pendingDoc = await getDoc(doc(db, "pendingUsers", nationalId));
-                        
-                        if (pendingDoc.exists()) {
-                            const userData = pendingDoc.data();
-                            
-                            // Move to rejected users
-                            await setDoc(doc(db, "rejectedUsers", nationalId), {
-                                ...userData,
-                                status: 'rejected',
-                                reason: reason.trim(),
-                                rejectedAt: serverTimestamp(),
-                                lastUpdated: serverTimestamp()
-                            });
-                            
-                            // Remove from pending users
-                            await deleteDoc(doc(db, "pendingUsers", nationalId));
-                            
-                            showMessage('تم', 'تم رفض الطلب', 'success');
-                            await loadAllData();
-                            renderRequests();
-                        }
-                    } catch (error) {
-                        console.error("خطأ في رفض الطلب:", error);
-                        showMessage('خطأ', 'فشل في رفض الطلب', 'error');
-                    }
-                }
-            } else if (reason !== null) {
-                showMessage('مطلوب', 'يجب إدخال سبب الرفض', 'error');
-            }
-        }
+            const jobBadge = document.getElementById('modalProJobBadge');
+            jobBadge.textContent = req.job || 'مهني';
+            jobBadge.className = `badge-status ${req.status}`;
 
-        window.viewRequest = function(nationalId) {
-            const request = allRequests.find(r => r.id === nationalId);
-            if (request) {
-                const details = `
-تفاصيل الطلب:
-================
-الاسم: ${request.name || 'غير محدد'}
-المهنة: ${request.job || 'غير محدد'}
-المحافظة: ${request.city || 'غير محدد'}
-الهاتف: ${request.phone || 'غير محدد'}
-البريد: ${request.email || 'غير محدد'}
-الرقم الوطني: ${request.nationalId || request.id}
-الوصف: ${request.bio || 'لا يوجد وصف'}
-تاريخ التقديم: ${formatDate(request.createdAt)}
-الحالة: ${getStatusText(request.status)}
-${request.reason ? `سبب الرفض: ${request.reason}` : ''}
+            document.getElementById('modalNationalId').textContent = req.nationalId || req.id;
+            document.getElementById('modalCity').textContent = req.city || 'غير محدد';
+            document.getElementById('modalPhone').textContent = req.phone || 'غير محدد';
+            document.getElementById('modalEmail').textContent = req.email || 'غير محدد';
+            document.getElementById('modalExperience').textContent = req.experienceYears || 'غير محدد';
+            document.getElementById('modalPrice').textContent = req.hourlyPrice ? `${req.hourlyPrice} دينار / ساعة` : 'غير محدد';
+            document.getElementById('modalHours').textContent = (req.workStartTime && req.workEndTime) ? `من ${req.workStartTime} إلى ${req.workEndTime}` : 'طوال اليوم';
+            document.getElementById('modalDate').textContent = formatDate(req.createdAt);
+            document.getElementById('modalBio').textContent = req.bio || req.description || 'لا يوجد نبذة إضافية مسجلة.';
+
+            // Contact quick links
+            const contactBox = document.getElementById('modalContactLinks');
+            contactBox.innerHTML = '';
+            if (req.phone) {
+                const cleanPhone = req.phone.replace(/[^0-9]/g, '');
+                contactBox.innerHTML = `
+                    <a href="tel:${cleanPhone}" class="btn-quick-contact" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">📞 اتصال</a>
+                    <a href="https://wa.me/962${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}" target="_blank" class="btn-quick-contact" style="background: rgba(37, 211, 102, 0.2); color: #4ade80; border: 1px solid rgba(37, 211, 102, 0.3);">💬 واتساب</a>
                 `;
-                alert(details);
-            } else {
-                showMessage('خطأ', 'لم يتم العثور على الطلب', 'error');
             }
-        }
+
+            // GPS
+            const locBox = document.getElementById('modalLocationBox');
+            if (req.latitude && req.longitude) {
+                locBox.style.display = 'block';
+                document.getElementById('modalGpsCoords').textContent = `${req.latitude}, ${req.longitude}`;
+                document.getElementById('modalMapLink').href = `https://www.google.com/maps?q=${req.latitude},${req.longitude}`;
+            } else {
+                locBox.style.display = 'none';
+            }
+
+            // Rejection reason
+            const rejectBox = document.getElementById('modalRejectReasonBox');
+            if (req.status === 'rejected' && req.reason) {
+                rejectBox.style.display = 'block';
+                document.getElementById('modalRejectReason').textContent = req.reason;
+            } else {
+                rejectBox.style.display = 'none';
+            }
+
+            // Modal Action Buttons
+            const actionContainer = document.getElementById('modalActionButtons');
+            actionContainer.innerHTML = '';
+
+            if (req.status === 'pending') {
+                actionContainer.innerHTML = `
+                    <button class="btn-modal-action accept" onclick="quickAccept('${req.id}', true)">
+                        <span>✅</span> <span>قبول واعتماد فوراً</span>
+                    </button>
+                    <button class="btn-modal-action reject" onclick="quickReject('${req.id}', true)">
+                        <span>❌</span> <span>رفض مع تحديد السبب</span>
+                    </button>
+                `;
+            } else if (req.status === 'approved') {
+                actionContainer.innerHTML = `
+                    <button class="btn-modal-action reject" onclick="quickReject('${req.id}', true)">
+                        <span>⚠️</span> <span>إلغاء الاعتماد وتعطيل الحساب</span>
+                    </button>
+                    <button class="btn-modal-action delete" onclick="deleteRequestRecord('${req.id}')">
+                        <span>🗑️</span> <span>حذف من النظام</span>
+                    </button>
+                `;
+            } else if (req.status === 'rejected') {
+                actionContainer.innerHTML = `
+                    <button class="btn-modal-action accept" onclick="quickAccept('${req.id}', true)">
+                        <span>🔄</span> <span>إعادة القبول والاعتماد</span>
+                    </button>
+                    <button class="btn-modal-action delete" onclick="deleteRequestRecord('${req.id}')">
+                        <span>🗑️</span> <span>حذف نهائي</span>
+                    </button>
+                `;
+            }
+
+            elements.detailModal.style.display = 'flex';
+        };
+
+        window.closeDetailModal = function() {
+            elements.detailModal.style.display = 'none';
+            activeModalRequestId = null;
+        };
+
+        // Quick Accept
+        window.quickAccept = async function(nationalId, fromModal = false) {
+            if (!confirm('هل تريد قبول واعتماد هذا المهني ونشر ملفه للمستخدمين؟')) return;
+
+            try {
+                showLoading(true);
+                // Check if in pending
+                const pendingRef = doc(db, "pendingUsers", nationalId);
+                const pendingSnap = await getDoc(pendingRef);
+                
+                let userData = null;
+                if (pendingSnap.exists()) {
+                    userData = pendingSnap.data();
+                    await deleteDoc(pendingRef);
+                } else {
+                    const rejRef = doc(db, "rejectedUsers", nationalId);
+                    const rejSnap = await getDoc(rejRef);
+                    if (rejSnap.exists()) {
+                        userData = rejSnap.data();
+                        await deleteDoc(rejRef);
+                    }
+                }
+
+                if (userData) {
+                    await setDoc(doc(db, "approvedUsers", nationalId), {
+                        ...userData,
+                        status: 'available',
+                        approvedAt: serverTimestamp(),
+                        lastUpdated: serverTimestamp()
+                    });
+                }
+
+                if (fromModal) closeDetailModal();
+                await loadAllData();
+                alert('✅ تم قبول المهني بنجاح وأصبح متاحاً للعملاء!');
+
+            } catch (err) {
+                console.error("Accept error:", err);
+                alert("حدث خطأ أثناء قبول الطلب");
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        // Quick Reject
+        window.quickReject = async function(nationalId, fromModal = false) {
+            const reason = prompt('يرجى كتابة سبب رفض الطلب (سيظهر للمهني عند الاستعلام):');
+            if (reason === null) return;
+            if (!reason.trim()) {
+                alert('يجب كتابة سبب الرفض لتوضيحه للمهني.');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                const pendingRef = doc(db, "pendingUsers", nationalId);
+                const approvedRef = doc(db, "approvedUsers", nationalId);
+
+                let userData = null;
+                const pSnap = await getDoc(pendingRef);
+                if (pSnap.exists()) {
+                    userData = pSnap.data();
+                    await deleteDoc(pendingRef);
+                } else {
+                    const aSnap = await getDoc(approvedRef);
+                    if (aSnap.exists()) {
+                        userData = aSnap.data();
+                        await deleteDoc(approvedRef);
+                    }
+                }
+
+                if (userData) {
+                    await setDoc(doc(db, "rejectedUsers", nationalId), {
+                        ...userData,
+                        status: 'rejected',
+                        reason: reason.trim(),
+                        rejectedAt: serverTimestamp(),
+                        lastUpdated: serverTimestamp()
+                    });
+                }
+
+                if (fromModal) closeDetailModal();
+                await loadAllData();
+                alert('❌ تم تسجيل رفض الطلب وتحديث الحالة.');
+
+            } catch (err) {
+                console.error("Reject error:", err);
+                alert("حدث خطأ أثناء رفض الطلب");
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        // Delete Request Record
+        window.deleteRequestRecord = async function(nationalId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا السجل نهائياً من قاعدة البيانات؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+
+            try {
+                showLoading(true);
+                await deleteDoc(doc(db, "pendingUsers", nationalId));
+                await deleteDoc(doc(db, "approvedUsers", nationalId));
+                await deleteDoc(doc(db, "rejectedUsers", nationalId));
+
+                closeDetailModal();
+                await loadAllData();
+                alert('🗑️ تم حذف السجل بنجاح.');
+            } catch (err) {
+                console.error("Delete error:", err);
+                alert("حدث خطأ أثناء الحذف");
+            } finally {
+                showLoading(false);
+            }
+        };
 
         window.refreshData = async function() {
-            showMessage('تحديث', 'جاري تحديث البيانات...', 'success');
             await loadAllData();
-            renderRequests();
-        }
+        };
 
         window.logout = function() {
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+            if (confirm('هل تريد تسجيل الخروج من لوحة الإدارة؟')) {
                 sessionStorage.removeItem("adminLoggedIn");
-                sessionStorage.removeItem("adminLoginTime");
-                showMessage('تم', 'تم تسجيل الخروج بنجاح', 'success');
-                setTimeout(() => {
-                    window.location.href = 'admin-login.html';
-                }, 1500);
+                localStorage.removeItem("adminLoggedIn");
+                localStorage.removeItem("adminRememberSaved");
+                window.location.href = "admin-login.html";
             }
-        }
-
-        // Auto-refresh every 30 seconds
-        setInterval(async () => {
-            try {
-                await loadAllData();
-                renderRequests();
-                console.log('🔄 تحديث تلقائي للبيانات');
-            } catch (error) {
-                console.error('خطأ في التحديث التلقائي:', error);
-            }
-        }, 30000);
-
-        console.log('✅ لوحة الإدارة جاهزة');
+        };
     </script>
 </body>
 </html>
