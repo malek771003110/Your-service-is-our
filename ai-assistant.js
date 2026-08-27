@@ -89,6 +89,50 @@ function toggleChat() {
     }
 }
 
+// -- نظام الردود الفورية الذكية (Instant Responses) للأسئلة الشائعة --
+const INSTANT_FAQS = [
+    {
+        keywords: ['تسجيل دخول', 'اسجل دخول', 'سجل دخول', 'كيف ادخل', 'دخول الحساب', 'تسجيل الدخول'],
+        reply: `لـ **تسجيل الدخول** 🔐:\n1. اضغط على زر **"تسجيل الدخول"** أعلى الصفحة أو من القائمة الجانبية ☰.\n2. اختر إذا كنت **زبون** أو **مهني**.\n3. أدخل رقم هاتفك أو بريدك وكلمة المرور.\n\nإذا ما عندك حساب بتقدر تعمل حساب جديد بثواني! ✨`
+    },
+    {
+        keywords: ['مفضلة', 'المفضلة', 'احفظ مهني', 'اضيف للمفضلة', 'قلب'],
+        reply: `لإضافة أي مهني إلى **المفضلة** ❤️:\n- اضغط على **أيقونة القلب (🤍)** الموجودة في بطاقة المهني.\n- بتقدر ترجع لكل المهنيين اللي حفظتهم بأي وقت من خيار **"مفضلتي"** في القائمة! 📂`
+    },
+    {
+        keywords: ['حجز', 'احجز', 'اتواصل', 'اتصال', 'رقم الهاتف', 'واتساب', 'احكي مع'],
+        reply: `للتواصل مع أي مهني 📞💬:\n1. بعد تسجيل دخولك، بتظهرلك أزرار التواصل مباشرة على بطاقة كل مهني.\n2. اضغط على **"اتصال" 📞** للاتصال المباشر، أو **"واتساب" 💬** لبدء محادثة فورية!`
+    },
+    {
+        keywords: ['مقارنة', 'المقارنة', 'اقارن'],
+        reply: `لمقارنة المهنيين ⚖️:\n- اضغط على زر **"إضافة للمقارنة" ⚖️** على بطاقات المهنيين (حتى 3 مهنيين).\n- رح يظهرلك شريط المقارنة بالأسفل، اضغط **"مقارنة الآن"** لمشاهدة الفروقات والأسعار جنباً إلى جنب!`
+    },
+    {
+        keywords: ['سجل مهنتك', 'انضم', 'بدي اشتغل', 'تسجيل مهني', 'اسجل كمهني'],
+        reply: `بدك تنضم لشبكة مهنيين "خدمتك"؟ 🛠️✨\n- اضغط على زر **"سجل مهنتك الآن"** أعلى الصفحة أو من القائمة.\n- عبي بياناتك وخبرتك ورقمك، وفريقنا رح يراجع طلبك ويفعل حسابك بسرعة!`
+    },
+    {
+        keywords: ['اسمع', 'مرحبا', 'هلا', 'سلام', 'السلام عليكم', 'الو', 'صباح الخير', 'مساء الخير', 'هاي', 'هلو'],
+        reply: `يا هلا وغلا بيك! 🇯🇴👋\nأنا **مساعد خدمتك الذكي** 🤖، كيف بقدر أساعدك اليوم؟ سواء بدك تشخيص لعطل بالبيت، أو ترشيح لأفضل مهني، أو استفسار عن الموقع أنا جاهز فوراً! 🛠️`
+    },
+    {
+        keywords: ['مين انت', 'شو بتعمل', 'شو وظيفتك', 'من انت'],
+        reply: `أنا **مساعد خدمتك الذكي** 🤖، خبيرك الفني المرشد في منصة "خدمتك" بالأردن 🇯🇴.\nبساعدك في تشخيص الأعطال المنزلية (كهرباء، سباكة، تكييف، نجارة...) وبرشحلك أحسن المهنيين المتوفرين لتصليحها فوراً!`
+    }
+];
+
+function checkInstantFAQ(query) {
+    const cleanQuery = query.toLowerCase().trim();
+    for (const faq of INSTANT_FAQS) {
+        for (const kw of faq.keywords) {
+            if (cleanQuery.includes(kw)) {
+                return faq.reply;
+            }
+        }
+    }
+    return null;
+}
+
 async function handleSend() {
     const text = chatInput.value.trim();
     if (!text) return;
@@ -96,16 +140,30 @@ async function handleSend() {
     addMessage("user", text);
     chatInput.value = '';
     chatInput.disabled = true;
+
+    // ⚡ فحص فوري للأسئلة الشائعة للرد بسرعة الصاروخ بدون انتظار الشبكة
+    const instantReply = checkInstantFAQ(text);
+    if (instantReply) {
+        const typingId = addTypingIndicator();
+        setTimeout(() => {
+            removeElement(typingId);
+            addMessage("model", instantReply);
+            chatInput.disabled = false;
+            chatInput.focus();
+        }, 150); // تأخير طبيعي بسيط جداً (0.15 ثانية) لراحة العين
+        return;
+    }
+
     const typingId = addTypingIndicator();
 
-    // -- LIVE DOM SCRAPING FOR CONTEXT --
+    // -- LIVE DOM SCRAPING FOR CONTEXT (فقط للأسئلة الفنية عند الحاجة) --
     let currentContext = "قائمة المهنيين المعروضين أمام المستخدم الآن:\n";
     try {
         const cards = document.querySelectorAll('.professional-card');
         if (cards && cards.length > 0) {
             let proCount = 0;
             cards.forEach((card) => {
-                if (proCount < 15) {
+                if (proCount < 10) {
                     const name = card.querySelector('h3')?.innerText.trim() || 'مجهول';
                     const job = card.querySelector('.profession')?.innerText.trim() || '';
                     const city = card.querySelector('.location')?.innerText.replace('📍', '').trim() || '';
@@ -137,8 +195,8 @@ async function handleSend() {
             },
             contents: chatHistory,
             generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 2048
+                temperature: 0.6,
+                maxOutputTokens: 1024
             }
         };
 
@@ -157,7 +215,7 @@ async function handleSend() {
                 if (errData?.error?.message) errMsg = errData.error.message;
             } catch(e) {
                 if (response.status === 404) {
-                    errMsg = 'لم يتم رفع ونشر ملفات Netlify بعد. يرجى عمل Git Push لتفعيل السيرفر.';
+                    errMsg = 'لم يتم رفع ونشر ملفات Netlify بعد.';
                 }
             }
             throw new Error(errMsg);
