@@ -929,6 +929,84 @@
         </div>
     </div>
 
+    <!-- ⚖️ Enforce / Moderate Report Modal -->
+    <div class="modal-overlay-drawer" id="enforceReportModal" style="display: none; z-index: 10000;">
+        <div class="modal-card-drawer" style="max-width: 600px;">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <h2 style="color: #fbbf24;">⚖️ اتخاذ إجراء والرد على البلاغ</h2>
+                    <span id="enforceReportUser" style="color: var(--text-secondary); font-size: 13px;">المستخدم المُبلّغ عنه</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeEnforceModal()">✕</button>
+            </div>
+
+            <div style="padding: 15px 0;">
+                <!-- Report details box -->
+                <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-size: 12px; color: var(--text-muted);">المُبلّغ: <strong id="enforceReporterName" style="color: var(--text-pure);">-</strong></span>
+                        <span style="font-size: 12px; color: #fb7185;">المُبلّغ عنه: <strong id="enforceReportedName">-</strong></span>
+                    </div>
+                    <div style="font-size: 12.5px; color: #fbbf24; margin-bottom: 4px;">سبب البلاغ: <span id="enforceReportReason">-</span></div>
+                    <div id="enforceReportDetails" style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">-</div>
+                    <div id="enforceUserBanStatus" style="margin-top: 8px; padding: 6px 10px; border-radius: 8px; font-size: 12px; display: none;"></div>
+                </div>
+
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 8px;">
+                    اختر نوع الإجراء / العقوبة (Preset Action):
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                    <label style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;">
+                        <input type="radio" name="enforceActionType" value="warning" checked onchange="onEnforceActionChanged('warning')" style="margin-top: 3px;">
+                        <div>
+                            <strong style="color: #fbbf24; font-size: 13px; display: block;">⚠️ إنذار وتحذير رسمي</strong>
+                            <span style="font-size: 11px; color: var(--text-muted);">المرة الأولى - توجيه تنبيه</span>
+                        </div>
+                    </label>
+
+                    <label style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;">
+                        <input type="radio" name="enforceActionType" value="ban_3h" onchange="onEnforceActionChanged('ban_3h')" style="margin-top: 3px;">
+                        <div>
+                            <strong style="color: #f87171; font-size: 13px; display: block;">⏳ حظر 3 ساعات</strong>
+                            <span style="font-size: 11px; color: var(--text-muted);">المخالفة 3 - إيقاف مؤقت</span>
+                        </div>
+                    </label>
+
+                    <label style="background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.4); padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;">
+                        <input type="radio" name="enforceActionType" value="ban_24h" onchange="onEnforceActionChanged('ban_24h')" style="margin-top: 3px;">
+                        <div>
+                            <strong style="color: #ef4444; font-size: 13px; display: block;">🚫 حظر 24 ساعة (يوم كامل)</strong>
+                            <span style="font-size: 11px; color: var(--text-muted);">عند 5 بلاغات أو مخالفة جسيمة</span>
+                        </div>
+                    </label>
+
+                    <label style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;">
+                        <input type="radio" name="enforceActionType" value="unban" onchange="onEnforceActionChanged('unban')" style="margin-top: 3px;">
+                        <div>
+                            <strong style="color: #34d399; font-size: 13px; display: block;">🔓 فك الحظر والتفعيل</strong>
+                            <span style="font-size: 11px; color: var(--text-muted);">إلغاء الحظر وتفعيل الحساب</span>
+                        </div>
+                    </label>
+                </div>
+
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 6px;">
+                    سبب الإجراء / رسالة التحذير الموجهة للمستخدم:
+                </label>
+                <textarea id="enforceMessageInput" rows="3" style="width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-pure); font-family: inherit; font-size: 13.5px; resize: vertical; outline: none; margin-bottom: 12px;"></textarea>
+
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 6px;">
+                    الرد الموجه للمُبلّغ (اختياري لطمأنته بإجراءات الإدارة):
+                </label>
+                <textarea id="enforceReporterFeedbackInput" rows="2" placeholder="مثال: نشكرك على إبلاغنا، لقد تم اتخاذ الإجراءات التأديبية اللازمة بحق المستخدم." style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-pure); font-family: inherit; font-size: 13px; resize: vertical; outline: none;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn-admin-action" onclick="closeEnforceModal()">إلغاء</button>
+                <button class="btn-modal-action accept" style="margin: 0; padding: 10px 24px;" onclick="submitEnforceAction()">تطبيق الإجراء وحفظ 🚀</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
@@ -1430,6 +1508,9 @@
             renderReports();
         }
 
+        let activeEnforceReportId = null;
+        let activeEnforceReport = null;
+
         function renderReports() {
             const tableBody = elements.requestsTableBody;
             const cardView = elements.requestsCardView;
@@ -1442,6 +1523,7 @@
                 <th>المُبلّغ عنه</th>
                 <th>السبب</th>
                 <th>تفاصيل البلاغ والمحتوى</th>
+                <th>حالة الإجراء</th>
                 <th>التاريخ</th>
                 <th>الإجراءات</th>
             `;
@@ -1457,18 +1539,30 @@
 
             filteredReports.forEach(rep => {
                 const tr = document.createElement('tr');
+                const actionBadge = rep.actionTaken 
+                    ? `<span class="badge-status approved" style="font-size:11px;">✅ تم اتخاذ: ${getActionLabel(rep.actionType)}</span>`
+                    : `<span class="badge-status pending" style="font-size:11px;">⏳ بانتظار الإجراء</span>`;
+
                 tr.innerHTML = `
                     <td><span class="badge-status rejected">🚨 ${rep.reportType || 'بلاغ'}</span></td>
                     <td><strong>${rep.reporterName || 'مجهول'}</strong></td>
-                    <td><strong style="color:#fb7185;">${rep.reportedName || 'مستخدم'}</strong></td>
+                    <td>
+                        <strong style="color:#fb7185;">${rep.reportedName || 'مستخدم'}</strong>
+                        ${rep.reportedUserBanned ? '<div style="margin-top:2px;"><span class="badge-status rejected" style="font-size:10px;">🔴 محظور حالياً</span></div>' : ''}
+                    </td>
                     <td><span style="font-weight:700; color:#fbbf24;">${rep.reason || '-'}</span></td>
                     <td>
                         <div style="font-size:12.5px; color:var(--text-pure);">${rep.details || 'لا توجد تفاصيل إضافية'}</div>
                         ${rep.targetContent ? `<div style="font-size:11px; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px; margin-top:4px; color:#fca5a5;">المحتوى: "${rep.targetContent}"</div>` : ''}
+                        ${rep.adminActionNotes ? `<div style="font-size:11px; color:#a5b4fc; margin-top:4px;">ملاحظة الإدارة: ${rep.adminActionNotes}</div>` : ''}
                     </td>
+                    <td>${actionBadge}</td>
                     <td>${formatDate(rep.createdAt)}</td>
                     <td>
-                        <button class="btn-table-action reject" onclick="deleteReportRecord('${rep.id}')">حذف البلاغ 🗑️</button>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <button class="btn-table-action view" style="background:rgba(245,158,11,0.2); color:#fbbf24; border-color:rgba(245,158,11,0.4);" onclick="openEnforceModal('${rep.id}')">اتخاذ إجراء ⚖️</button>
+                            <button class="btn-table-action reject" onclick="deleteReportRecord('${rep.id}')">حذف 🗑️</button>
+                        </div>
                     </td>
                 `;
                 tableBody.appendChild(tr);
@@ -1478,7 +1572,7 @@
                 card.innerHTML = `
                     <div class="mobile-req-header">
                         <span class="badge-status rejected">🚨 بلاغ: ${rep.reportType}</span>
-                        <span style="font-size:12px; color:var(--text-muted);">${formatDate(rep.createdAt)}</span>
+                        ${actionBadge}
                     </div>
                     <div style="margin: 10px 0;">
                         <div>المُبلّغ عنه: <strong style="color:#fb7185;">${rep.reportedName}</strong> (من: ${rep.reporterName})</div>
@@ -1487,12 +1581,251 @@
                         ${rep.targetContent ? `<div style="font-size:12px; background:rgba(0,0,0,0.3); padding:6px; border-radius:6px; margin-top:4px;">المحتوى: "${rep.targetContent}"</div>` : ''}
                     </div>
                     <div class="mobile-req-actions">
-                        <button class="btn-table-action reject" style="flex:1; padding:10px;" onclick="deleteReportRecord('${rep.id}')">حذف البلاغ 🗑️</button>
+                        <button class="btn-table-action view" style="flex:1; padding:10px; background:rgba(245,158,11,0.2); color:#fbbf24;" onclick="openEnforceModal('${rep.id}')">اتخاذ إجراء ⚖️</button>
+                        <button class="btn-table-action reject" style="padding:10px;" onclick="deleteReportRecord('${rep.id}')">🗑️</button>
                     </div>
                 `;
                 cardView.appendChild(card);
             });
         }
+
+        function getActionLabel(type) {
+            if (type === 'warning') return 'إنذار رسمي';
+            if (type === 'ban_3h') return 'حظر 3 ساعات';
+            if (type === 'ban_24h') return 'حظر 24 ساعة';
+            if (type === 'unban') return 'فك الحظر';
+            return type || 'إجراء إداري';
+        }
+
+        window.openEnforceModal = async function(reportId) {
+            const rep = allReports.find(r => r.id === reportId);
+            if (!rep) return;
+
+            activeEnforceReportId = reportId;
+            activeEnforceReport = rep;
+
+            document.getElementById('enforceReportUser').textContent = `المُبلّغ عنه: ${rep.reportedName || 'مستخدم'}`;
+            document.getElementById('enforceReporterName').textContent = rep.reporterName || 'مجهول';
+            document.getElementById('enforceReportedName').textContent = rep.reportedName || 'مستخدم';
+            document.getElementById('enforceReportReason').textContent = rep.reason || '-';
+            document.getElementById('enforceReportDetails').textContent = rep.details || rep.targetContent || 'بلاغ عن محتوى أو سلوك غير لائق';
+
+            // Check current ban status of reported user from Firestore
+            const statusBox = document.getElementById('enforceUserBanStatus');
+            statusBox.style.display = 'none';
+
+            if (rep.reportedId) {
+                try {
+                    // Check customers or approvedUsers
+                    let userDoc = await getDoc(doc(db, "customers", rep.reportedId));
+                    if (!userDoc.exists()) {
+                        userDoc = await getDoc(doc(db, "approvedUsers", rep.reportedId));
+                    }
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        const warningCount = data.warningCount || 0;
+                        if (data.isBanned) {
+                            const bannedUntil = data.bannedUntil?.toDate ? data.bannedUntil.toDate() : null;
+                            const isStillBanned = bannedUntil ? (new Date() < bannedUntil) : true;
+                            if (isStillBanned) {
+                                statusBox.style.display = 'block';
+                                statusBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                                statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+                                statusBox.style.color = '#fca5a5';
+                                statusBox.innerHTML = `🔴 <strong>حالة الحساب:</strong> محظور حالياً حتى (${bannedUntil ? bannedUntil.toLocaleTimeString('ar-JO') : 'غير محدد'}) | السبب: ${data.banReason || 'مخالفة'} | عدد الإنذارات: ${warningCount}`;
+                            } else {
+                                statusBox.style.display = 'block';
+                                statusBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                                statusBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+                                statusBox.style.color = '#6ee7b7';
+                                statusBox.innerHTML = `🟢 <strong>حالة الحساب:</strong> نشط (انتهت فترة الحظر السابقة) | عدد الإنذارات: ${warningCount}`;
+                            }
+                        } else {
+                            statusBox.style.display = 'block';
+                            statusBox.style.background = 'rgba(255, 255, 255, 0.05)';
+                            statusBox.style.border = '1px solid var(--border-color)';
+                            statusBox.style.color = 'var(--text-secondary)';
+                            statusBox.innerHTML = `ℹ️ <strong>حالة الحساب:</strong> نشط وغير محظور | عدد الإنذارات السابقة: <strong>${warningCount}</strong>`;
+                        }
+                    }
+                } catch (e) {
+                    console.log("Error checking user ban:", e);
+                }
+            }
+
+            // Set default radio & preset message
+            const firstRadio = document.querySelector('input[name="enforceActionType"][value="warning"]');
+            if (firstRadio) firstRadio.checked = true;
+            window.onEnforceActionChanged('warning');
+
+            document.getElementById('enforceReportModal').style.display = 'flex';
+        };
+
+        window.closeEnforceModal = function() {
+            document.getElementById('enforceReportModal').style.display = 'none';
+            activeEnforceReportId = null;
+            activeEnforceReport = null;
+        };
+
+        window.onEnforceActionChanged = function(actionType) {
+            const msgInput = document.getElementById('enforceMessageInput');
+            const userName = activeEnforceReport?.reportedName || 'المستخدم';
+
+            if (actionType === 'warning') {
+                msgInput.value = `تحذير إداري أخير: تم رصد مخالفة لشروط وسياسة الاستخدام على حسابك بناءً على بلاغ وارد. يرجى الالتزام بالتعليمات لتجنب إيقاف الحساب.`;
+            } else if (actionType === 'ban_3h') {
+                msgInput.value = `تم إيقاف حسابك مؤقتاً لمدة 3 ساعات بسبب تكرار البلاغات والمخالفات الموجهة إليك. سيتم إعادة تفعيل الحساب تلقائياً بعد انقضاء المدة.`;
+            } else if (actionType === 'ban_24h') {
+                msgInput.value = `تم إغلاق حسابك لمدة يوم كامل (24 ساعة) لتجاوز الحد المسموح به من البلاغات والمخالفات.`;
+            } else if (actionType === 'unban') {
+                msgInput.value = `تم رفع الحظر عن حسابك وإعادة تفعيله بنجاح. نتمنى منك الالتزام بشروط مجتمع منصة خدمتك.`;
+            }
+        };
+
+        window.submitEnforceAction = async function() {
+            if (!activeEnforceReport) return;
+
+            const selectedRadio = document.querySelector('input[name="enforceActionType"]:checked');
+            const actionType = selectedRadio ? selectedRadio.value : 'warning';
+            const adminMessage = document.getElementById('enforceMessageInput').value.trim();
+            const reporterFeedback = document.getElementById('enforceReporterFeedbackInput').value.trim();
+
+            try {
+                showLoading(true);
+
+                const reportedId = activeEnforceReport.reportedId;
+                const now = new Date();
+                let bannedUntil = null;
+                let banDurationStr = null;
+                let isBanned = false;
+
+                if (actionType === 'ban_3h') {
+                    isBanned = true;
+                    bannedUntil = new Date(now.getTime() + (3 * 60 * 60 * 1000)); // + 3 hours
+                    banDurationStr = '3 ساعات';
+                } else if (actionType === 'ban_24h') {
+                    isBanned = true;
+                    bannedUntil = new Date(now.getTime() + (24 * 60 * 60 * 1000)); // + 24 hours
+                    banDurationStr = '24 ساعة (يوم كامل)';
+                } else if (actionType === 'unban') {
+                    isBanned = false;
+                    bannedUntil = null;
+                    banDurationStr = null;
+                }
+
+                // 1. Update Reported User Doc (if reportedId is known)
+                if (reportedId) {
+                    const updatePayload = {
+                        isBanned: isBanned,
+                        bannedUntil: bannedUntil ? bannedUntil : null,
+                        banReason: isBanned ? (activeEnforceReport.reason || 'مخالفة شروط الاستخدام') : null,
+                        banDuration: banDurationStr,
+                        lastWarningMessage: adminMessage,
+                        lastWarningAt: serverTimestamp(),
+                    };
+
+                    // Try updating customer
+                    try {
+                        const custRef = doc(db, "customers", reportedId);
+                        const custSnap = await getDoc(custRef);
+                        if (custSnap.exists()) {
+                            const curWarnings = (custSnap.data().warningCount || 0) + (actionType === 'warning' ? 1 : 0);
+                            await setDoc(custRef, { ...updatePayload, warningCount: curWarnings }, { merge: true });
+                        }
+                    } catch (e) { console.log(e); }
+
+                    // Try updating approvedUser (professional)
+                    try {
+                        const profRef = doc(db, "approvedUsers", reportedId);
+                        const profSnap = await getDoc(profRef);
+                        if (profSnap.exists()) {
+                            const curWarnings = (profSnap.data().warningCount || 0) + (actionType === 'warning' ? 1 : 0);
+                            await setDoc(profRef, { ...updatePayload, warningCount: curWarnings }, { merge: true });
+                        }
+                    } catch (e) { console.log(e); }
+
+                    // 2. Create In-App Notification for Reported User
+                    try {
+                        await setDoc(doc(collection(db, "notifications")), {
+                            userId: reportedId,
+                            title: isBanned ? '🚫 تنبيه حظر وإيقاف الحساب' : (actionType === 'unban' ? '🔓 تم تفعيل الحساب' : '⚠️ تحذير إداري رسمي'),
+                            body: adminMessage,
+                            type: 'admin_enforcement',
+                            isBanned: isBanned,
+                            bannedUntil: bannedUntil,
+                            createdAt: serverTimestamp(),
+                            isRead: false
+                        });
+                    } catch (e) { console.log(e); }
+                }
+
+                // 3. Create In-App Notification for Reporter (if reporterId exists)
+                if (activeEnforceReport.reporterId && reporterFeedback) {
+                    try {
+                        await setDoc(doc(collection(db, "notifications")), {
+                            userId: activeEnforceReport.reporterId,
+                            title: '🛡️ تحديث بخصوص بلاغك',
+                            body: reporterFeedback,
+                            type: 'report_reply',
+                            createdAt: serverTimestamp(),
+                            isRead: false
+                        });
+                    } catch (e) { console.log(e); }
+                }
+
+                // 4. Update Report Doc
+                await setDoc(doc(db, "reports", activeEnforceReportId), {
+                    actionTaken: true,
+                    actionType: actionType,
+                    actionNotes: adminMessage,
+                    reporterFeedback: reporterFeedback,
+                    actionAt: serverTimestamp(),
+                    resolvedBy: 'Admin'
+                }, { merge: true });
+
+                closeEnforceModal();
+                await loadAllData();
+                alert(`✅ تم تطبيق الإجراء بنجاح: ${getActionLabel(actionType)}\nتم إشعار المستخدم فورياً.`);
+            } catch (err) {
+                console.error("Enforce action error:", err);
+                alert("حدث خطأ أثناء تطبيق الإجراء: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        window.quickUnbanUser = async function(userId, userName) {
+            if (!confirm(`هل أنت متأكد من فك الحظر عن المستخدم "${userName}" فوراً؟`)) return;
+            try {
+                showLoading(true);
+                const unbanPayload = {
+                    isBanned: false,
+                    bannedUntil: null,
+                    banReason: null,
+                    banDuration: null,
+                    unbannedAt: serverTimestamp()
+                };
+
+                await setDoc(doc(db, "customers", userId), unbanPayload, { merge: true });
+                await setDoc(doc(db, "approvedUsers", userId), unbanPayload, { merge: true });
+
+                await setDoc(doc(collection(db, "notifications")), {
+                    userId: userId,
+                    title: '🔓 تم فك الحظر عن حسابك',
+                    body: 'لقد قامت الإدارة بإلغاء الحظر وتفعيل حسابك بالكامل. مرحباً بعودتك.',
+                    type: 'admin_enforcement',
+                    createdAt: serverTimestamp(),
+                    isRead: false
+                });
+
+                await loadAllData();
+                alert('🔓 تم فك الحظر وتفعيل الحساب بنجاح!');
+            } catch (err) {
+                alert("فشل فك الحظر: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
 
         window.deleteReportRecord = async function(id) {
             if (!confirm('هل تريد حذف هذا البلاغ بعد مراجعته؟')) return;
