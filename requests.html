@@ -560,6 +560,26 @@
             margin-right: 6px;
         }
 
+        .btn-admin-tab {
+            padding: 12px 22px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-admin-tab.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
         @media (max-width: 768px) {
             .table-responsive {
                 display: none;
@@ -612,68 +632,117 @@
             </div>
         </header>
 
-        <!-- Stats Overview Cards -->
-        <div class="admin-stats-grid">
-            <div class="admin-stat-card">
-                <div class="stat-meta">
-                    <h3 id="pendingCount">0</h3>
-                    <p>طلبات قيد الانتظار</p>
+        <!-- Top Navigation Tabs -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button class="btn-admin-tab active" id="tabBtnRequests" onclick="switchAdminTab('requests')">
+                📋 طلبات انضمام المهنيين (<span id="tabBadgeRequests">0</span>)
+            </button>
+            <button class="btn-admin-tab" id="tabBtnFeedback" onclick="switchAdminTab('feedback')">
+                📬 الشكاوى والاستفسارات والاقتراحات (<span id="tabBadgeFeedback">0</span>)
+            </button>
+            <button class="btn-admin-tab" id="tabBtnReports" onclick="switchAdminTab('reports')">
+                🚨 البلاغات والمحتوى المسيء (<span id="tabBadgeReports">0</span>)
+            </button>
+        </div>
+
+        <!-- SECTION 1: REQUESTS VIEW -->
+        <div id="sectionRequests">
+            <!-- Stats Overview Cards -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="pendingCount">0</h3>
+                        <p>طلبات قيد الانتظار</p>
+                    </div>
+                    <div class="stat-icon-wrapper pending">⏳</div>
                 </div>
-                <div class="stat-icon-wrapper pending">⏳</div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="approvedCount">0</h3>
+                        <p>مهنيين معتمدين ونشطين</p>
+                    </div>
+                    <div class="stat-icon-wrapper approved">✅</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="rejectedCount">0</h3>
+                        <p>طلبات مرفوضة</p>
+                    </div>
+                    <div class="stat-icon-wrapper rejected">❌</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="totalCount">0</h3>
+                        <p>إجمالي السجلات</p>
+                    </div>
+                    <div class="stat-icon-wrapper total">📊</div>
+                </div>
             </div>
 
-            <div class="admin-stat-card">
-                <div class="stat-meta">
-                    <h3 id="approvedCount">0</h3>
-                    <p>مهنيين معتمدين ونشطين</p>
-                </div>
-                <div class="stat-icon-wrapper approved">✅</div>
-            </div>
+            <!-- Filter Controls -->
+            <div class="admin-filter-bar">
+                <input type="text" class="search-field-admin" id="searchInput" placeholder="🔍 ابحث بالاسم، رقم الهاتف، الرقم الوطني، أو التخصص...">
+                
+                <select class="select-field-admin" id="statusFilter">
+                    <option value="">جميع الحالات</option>
+                    <option value="pending">⏳ قيد الانتظار</option>
+                    <option value="approved">✅ المقبولة</option>
+                    <option value="rejected">❌ المرفوضة</option>
+                </select>
 
-            <div class="admin-stat-card">
-                <div class="stat-meta">
-                    <h3 id="rejectedCount">0</h3>
-                    <p>طلبات مرفوضة</p>
-                </div>
-                <div class="stat-icon-wrapper rejected">❌</div>
-            </div>
-
-            <div class="admin-stat-card">
-                <div class="stat-meta">
-                    <h3 id="totalCount">0</h3>
-                    <p>إجمالي السجلات</p>
-                </div>
-                <div class="stat-icon-wrapper total">📊</div>
+                <select class="select-field-admin" id="governorateFilter">
+                    <option value="">جميع المحافظات</option>
+                    <option value="عمان">عمان</option>
+                    <option value="الزرقاء">الزرقاء</option>
+                    <option value="إربد">إربد</option>
+                    <option value="البلقاء">البلقاء</option>
+                    <option value="المفرق">المفرق</option>
+                    <option value="الكرك">الكرك</option>
+                    <option value="معان">معان</option>
+                    <option value="الطفيلة">الطفيلة</option>
+                    <option value="العقبة">العقبة</option>
+                    <option value="السلط">السلط</option>
+                    <option value="مادبا">مادبا</option>
+                    <option value="عجلون">عجلون</option>
+                    <option value="جرش">جرش</option>
+                </select>
             </div>
         </div>
 
-        <!-- Filter Controls -->
-        <div class="admin-filter-bar">
-            <input type="text" class="search-field-admin" id="searchInput" placeholder="🔍 ابحث بالاسم، رقم الهاتف، الرقم الوطني، أو التخصص...">
-            
-            <select class="select-field-admin" id="statusFilter">
-                <option value="">جميع الحالات</option>
-                <option value="pending">⏳ قيد الانتظار</option>
-                <option value="approved">✅ المقبولة</option>
-                <option value="rejected">❌ المرفوضة</option>
-            </select>
+        <!-- SECTION 2: FEEDBACK VIEW -->
+        <div id="sectionFeedback" style="display: none;">
+            <div class="admin-filter-bar">
+                <input type="text" class="search-field-admin" id="searchFeedbackInput" placeholder="🔍 ابحث في الشكاوى والاقتراحات بالاسم، الهاتف، أو العنوان...">
+                <select class="select-field-admin" id="feedbackTypeFilter">
+                    <option value="">جميع الأنواع</option>
+                    <option value="complaint">⚠️ الشكاوى فقط</option>
+                    <option value="suggestion">💡 الاقتراحات فقط</option>
+                    <option value="inquiry">📩 الاستفسارات فقط</option>
+                </select>
+                <select class="select-field-admin" id="feedbackStatusFilter">
+                    <option value="">جميع الحالات</option>
+                    <option value="pending">🆕 جديدة قيد المراجعة</option>
+                    <option value="in_progress">⏳ قيد المتابعة</option>
+                    <option value="resolved">✅ تم الحل والإغلاق</option>
+                </select>
+            </div>
+        </div>
 
-            <select class="select-field-admin" id="governorateFilter">
-                <option value="">جميع المحافظات</option>
-                <option value="عمان">عمان</option>
-                <option value="الزرقاء">الزرقاء</option>
-                <option value="إربد">إربد</option>
-                <option value="البلقاء">البلقاء</option>
-                <option value="المفرق">المفرق</option>
-                <option value="الكرك">الكرك</option>
-                <option value="معان">معان</option>
-                <option value="الطفيلة">الطفيلة</option>
-                <option value="العقبة">العقبة</option>
-                <option value="السلط">السلط</option>
-                <option value="مادبا">مادبا</option>
-                <option value="عجلون">عجلون</option>
-                <option value="جرش">جرش</option>
-            </select>
+        <!-- SECTION 3: REPORTS VIEW -->
+        <div id="sectionReports" style="display: none;">
+            <div class="admin-filter-bar">
+                <input type="text" class="search-field-admin" id="searchReportsInput" placeholder="🔍 ابحث في البلاغات...">
+                <select class="select-field-admin" id="reportsTypeFilter">
+                    <option value="">جميع أنواع البلاغات</option>
+                    <option value="user">مستخدمين</option>
+                    <option value="chat">محادثات</option>
+                    <option value="post">منشورات</option>
+                    <option value="comment">تعليقات</option>
+                </select>
+            </div>
         </div>
 
         <!-- Content Area -->
@@ -681,7 +750,7 @@
             <!-- Loading Indicator -->
             <div id="loadingState" style="text-align: center; padding: 40px;">
                 <div class="loading-spinner" style="margin: 0 auto 12px;"></div>
-                <p style="color: var(--text-secondary); font-weight: 700;">جاري مزامنة بيانات المهنيين والطلبات...</p>
+                <p style="color: var(--text-secondary); font-weight: 700;">جاري تحميل ومزامنة البيانات...</p>
             </div>
 
             <!-- Desktop Table View -->
@@ -821,6 +890,45 @@
         </div>
     </div>
 
+    <!-- 📬 Reply to Feedback / Complaint Modal -->
+    <div class="modal-overlay-drawer" id="replyFeedbackModal" style="display: none; z-index: 10000;">
+        <div class="modal-card-drawer" style="max-width: 550px;">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <h2 id="feedbackModalTitle">الرد على الشكوى / الاقتراح 📬</h2>
+                    <span id="feedbackModalUser" style="color: var(--text-secondary); font-size: 13px;">المستخدم</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeFeedbackModal()">✕</button>
+            </div>
+
+            <div style="padding: 15px 0;">
+                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">تفاصيل الرسالة:</div>
+                    <div id="feedbackModalDetails" style="font-size: 13.5px; color: var(--text-pure); line-height: 1.5;">-</div>
+                </div>
+
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 6px;">
+                    تحديث حالة الطلب:
+                </label>
+                <select id="feedbackStatusSelect" class="select-field-admin" style="width: 100%; margin-bottom: 15px;">
+                    <option value="pending">🆕 جديدة قيد المراجعة</option>
+                    <option value="in_progress">⏳ قيد المتابعة والحل</option>
+                    <option value="resolved">✅ تم الحل والإغلاق</option>
+                </select>
+
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 6px;">
+                    نص رد الإدارة (سيظهر للمستخدم فوراً في التطبيق):
+                </label>
+                <textarea id="feedbackReplyInput" rows="4" placeholder="اكتب ردك التوضيحي أو إجراءات الحل هنا..." style="width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-pure); font-family: inherit; font-size: 14px; resize: vertical; outline: none;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn-admin-action" onclick="closeFeedbackModal()">إلغاء</button>
+                <button class="btn-modal-action accept" style="margin: 0; padding: 10px 22px;" onclick="submitFeedbackReply()">حفظ وإرسال الرد 🚀</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
@@ -853,10 +961,17 @@
             window.location.href = "admin-login.html";
         }
 
+        let currentAdminTab = 'requests';
         let allRequests = [];
         let filteredRequests = [];
+        let allFeedbacks = [];
+        let filteredFeedbacks = [];
+        let allReports = [];
+        let filteredReports = [];
+
         let activeModalRequestId = null;
         let activeRejectRequestId = null;
+        let activeFeedbackId = null;
 
         const elements = {
             loadingState: document.getElementById('loadingState'),
@@ -874,7 +989,32 @@
             detailModal: document.getElementById('detailModal'),
             rejectModal: document.getElementById('rejectModal'),
             rejectModalProName: document.getElementById('rejectModalProName'),
-            rejectReasonInput: document.getElementById('rejectReasonInput')
+            rejectReasonInput: document.getElementById('rejectReasonInput'),
+            
+            // Tab badges
+            tabBadgeRequests: document.getElementById('tabBadgeRequests'),
+            tabBadgeFeedback: document.getElementById('tabBadgeFeedback'),
+            tabBadgeReports: document.getElementById('tabBadgeReports'),
+
+            // Section containers
+            sectionRequests: document.getElementById('sectionRequests'),
+            sectionFeedback: document.getElementById('sectionFeedback'),
+            sectionReports: document.getElementById('sectionReports'),
+
+            // Feedback controls
+            searchFeedbackInput: document.getElementById('searchFeedbackInput'),
+            feedbackTypeFilter: document.getElementById('feedbackTypeFilter'),
+            feedbackStatusFilter: document.getElementById('feedbackStatusFilter'),
+            replyFeedbackModal: document.getElementById('replyFeedbackModal'),
+            feedbackModalTitle: document.getElementById('feedbackModalTitle'),
+            feedbackModalUser: document.getElementById('feedbackModalUser'),
+            feedbackModalDetails: document.getElementById('feedbackModalDetails'),
+            feedbackStatusSelect: document.getElementById('feedbackStatusSelect'),
+            feedbackReplyInput: document.getElementById('feedbackReplyInput'),
+
+            // Reports controls
+            searchReportsInput: document.getElementById('searchReportsInput'),
+            reportsTypeFilter: document.getElementById('reportsTypeFilter'),
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
@@ -886,38 +1026,91 @@
             elements.searchInput.addEventListener('input', filterRequests);
             elements.governorateFilter.addEventListener('change', filterRequests);
             elements.statusFilter.addEventListener('change', filterRequests);
+
+            elements.searchFeedbackInput.addEventListener('input', filterFeedback);
+            elements.feedbackTypeFilter.addEventListener('change', filterFeedback);
+            elements.feedbackStatusFilter.addEventListener('change', filterFeedback);
+
+            elements.searchReportsInput.addEventListener('input', filterReports);
+            elements.reportsTypeFilter.addEventListener('change', filterReports);
         }
+
+        window.switchAdminTab = function(tab) {
+            currentAdminTab = tab;
+            document.querySelectorAll('.btn-admin-tab').forEach(b => b.classList.remove('active'));
+            
+            elements.sectionRequests.style.display = tab === 'requests' ? 'block' : 'none';
+            elements.sectionFeedback.style.display = tab === 'feedback' ? 'block' : 'none';
+            elements.sectionReports.style.display = tab === 'reports' ? 'block' : 'none';
+
+            if (tab === 'requests') {
+                document.getElementById('tabBtnRequests').classList.add('active');
+                renderRequests();
+            } else if (tab === 'feedback') {
+                document.getElementById('tabBtnFeedback').classList.add('active');
+                renderFeedback();
+            } else if (tab === 'reports') {
+                document.getElementById('tabBtnReports').classList.add('active');
+                renderReports();
+            }
+        };
 
         async function loadAllData() {
             try {
                 showLoading(true);
-                const [pendingSnap, approvedSnap, rejectedSnap] = await Promise.all([
+                const [pendingSnap, approvedSnap, rejectedSnap, feedbackSnap, reportsSnap] = await Promise.all([
                     getDocs(collection(db, "pendingUsers")),
                     getDocs(collection(db, "approvedUsers")),
-                    getDocs(collection(db, "rejectedUsers"))
+                    getDocs(collection(db, "rejectedUsers")),
+                    getDocs(collection(db, "feedbacks")),
+                    getDocs(collection(db, "reports"))
                 ]);
 
                 allRequests = [];
-
                 pendingSnap.forEach((d) => {
                     allRequests.push({ id: d.id, ...d.data(), status: 'pending' });
                 });
-
                 approvedSnap.forEach((d) => {
                     allRequests.push({ id: d.id, ...d.data(), status: 'approved' });
                 });
-
                 rejectedSnap.forEach((d) => {
                     allRequests.push({ id: d.id, ...d.data(), status: 'rejected' });
                 });
 
+                allFeedbacks = [];
+                feedbackSnap.forEach((d) => {
+                    allFeedbacks.push({ id: d.id, ...d.data() });
+                });
+                // Sort descending
+                allFeedbacks.sort((a, b) => {
+                    const tA = a.createdAt?.seconds || 0;
+                    const tB = b.createdAt?.seconds || 0;
+                    return tB - tA;
+                });
+
+                allReports = [];
+                reportsSnap.forEach((d) => {
+                    allReports.push({ id: d.id, ...d.data() });
+                });
+                allReports.sort((a, b) => {
+                    const tA = a.createdAt?.seconds || 0;
+                    const tB = b.createdAt?.seconds || 0;
+                    return tB - tA;
+                });
+
                 filteredRequests = [...allRequests];
+                filteredFeedbacks = [...allFeedbacks];
+                filteredReports = [...allReports];
+
                 updateStats();
-                renderRequests();
+
+                if (currentAdminTab === 'requests') renderRequests();
+                else if (currentAdminTab === 'feedback') renderFeedback();
+                else if (currentAdminTab === 'reports') renderReports();
 
             } catch (err) {
                 console.error("Error loading data:", err);
-                alert("حدث خطأ أثناء تحميل البيانات من الخادم");
+                alert("حدث خطأ أثناء تحميل البيانات من الخادم: " + err.message);
             } finally {
                 showLoading(false);
             }
@@ -932,6 +1125,10 @@
             elements.approvedCount.textContent = approved;
             elements.rejectedCount.textContent = rejected;
             elements.totalCount.textContent = allRequests.length;
+
+            elements.tabBadgeRequests.textContent = pending;
+            elements.tabBadgeFeedback.textContent = allFeedbacks.filter(f => f.status !== 'resolved').length;
+            elements.tabBadgeReports.textContent = allReports.length;
         }
 
         function filterRequests() {
@@ -960,6 +1157,18 @@
             const cardView = elements.requestsCardView;
             tableBody.innerHTML = '';
             cardView.innerHTML = '';
+
+            // Set table headers for requests
+            document.querySelector('#requestsTable thead tr').innerHTML = `
+                <th>الاسم الكامل</th>
+                <th>المهنة</th>
+                <th>المحافظة</th>
+                <th>رقم الهاتف</th>
+                <th>الرقم الوطني</th>
+                <th>تاريخ التقديم</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+            `;
 
             if (filteredRequests.length === 0) {
                 elements.emptyState.style.display = 'block';
@@ -1021,6 +1230,283 @@
                 cardView.appendChild(card);
             });
         }
+
+        // --- Feedback (Complaints/Suggestions) Management ---
+        function filterFeedback() {
+            const query = elements.searchFeedbackInput.value.toLowerCase().trim();
+            const type = elements.feedbackTypeFilter.value;
+            const status = elements.feedbackStatusFilter.value;
+
+            filteredFeedbacks = allFeedbacks.filter(fb => {
+                const matchesQuery = !query ||
+                    (fb.userName && fb.userName.toLowerCase().includes(query)) ||
+                    (fb.userPhone && fb.userPhone.includes(query)) ||
+                    (fb.title && fb.title.toLowerCase().includes(query)) ||
+                    (fb.description && fb.description.toLowerCase().includes(query));
+
+                const matchesType = !type || fb.type === type;
+                const matchesStatus = !status || (fb.status || 'pending') === status;
+
+                return matchesQuery && matchesType && matchesStatus;
+            });
+
+            renderFeedback();
+        }
+
+        function renderFeedback() {
+            const tableBody = elements.requestsTableBody;
+            const cardView = elements.requestsCardView;
+            tableBody.innerHTML = '';
+            cardView.innerHTML = '';
+
+            document.querySelector('#requestsTable thead tr').innerHTML = `
+                <th>نوع الطلب</th>
+                <th>المستخدم</th>
+                <th>رقم الهاتف</th>
+                <th>العنوان</th>
+                <th>التاريخ</th>
+                <th>الحالة</th>
+                <th>الرد المسجل</th>
+                <th>الإجراءات</th>
+            `;
+
+            if (filteredFeedbacks.length === 0) {
+                elements.emptyState.style.display = 'block';
+                elements.requestsTable.style.display = 'none';
+                return;
+            }
+
+            elements.emptyState.style.display = 'none';
+            elements.requestsTable.style.display = 'table';
+
+            filteredFeedbacks.forEach(fb => {
+                const typeLabel = fb.type === 'complaint' ? '⚠️ شكوى' : (fb.type === 'suggestion' ? '💡 اقتراح' : '📩 استفسار');
+                const typeClass = fb.type === 'complaint' ? 'rejected' : (fb.type === 'suggestion' ? 'pending' : 'total');
+                const statusBadge = getFeedbackStatusBadgeHtml(fb.status || 'pending');
+
+                const cleanPhone = (fb.userPhone || '').replace(/\D/g, '');
+                let waPhone = cleanPhone;
+                if (waPhone.startsWith('07')) waPhone = '962' + waPhone.substring(1);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge-status ${typeClass}">${typeLabel}</span></td>
+                    <td><strong>${fb.userName || 'مستخدم'}</strong> <br><small style="color: var(--text-muted);">${fb.userType === 'professional' ? 'مهني' : 'عميل'}</small></td>
+                    <td dir="ltr" style="text-align: right;">
+                        ${fb.userPhone || '-'}
+                        <div style="margin-top: 4px;">
+                            <a href="tel:${cleanPhone}" class="btn-quick-contact" style="background: rgba(16,185,129,0.2); color:#6ee7b7;">📞</a>
+                            <a href="https://wa.me/${waPhone}" target="_blank" class="btn-quick-contact" style="background: rgba(37,211,102,0.2); color:#4ade80;">💬</a>
+                        </div>
+                    </td>
+                    <td>
+                        <strong>${fb.title || '-'}</strong>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px; max-width: 250px;">${fb.description || ''}</p>
+                        ${fb.imageUrls && fb.imageUrls.length > 0 ? `
+                            <div style="display:flex; gap:4px; margin-top:4px;">
+                                ${fb.imageUrls.map(url => `<a href="${url}" target="_blank"><img src="${url}" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(255,255,255,0.2);" /></a>`).join('')}
+                            </div>
+                        ` : ''}
+                    </td>
+                    <td>${formatDate(fb.createdAt)}</td>
+                    <td>${statusBadge}</td>
+                    <td style="max-width: 200px; font-size: 12px; color: #a5b4fc;">${fb.adminReply || '<span style="color:var(--text-muted);">لم يتم الرد بعد</span>'}</td>
+                    <td>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="btn-table-action accept" onclick="openFeedbackReply('${fb.id}')">الرد والتحديث 💬</button>
+                            <button class="btn-table-action reject" onclick="deleteFeedbackRecord('${fb.id}')">حذف 🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+
+                // Mobile Card
+                const card = document.createElement('div');
+                card.className = 'mobile-req-card';
+                card.innerHTML = `
+                    <div class="mobile-req-header">
+                        <span class="badge-status ${typeClass}">${typeLabel}</span>
+                        ${statusBadge}
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <h4 style="color:var(--text-pure); margin-bottom:4px;">${fb.title}</h4>
+                        <p style="font-size: 13px; color: var(--text-secondary);">${fb.description}</p>
+                    </div>
+                    <div class="mobile-req-info-grid">
+                        <span>المستخدم: <strong>${fb.userName}</strong></span>
+                        <span>الهاتف: <strong>${fb.userPhone}</strong></span>
+                    </div>
+                    ${fb.adminReply ? `<div style="background:rgba(16,185,129,0.1); padding:8px; border-radius:8px; margin:8px 0; font-size:12px; color:#6ee7b7;">رد الإدارة: ${fb.adminReply}</div>` : ''}
+                    <div class="mobile-req-actions">
+                        <button class="btn-table-action accept" style="flex: 1; padding: 10px;" onclick="openFeedbackReply('${fb.id}')">الرد والتحديث 💬</button>
+                        <button class="btn-table-action reject" style="padding: 10px;" onclick="deleteFeedbackRecord('${fb.id}')">🗑️</button>
+                    </div>
+                `;
+                cardView.appendChild(card);
+            });
+        }
+
+        function getFeedbackStatusBadgeHtml(status) {
+            if (status === 'in_progress') return `<span class="badge-status pending">⏳ قيد المتابعة</span>`;
+            if (status === 'resolved') return `<span class="badge-status approved">✅ تم الحل</span>`;
+            return `<span class="badge-status total">🆕 جديد</span>`;
+        }
+
+        window.openFeedbackReply = function(id) {
+            const fb = allFeedbacks.find(f => f.id === id);
+            if (!fb) return;
+
+            activeFeedbackId = id;
+            elements.feedbackModalTitle.textContent = `${fb.type === 'complaint' ? '⚠️ شكوى' : '💡 اقتراح'}: ${fb.title}`;
+            elements.feedbackModalUser.textContent = `من: ${fb.userName} (${fb.userPhone})`;
+            elements.feedbackModalDetails.textContent = fb.description;
+            elements.feedbackStatusSelect.value = fb.status || 'pending';
+            elements.feedbackReplyInput.value = fb.adminReply || '';
+
+            elements.replyFeedbackModal.style.display = 'flex';
+        };
+
+        window.closeFeedbackModal = function() {
+            elements.replyFeedbackModal.style.display = 'none';
+            activeFeedbackId = null;
+        };
+
+        window.submitFeedbackReply = async function() {
+            if (!activeFeedbackId) return;
+
+            try {
+                showLoading(true);
+                const replyText = elements.feedbackReplyInput.value.trim();
+                const newStatus = elements.feedbackStatusSelect.value;
+
+                await setDoc(doc(db, "feedbacks", activeFeedbackId), {
+                    adminReply: replyText,
+                    status: newStatus,
+                    repliedAt: serverTimestamp(),
+                    lastUpdated: serverTimestamp()
+                }, { merge: true });
+
+                closeFeedbackModal();
+                await loadAllData();
+                alert('✅ تم حفظ وإرسال رد الإدارة بنجاح وسيظهر للمستخدم في تطبيقه فوراً!');
+            } catch (err) {
+                console.error("Feedback update error:", err);
+                alert("حدث خطأ أثناء حفظ الرد: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        window.deleteFeedbackRecord = async function(id) {
+            if (!confirm('هل أنت متأكد من حذف هذه الشكوى / الاقتراح نهائياً؟')) return;
+            try {
+                showLoading(true);
+                await deleteDoc(doc(db, "feedbacks", id));
+                await loadAllData();
+                alert('🗑️ تم الحذف بنجاح.');
+            } catch (err) {
+                alert("فشل الحذف: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        // --- Reports (User/Chat/Post Violations) ---
+        function filterReports() {
+            const query = elements.searchReportsInput.value.toLowerCase().trim();
+            const type = elements.reportsTypeFilter.value;
+
+            filteredReports = allReports.filter(rep => {
+                const matchesQuery = !query ||
+                    (rep.reporterName && rep.reporterName.toLowerCase().includes(query)) ||
+                    (rep.reportedName && rep.reportedName.toLowerCase().includes(query)) ||
+                    (rep.reason && rep.reason.toLowerCase().includes(query)) ||
+                    (rep.details && rep.details.toLowerCase().includes(query));
+
+                const matchesType = !type || rep.reportType === type;
+                return matchesQuery && matchesType;
+            });
+
+            renderReports();
+        }
+
+        function renderReports() {
+            const tableBody = elements.requestsTableBody;
+            const cardView = elements.requestsCardView;
+            tableBody.innerHTML = '';
+            cardView.innerHTML = '';
+
+            document.querySelector('#requestsTable thead tr').innerHTML = `
+                <th>نوع البلاغ</th>
+                <th>المُبلّغ</th>
+                <th>المُبلّغ عنه</th>
+                <th>السبب</th>
+                <th>تفاصيل البلاغ والمحتوى</th>
+                <th>التاريخ</th>
+                <th>الإجراءات</th>
+            `;
+
+            if (filteredReports.length === 0) {
+                elements.emptyState.style.display = 'block';
+                elements.requestsTable.style.display = 'none';
+                return;
+            }
+
+            elements.emptyState.style.display = 'none';
+            elements.requestsTable.style.display = 'table';
+
+            filteredReports.forEach(rep => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge-status rejected">🚨 ${rep.reportType || 'بلاغ'}</span></td>
+                    <td><strong>${rep.reporterName || 'مجهول'}</strong></td>
+                    <td><strong style="color:#fb7185;">${rep.reportedName || 'مستخدم'}</strong></td>
+                    <td><span style="font-weight:700; color:#fbbf24;">${rep.reason || '-'}</span></td>
+                    <td>
+                        <div style="font-size:12.5px; color:var(--text-pure);">${rep.details || 'لا توجد تفاصيل إضافية'}</div>
+                        ${rep.targetContent ? `<div style="font-size:11px; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px; margin-top:4px; color:#fca5a5;">المحتوى: "${rep.targetContent}"</div>` : ''}
+                    </td>
+                    <td>${formatDate(rep.createdAt)}</td>
+                    <td>
+                        <button class="btn-table-action reject" onclick="deleteReportRecord('${rep.id}')">حذف البلاغ 🗑️</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+
+                const card = document.createElement('div');
+                card.className = 'mobile-req-card';
+                card.innerHTML = `
+                    <div class="mobile-req-header">
+                        <span class="badge-status rejected">🚨 بلاغ: ${rep.reportType}</span>
+                        <span style="font-size:12px; color:var(--text-muted);">${formatDate(rep.createdAt)}</span>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <div>المُبلّغ عنه: <strong style="color:#fb7185;">${rep.reportedName}</strong> (من: ${rep.reporterName})</div>
+                        <div style="margin-top:4px; color:#fbbf24;">السبب: <strong>${rep.reason}</strong></div>
+                        <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">${rep.details || ''}</p>
+                        ${rep.targetContent ? `<div style="font-size:12px; background:rgba(0,0,0,0.3); padding:6px; border-radius:6px; margin-top:4px;">المحتوى: "${rep.targetContent}"</div>` : ''}
+                    </div>
+                    <div class="mobile-req-actions">
+                        <button class="btn-table-action reject" style="flex:1; padding:10px;" onclick="deleteReportRecord('${rep.id}')">حذف البلاغ 🗑️</button>
+                    </div>
+                `;
+                cardView.appendChild(card);
+            });
+        }
+
+        window.deleteReportRecord = async function(id) {
+            if (!confirm('هل تريد حذف هذا البلاغ بعد مراجعته؟')) return;
+            try {
+                showLoading(true);
+                await deleteDoc(doc(db, "reports", id));
+                await loadAllData();
+                alert('🗑️ تم حذف البلاغ بنجاح.');
+            } catch (err) {
+                alert("فشل الحذف: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
 
         function getStatusBadgeHtml(status) {
             if (status === 'pending') return `<span class="badge-status pending">⏳ قيد الانتظار</span>`;
