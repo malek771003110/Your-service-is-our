@@ -796,6 +796,31 @@
         </div>
     </div>
 
+    <!-- ❌ Reject Reason Modal -->
+    <div class="modal-overlay-drawer" id="rejectModal" style="display: none; z-index: 10000;">
+        <div class="modal-card-drawer" style="max-width: 480px;">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <h2 style="color: #fb7185;">❌ رفض طلب المهني</h2>
+                    <span id="rejectModalProName" style="color: var(--text-secondary); font-size: 13px;">المهني</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeRejectModal()">✕</button>
+            </div>
+
+            <div style="padding: 20px 0;">
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 8px;">
+                    يرجى كتابة سبب الرفض (سيظهر للمهني عند تسجيل الدخول أو الاستعلام):
+                </label>
+                <textarea id="rejectReasonInput" rows="4" placeholder="مثال: يرجى تزويدنا برقم هاتف صحيح أو إعادة التقاط صورة الهوية..." style="width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-pure); font-family: inherit; font-size: 14px; resize: vertical; outline: none;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn-admin-action" onclick="closeRejectModal()">إلغاء</button>
+                <button class="btn-modal-action reject" style="margin: 0; padding: 10px 20px;" onclick="submitReject()">تأكيد الرفض ✕</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
@@ -831,6 +856,7 @@
         let allRequests = [];
         let filteredRequests = [];
         let activeModalRequestId = null;
+        let activeRejectRequestId = null;
 
         const elements = {
             loadingState: document.getElementById('loadingState'),
@@ -845,7 +871,10 @@
             searchInput: document.getElementById('searchInput'),
             governorateFilter: document.getElementById('governorateFilter'),
             statusFilter: document.getElementById('statusFilter'),
-            detailModal: document.getElementById('detailModal')
+            detailModal: document.getElementById('detailModal'),
+            rejectModal: document.getElementById('rejectModal'),
+            rejectModalProName: document.getElementById('rejectModalProName'),
+            rejectReasonInput: document.getElementById('rejectReasonInput')
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
@@ -960,7 +989,7 @@
                             <button class="btn-table-action view" onclick="openRequestDetails('${req.id}')">عرض التفاصيل 🔍</button>
                             ${req.status === 'pending' ? `
                                 <button class="btn-table-action accept" onclick="quickAccept('${req.id}')">قبول ✓</button>
-                                <button class="btn-table-action reject" onclick="quickReject('${req.id}')">رفض ✕</button>
+                                <button class="btn-table-action reject" onclick="openRejectModal('${req.id}')">رفض ✕</button>
                             ` : ''}
                         </div>
                     </td>
@@ -985,7 +1014,7 @@
                         <button class="btn-table-action view" style="flex: 1; padding: 10px;" onclick="openRequestDetails('${req.id}')">التفاصيل الكاملة 🔍</button>
                         ${req.status === 'pending' ? `
                             <button class="btn-table-action accept" style="flex: 1; padding: 10px;" onclick="quickAccept('${req.id}')">قبول ✓</button>
-                            <button class="btn-table-action reject" style="flex: 1; padding: 10px;" onclick="quickReject('${req.id}')">رفض ✕</button>
+                            <button class="btn-table-action reject" style="flex: 1; padding: 10px;" onclick="openRejectModal('${req.id}')">رفض ✕</button>
                         ` : ''}
                     </div>
                 `;
@@ -1024,7 +1053,7 @@
 
         // Modal Handler: Show ALL Request Details
         window.openRequestDetails = function(nationalId) {
-            const req = allRequests.find(r => r.id === nationalId);
+            const req = allRequests.find(r => r.id === nationalId || r.nationalId === nationalId);
             if (!req) return;
 
             activeModalRequestId = nationalId;
@@ -1068,9 +1097,10 @@
 
             // Rejection reason
             const rejectBox = document.getElementById('modalRejectReasonBox');
-            if (req.status === 'rejected' && req.reason) {
+            const rejReason = req.rejectionReason || req.reason;
+            if (req.status === 'rejected' && rejReason) {
                 rejectBox.style.display = 'block';
-                document.getElementById('modalRejectReason').textContent = req.reason;
+                document.getElementById('modalRejectReason').textContent = rejReason;
             } else {
                 rejectBox.style.display = 'none';
             }
@@ -1084,13 +1114,13 @@
                     <button class="btn-modal-action accept" onclick="quickAccept('${req.id}', true)">
                         <span>✅</span> <span>قبول واعتماد فوراً</span>
                     </button>
-                    <button class="btn-modal-action reject" onclick="quickReject('${req.id}', true)">
+                    <button class="btn-modal-action reject" onclick="openRejectModal('${req.id}')">
                         <span>❌</span> <span>رفض مع تحديد السبب</span>
                     </button>
                 `;
             } else if (req.status === 'approved') {
                 actionContainer.innerHTML = `
-                    <button class="btn-modal-action reject" onclick="quickReject('${req.id}', true)">
+                    <button class="btn-modal-action reject" onclick="openRejectModal('${req.id}')">
                         <span>⚠️</span> <span>إلغاء الاعتماد وتعطيل الحساب</span>
                     </button>
                     <button class="btn-modal-action delete" onclick="deleteRequestRecord('${req.id}')">
@@ -1116,36 +1146,120 @@
             activeModalRequestId = null;
         };
 
+        // Open Reject Modal
+        window.openRejectModal = function(nationalId) {
+            const req = allRequests.find(r => r.id === nationalId || r.nationalId === nationalId);
+            activeRejectRequestId = nationalId;
+            elements.rejectModalProName.textContent = req ? (req.name || req.job || 'المهني') : 'المهني';
+            elements.rejectReasonInput.value = '';
+            elements.rejectModal.style.display = 'flex';
+            setTimeout(() => elements.rejectReasonInput.focus(), 100);
+        };
+
+        window.closeRejectModal = function() {
+            elements.rejectModal.style.display = 'none';
+            activeRejectRequestId = null;
+        };
+
+        // Submit Reject
+        window.submitReject = async function() {
+            const reason = elements.rejectReasonInput.value.trim();
+            if (!reason) {
+                alert('⚠️ يرجى كتابة سبب رفض الطلب لتوضيحه للمهني.');
+                return;
+            }
+
+            const targetId = activeRejectRequestId;
+            if (!targetId) return;
+
+            try {
+                showLoading(true);
+                const req = allRequests.find(r => r.id === targetId || r.nationalId === targetId);
+                const cleanNatId = (req && req.nationalId) ? req.nationalId : targetId;
+                const reqDocId = (req && req.id) ? req.id : targetId;
+
+                const baseData = req ? { ...req } : {};
+                delete baseData.id;
+
+                const rejectionPayload = {
+                    ...baseData,
+                    status: 'rejected',
+                    reason: reason,
+                    rejectionReason: reason,
+                    rejectedAt: serverTimestamp(),
+                    lastUpdated: serverTimestamp()
+                };
+
+                // Delete from pending and approved in all collections
+                await Promise.allSettled([
+                    deleteDoc(doc(db, "pendingUsers", reqDocId)),
+                    deleteDoc(doc(db, "pendingUsers", cleanNatId)),
+                    deleteDoc(doc(db, "pendingRequests", reqDocId)),
+                    deleteDoc(doc(db, "pendingRequests", cleanNatId)),
+                    deleteDoc(doc(db, "approvedUsers", reqDocId)),
+                    deleteDoc(doc(db, "approvedUsers", cleanNatId)),
+                ]);
+
+                // Write to rejectedUsers with cleanNatId AND reqDocId
+                await setDoc(doc(db, "rejectedUsers", cleanNatId), rejectionPayload);
+                if (reqDocId !== cleanNatId) {
+                    await setDoc(doc(db, "rejectedUsers", reqDocId), rejectionPayload);
+                }
+
+                closeRejectModal();
+                closeDetailModal();
+
+                if (req) {
+                    req.status = 'rejected';
+                    req.reason = reason;
+                    req.rejectionReason = reason;
+                }
+
+                await loadAllData();
+                alert('❌ تم تسجيل رفض الطلب بنجاح، وسيظهر السبب للمهني فوراً عند الاستعلام أو تسجيل الدخول.');
+
+            } catch (err) {
+                console.error("Reject error:", err);
+                alert("حدث خطأ أثناء رفض الطلب: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
         // Quick Accept
         window.quickAccept = async function(nationalId, fromModal = false) {
             if (!confirm('هل تريد قبول واعتماد هذا المهني ونشر ملفه للمستخدمين؟')) return;
 
             try {
                 showLoading(true);
-                // Check if in pending
-                const pendingRef = doc(db, "pendingUsers", nationalId);
-                const pendingSnap = await getDoc(pendingRef);
-                
-                let userData = null;
-                if (pendingSnap.exists()) {
-                    userData = pendingSnap.data();
-                    await deleteDoc(pendingRef);
-                } else {
-                    const rejRef = doc(db, "rejectedUsers", nationalId);
-                    const rejSnap = await getDoc(rejRef);
-                    if (rejSnap.exists()) {
-                        userData = rejSnap.data();
-                        await deleteDoc(rejRef);
-                    }
-                }
+                const req = allRequests.find(r => r.id === nationalId || r.nationalId === nationalId);
+                const cleanNatId = (req && req.nationalId) ? req.nationalId : nationalId;
+                const reqDocId = (req && req.id) ? req.id : nationalId;
 
-                if (userData) {
-                    await setDoc(doc(db, "approvedUsers", nationalId), {
-                        ...userData,
-                        status: 'available',
-                        approvedAt: serverTimestamp(),
-                        lastUpdated: serverTimestamp()
-                    });
+                const baseData = req ? { ...req } : {};
+                delete baseData.id;
+
+                const approvedPayload = {
+                    ...baseData,
+                    status: 'available',
+                    approvedAt: serverTimestamp(),
+                    lastUpdated: serverTimestamp()
+                };
+
+                // Delete from pending and rejected
+                await Promise.allSettled([
+                    deleteDoc(doc(db, "pendingUsers", reqDocId)),
+                    deleteDoc(doc(db, "pendingUsers", cleanNatId)),
+                    deleteDoc(doc(db, "pendingRequests", reqDocId)),
+                    deleteDoc(doc(db, "pendingRequests", cleanNatId)),
+                    deleteDoc(doc(db, "rejectedUsers", reqDocId)),
+                    deleteDoc(doc(db, "rejectedUsers", cleanNatId)),
+                ]);
+
+                // Write into approvedUsers
+                await setDoc(doc(db, "approvedUsers", cleanNatId), approvedPayload);
+                if (reqDocId !== cleanNatId) {
+                    await setDoc(doc(db, "approvedUsers", reqDocId), approvedPayload);
                 }
 
                 if (fromModal) closeDetailModal();
@@ -1154,56 +1268,7 @@
 
             } catch (err) {
                 console.error("Accept error:", err);
-                alert("حدث خطأ أثناء قبول الطلب");
-            } finally {
-                showLoading(false);
-            }
-        };
-
-        // Quick Reject
-        window.quickReject = async function(nationalId, fromModal = false) {
-            const reason = prompt('يرجى كتابة سبب رفض الطلب (سيظهر للمهني عند الاستعلام):');
-            if (reason === null) return;
-            if (!reason.trim()) {
-                alert('يجب كتابة سبب الرفض لتوضيحه للمهني.');
-                return;
-            }
-
-            try {
-                showLoading(true);
-                const pendingRef = doc(db, "pendingUsers", nationalId);
-                const approvedRef = doc(db, "approvedUsers", nationalId);
-
-                let userData = null;
-                const pSnap = await getDoc(pendingRef);
-                if (pSnap.exists()) {
-                    userData = pSnap.data();
-                    await deleteDoc(pendingRef);
-                } else {
-                    const aSnap = await getDoc(approvedRef);
-                    if (aSnap.exists()) {
-                        userData = aSnap.data();
-                        await deleteDoc(approvedRef);
-                    }
-                }
-
-                if (userData) {
-                    await setDoc(doc(db, "rejectedUsers", nationalId), {
-                        ...userData,
-                        status: 'rejected',
-                        reason: reason.trim(),
-                        rejectedAt: serverTimestamp(),
-                        lastUpdated: serverTimestamp()
-                    });
-                }
-
-                if (fromModal) closeDetailModal();
-                await loadAllData();
-                alert('❌ تم تسجيل رفض الطلب وتحديث الحالة.');
-
-            } catch (err) {
-                console.error("Reject error:", err);
-                alert("حدث خطأ أثناء رفض الطلب");
+                alert("حدث خطأ أثناء قبول الطلب: " + err.message);
             } finally {
                 showLoading(false);
             }
@@ -1215,16 +1280,27 @@
 
             try {
                 showLoading(true);
-                await deleteDoc(doc(db, "pendingUsers", nationalId));
-                await deleteDoc(doc(db, "approvedUsers", nationalId));
-                await deleteDoc(doc(db, "rejectedUsers", nationalId));
+                const req = allRequests.find(r => r.id === nationalId || r.nationalId === nationalId);
+                const cleanNatId = (req && req.nationalId) ? req.nationalId : nationalId;
+                const reqDocId = (req && req.id) ? req.id : nationalId;
+
+                await Promise.allSettled([
+                    deleteDoc(doc(db, "pendingUsers", reqDocId)),
+                    deleteDoc(doc(db, "pendingUsers", cleanNatId)),
+                    deleteDoc(doc(db, "pendingRequests", reqDocId)),
+                    deleteDoc(doc(db, "pendingRequests", cleanNatId)),
+                    deleteDoc(doc(db, "approvedUsers", reqDocId)),
+                    deleteDoc(doc(db, "approvedUsers", cleanNatId)),
+                    deleteDoc(doc(db, "rejectedUsers", reqDocId)),
+                    deleteDoc(doc(db, "rejectedUsers", cleanNatId)),
+                ]);
 
                 closeDetailModal();
                 await loadAllData();
                 alert('🗑️ تم حذف السجل بنجاح.');
             } catch (err) {
                 console.error("Delete error:", err);
-                alert("حدث خطأ أثناء الحذف");
+                alert("حدث خطأ أثناء الحذف: " + err.message);
             } finally {
                 showLoading(false);
             }
