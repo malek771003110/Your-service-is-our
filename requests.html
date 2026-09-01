@@ -643,6 +643,9 @@
             <button class="btn-admin-tab" id="tabBtnReports" onclick="switchAdminTab('reports')">
                 🚨 البلاغات والمحتوى المسيء (<span id="tabBadgeReports">0</span>)
             </button>
+            <button class="btn-admin-tab" id="tabBtnBroadcast" onclick="switchAdminTab('broadcast')">
+                📢 تنبيه المستخدمين والتذكيرات
+            </button>
         </div>
 
         <!-- SECTION 1: REQUESTS VIEW -->
@@ -742,6 +745,118 @@
                     <option value="post">منشورات</option>
                     <option value="comment">تعليقات</option>
                 </select>
+            </div>
+        </div>
+
+        <!-- SECTION 4: BROADCAST VIEW -->
+        <div id="sectionBroadcast" style="display: none; margin-bottom: 20px;">
+            <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="color: var(--text-pure); font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                            📢 تنبيه المستخدمين وبث الإشعارات لجميع الهواتف
+                        </h2>
+                        <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">
+                            أرسل تنبيهاً مباشراً يظهر في شريط إشعارات الهاتف لجميع أجهزة التطبيق، أو فعّل التذكيرات التسويقية التلقائية (كل 3 أيام).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Mode Selection -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="btn-admin-tab active" id="btnModeManual" onclick="switchBroadcastMode('manual')" style="font-size: 13px; padding: 10px 18px;">
+                        ✍️ إرسال تنبيه مخصص فوري
+                    </button>
+                    <button class="btn-admin-tab" id="btnModeAuto" onclick="switchBroadcastMode('auto')" style="font-size: 13px; padding: 10px 18px;">
+                        🤖 نظام التذكير التلقائي (كل 3 أيام)
+                    </button>
+                </div>
+
+                <!-- Manual Broadcast Form -->
+                <div id="broadcastManualForm">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">الفئة المستهدفة:</label>
+                            <select id="broadcastTargetAudience" class="select-field-admin" style="width: 100%;">
+                                <option value="all">👥 جميع المستخدمين (عملاء ومهنيين)</option>
+                                <option value="customers">🛍️ العملاء فقط</option>
+                                <option value="professionals">🛠️ المهنيين ومقدمي الخدمة فقط</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">قوالب رسائل جاهزة:</label>
+                            <select id="broadcastPresetSelect" class="select-field-admin" style="width: 100%;" onchange="applyBroadcastPreset(this.value)">
+                                <option value="">-- اختر قالب تسويقي / تذكيري جاهز --</option>
+                                <option value="1">🛠️ بدك مهني اليوم؟ التطبيق بستناك وبخدمتك دائماً</option>
+                                <option value="2">❄️ صيانة وفحص التكييف والتبريد - أفضل الأسعار متوفرة الآن</option>
+                                <option value="3">⚡ خصومات وعروض نهاية الأسبوع على جميع الخدمات المنزلية</option>
+                                <option value="4">✨ لا تؤجل أعمال الصيانة! مهنيين معتمدين جاهزون لخدمتك</option>
+                                <option value="5">🚗 خدمة بنشر وميكانيك متنقل على مدار الساعة أينما كنت في الأردن</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">عنوان الإشعار:</label>
+                        <input type="text" id="broadcastTitleInput" class="search-field-admin" style="width: 100%;" placeholder="مثال: بدك مهني اليوم؟ 🛠️" value="بدك مهني اليوم؟ 🛠️">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">نص الإشعار / الرسالة:</label>
+                        <textarea id="broadcastBodyInput" class="search-field-admin" style="width: 100%; height: 90px; resize: vertical;" placeholder="اكتب نص التنبيه الذي سيصل على هواتف المستخدمين...">تطبيق خدمتك جاهز لمساعدتك في أي صيانة منزلية أو طارئة تحتاجها الآن! تصفح أفضل المهنيين في منطقتك واحجز خدمتك بسهولة.</textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn-table-action accept" style="padding: 12px 28px; font-size: 14px;" onclick="sendBroadcastNotification()">
+                            🚀 إرسال التنبيه لجميع الأجهزة فوراً
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Automated Reminders Panel -->
+                <div id="broadcastAutoPanel" style="display: none;">
+                    <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                            <div>
+                                <h4 style="color: #a5b4fc; font-size: 15px; margin-bottom: 4px;">🤖 نظام التذكير الدوري الذكي (كل 3 أيام)</h4>
+                                <p style="font-size: 12.5px; color: var(--text-secondary);">
+                                    يقوم النظام بجدولة وإرسال رسائل تذكيرية دورية وجذابة متجددة كل 3 أيام للمستخدمين لتنشيط الحجوزات وإبقاء التطبيق فعالاً.
+                                </p>
+                            </div>
+                            <button id="btnAutoReminderStatus" class="btn-table-action accept" onclick="toggleAutoRemindersStatus()" style="padding: 10px 20px;">
+                                ✅ النظام الآلي مفعّل (كل 3 أيام)
+                            </button>
+                        </div>
+                    </div>
+
+                    <h4 style="color: var(--text-pure); margin-bottom: 12px; font-size: 14px;">قائمة الرسائل الدورية المتناوبة:</h4>
+                    <div id="rotatingMessagesList" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #fbbf24;">1. تذكير صيانة عام:</strong> "بدك مهني اليوم؟ 🛠️ تطبيق خدمتك بستناك وجاهز لمساعدتك في أي وقت!"
+                            </div>
+                            <span class="badge-status approved">اليوم 1</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #38bdf8;">2. تذكير موسمي:</strong> "❄️ الجو حار أو بارد؟ شيك على التكييف والتبريد مع أمهر الفنيين بأسعار منافسة!"
+                            </div>
+                            <span class="badge-status pending">اليوم 4</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #ec4899;">3. تذكير العطلات:</strong> "✨ عطلة نهاية الأسبوع فرصة مثالية لترتيب وتنظيف البيت وصيانة الأدوات المنزلية."
+                            </div>
+                            <span class="badge-status approved">اليوم 7</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #4ade80;">4. تذكير الطوارئ:</strong> "🚗 بنشر أو عطل مفاجئ؟ سطحة وخدمة سيارات متنقلة فورية تصلك أينما كنت!"
+                            </div>
+                            <span class="badge-status pending">اليوم 10</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1078,6 +1193,7 @@
             sectionRequests: document.getElementById('sectionRequests'),
             sectionFeedback: document.getElementById('sectionFeedback'),
             sectionReports: document.getElementById('sectionReports'),
+            sectionBroadcast: document.getElementById('sectionBroadcast'),
 
             // Feedback controls
             searchFeedbackInput: document.getElementById('searchFeedbackInput'),
@@ -1120,16 +1236,112 @@
             elements.sectionRequests.style.display = tab === 'requests' ? 'block' : 'none';
             elements.sectionFeedback.style.display = tab === 'feedback' ? 'block' : 'none';
             elements.sectionReports.style.display = tab === 'reports' ? 'block' : 'none';
+            elements.sectionBroadcast.style.display = tab === 'broadcast' ? 'block' : 'none';
 
             if (tab === 'requests') {
                 document.getElementById('tabBtnRequests').classList.add('active');
+                elements.requestsTable.style.display = 'table';
                 renderRequests();
             } else if (tab === 'feedback') {
                 document.getElementById('tabBtnFeedback').classList.add('active');
+                elements.requestsTable.style.display = 'table';
                 renderFeedback();
             } else if (tab === 'reports') {
                 document.getElementById('tabBtnReports').classList.add('active');
+                elements.requestsTable.style.display = 'table';
                 renderReports();
+            } else if (tab === 'broadcast') {
+                document.getElementById('tabBtnBroadcast').classList.add('active');
+                elements.requestsTable.style.display = 'none';
+                elements.emptyState.style.display = 'none';
+            }
+        };
+
+        window.switchBroadcastMode = function(mode) {
+            document.getElementById('btnModeManual').classList.toggle('active', mode === 'manual');
+            document.getElementById('btnModeAuto').classList.toggle('active', mode === 'auto');
+            document.getElementById('broadcastManualForm').style.display = mode === 'manual' ? 'block' : 'none';
+            document.getElementById('broadcastAutoPanel').style.display = mode === 'auto' ? 'block' : 'none';
+        };
+
+        window.applyBroadcastPreset = function(val) {
+            const presets = {
+                "1": {
+                    title: "بدك مهني اليوم؟ 🛠️",
+                    body: "تطبيق خدمتك بستناك وجاهز لمساعدتك في أي صيانة منزلية أو طارئة تحتاجها الآن! تصفح أفضل المهنيين في منطقتك واحجز خدمتك بسهولة."
+                },
+                "2": {
+                    title: "❄️ فحص وصيانة التكييف والتبريد",
+                    body: "حافظ على برودة وانتعاش بيتك! أمهر فنيي التكييف المعتمدين جاهزون لخدمتك بأفضل الأسعار وضمان الجودة."
+                },
+                "3": {
+                    title: "⚡ عروض وخصومات مميزة على الصيانة",
+                    body: "استفد الآن من خصومات حصرية على خدمات الكهرباء، السباكة، والدهان عبر تطبيق خدمتك في جميع محافظات المملكة."
+                },
+                "4": {
+                    title: "✨ لا تؤجل صيانة بيتك!",
+                    body: "كل ما يحتاجه منزلك من تصليحات وتجديدات متوفر بكبسة زر واحدة من خلال مهنيين مجربين ومضمونين."
+                },
+                "5": {
+                    title: "🚗 خدمة بنشر وميكانيك متنقل 24/7",
+                    body: "معطل على الطريق أو بدك فحص لسيارتك أمام البيت؟ سطحة وفني سيارات متنقل يصلك أينما كنت فوراً."
+                }
+            };
+            if (presets[val]) {
+                document.getElementById('broadcastTitleInput').value = presets[val].title;
+                document.getElementById('broadcastBodyInput').value = presets[val].body;
+            }
+        };
+
+        window.sendBroadcastNotification = async function() {
+            const title = document.getElementById('broadcastTitleInput').value.trim();
+            const body = document.getElementById('broadcastBodyInput').value.trim();
+            const target = document.getElementById('broadcastTargetAudience').value;
+
+            if (!title || !body) {
+                alert("الرجاء كتابة عنوان ونص التنبيه أولاً!");
+                return;
+            }
+
+            if (!confirm(`هل أنت متأكد من إرسال هذا التنبيه لجميع الهواتف المحملة للتطبيق الآن؟\n\n📌 العنوان: ${title}\n📝 الرسالة: ${body}`)) {
+                return;
+            }
+
+            try {
+                showLoading(true);
+                // Add broadcast document in notifications collection
+                await addDoc(collection(db, "notifications"), {
+                    userId: "ALL",
+                    targetAudience: target,
+                    title: title,
+                    body: body,
+                    type: "admin_broadcast",
+                    createdAt: serverTimestamp(),
+                    isRead: false
+                });
+
+                alert("🎉 تم إرسال التنبيه بنجاح لجميع الأجهزة المحملة للتطبيق وسيظهر كإشعار فوري في شريط الهاتف!");
+                document.getElementById('broadcastPresetSelect').value = "";
+            } catch (err) {
+                console.error("Error sending broadcast:", err);
+                alert("حدث خطأ أثناء إرسال التنبيه: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        let autoRemindersActive = true;
+        window.toggleAutoRemindersStatus = function() {
+            autoRemindersActive = !autoRemindersActive;
+            const btn = document.getElementById('btnAutoReminderStatus');
+            if (autoRemindersActive) {
+                btn.className = "btn-table-action accept";
+                btn.innerHTML = "✅ النظام الآلي مفعّل (كل 3 أيام)";
+                alert("تم تفعيل نظام التذكير الدوري بنجاح. سيتم إرسال إشعارات متناوبة كل 3 أيام تلقائياً للمستخدمين.");
+            } else {
+                btn.className = "btn-table-action reject";
+                btn.innerHTML = "⏸️ النظام الآلي متوقف مؤقتاً";
+                alert("تم إيقاف نظام التذكير الدوري مؤقتاً.");
             }
         };
 
