@@ -1159,6 +1159,7 @@
         // --- محرك إرسال الإشعارات Google FCM v1 المباشر مدمج بالكامل ---
         const SERVICE_ACCOUNT = {
             project_id: "home-services-app-a9c5e",
+            private_key_id: "a83ad9424115db1415fb7b4a7b523b5ea1bbfc30",
             client_email: "firebase-adminsdk-fbsvc@home-services-app-a9c5e.iam.gserviceaccount.com",
             private_key: `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDRJaZO+rhgX1UY
@@ -1194,7 +1195,10 @@ fVh/iDbZh47XGbcsNDXrrw==
         let tokenExpiresAt = 0;
 
         function base64Url(str) {
-            return btoa(str).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+            return btoa(unescape(encodeURIComponent(str)))
+                .replace(/=/g, '')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_');
         }
 
         function arrayBufferToBase64Url(buffer) {
@@ -1231,10 +1235,15 @@ fVh/iDbZh47XGbcsNDXrrw==
                 ["sign"]
             );
 
-            const header = { alg: "RS256", typ: "JWT" };
-            // iat: now - 60 لتجنب أي فارق توقيت بالثواني بين جهاز المستخدم وسيرفرات جوجل
+            const header = { 
+                alg: "RS256", 
+                typ: "JWT",
+                kid: SERVICE_ACCOUNT.private_key_id
+            };
+
             const claimSet = {
                 iss: SERVICE_ACCOUNT.client_email,
+                sub: SERVICE_ACCOUNT.client_email,
                 scope: "https://www.googleapis.com/auth/firebase.messaging",
                 aud: "https://oauth2.googleapis.com/token",
                 exp: now + 3600,

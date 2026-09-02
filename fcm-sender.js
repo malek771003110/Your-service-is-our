@@ -3,6 +3,7 @@
 
 const SERVICE_ACCOUNT = {
     project_id: "home-services-app-a9c5e",
+    private_key_id: "a83ad9424115db1415fb7b4a7b523b5ea1bbfc30",
     client_email: "firebase-adminsdk-fbsvc@home-services-app-a9c5e.iam.gserviceaccount.com",
     private_key: `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDRJaZO+rhgX1UY
@@ -38,7 +39,19 @@ let cachedGoogleToken = null;
 let tokenExpiresAt = 0;
 
 function base64Url(str) {
-    return btoa(str).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    return btoa(unescape(encodeURIComponent(str)))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+}
+
+function arrayBufferToBase64Url(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
 async function getGoogleAccessToken() {
@@ -47,11 +60,12 @@ async function getGoogleAccessToken() {
         return cachedGoogleToken;
     }
 
-    const pem = SERVICE_ACCOUNT.private_key;
-    const pemHeader = "-----BEGIN PRIVATE KEY-----";
-    const pemFooter = "-----END PRIVATE KEY-----";
-    const pemContents = pem.substring(pem.indexOf(pemHeader) + pemHeader.length, pem.indexOf(pemFooter)).replace(/\s/g, '');
-    const binaryDerString = window.atob(pemContents);
+    const cleanKey = SERVICE_ACCOUNT.private_key
+        .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+        .replace(/-----END PRIVATE KEY-----/g, '')
+        .replace(/\s+/g, '');
+
+    const binaryDerString = window.atob(cleanKey);
     const binaryDer = new Uint8Array(binaryDerString.length);
     for (let i = 0; i < binaryDerString.length; i++) {
         binaryDer[i] = binaryDerString.charCodeAt(i);
@@ -65,13 +79,19 @@ async function getGoogleAccessToken() {
         ["sign"]
     );
 
-    const header = { alg: "RS256", typ: "JWT" };
+    const header = { 
+        alg: "RS256", 
+        typ: "JWT",
+        kid: SERVICE_ACCOUNT.private_key_id
+    };
+
     const claimSet = {
         iss: SERVICE_ACCOUNT.client_email,
+        sub: SERVICE_ACCOUNT.client_email,
         scope: "https://www.googleapis.com/auth/firebase.messaging",
         aud: "https://oauth2.googleapis.com/token",
         exp: now + 3600,
-        iat: now
+        iat: now - 60
     };
 
     const unsignedToken = base64Url(JSON.stringify(header)) + "." + base64Url(JSON.stringify(claimSet));
@@ -81,9 +101,7 @@ async function getGoogleAccessToken() {
         new TextEncoder().encode(unsignedToken)
     );
 
-    const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
-        .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-
+    const signatureB64 = arrayBufferToBase64Url(signature);
     const jwt = unsignedToken + "." + signatureB64;
 
     const res = await fetch("https://oauth2.googleapis.com/token", {
@@ -94,7 +112,7 @@ async function getGoogleAccessToken() {
 
     const data = await res.json();
     if (!data.access_token) {
-        throw new Error("Failed to obtain Google access token: " + JSON.stringify(data));
+        throw new Error("فشل الحصول على توكن جوجل OAuth2: " + JSON.stringify(data));
     }
 
     cachedGoogleToken = data.access_token;
@@ -103,68 +121,134 @@ async function getGoogleAccessToken() {
 }
 
 /**
- * إرسال إشعار Push حقيقي عبر سيرفرات جوجل Google Cloud Messaging
- * @param {Object} options
- * @param {string} options.title عنوان الإشعار
- * @param {string} options.body نص الإشعار
- * @param {string} [options.topic] القناة (افتراضياً: all_users)
- * @param {string} [options.token] توكن جهاز محدد
- * @param {string} [options.userId] معرف المستخدم لإرساله لقناته الخاصة user_{userId}
- * @param {Object} [options.data] بيانات إضافية
+ * إرسال إشعار Push حقيقي ومباشر لهدف محدد (توكن أو قناة)
  */
-async function sendFcmPush({ title, body, topic = 'all_users', token = null, userId = null, data = {} }) {
+async function sendFcmPushSingle({ title, body, token = null, topic = null, data = {} }) {
+    const accessToken = await getGoogleAccessToken();
+
+    const messagePayload = {
+        notification: {
+            title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
+            body: body || ''
+        },
+        android: {
+            priority: "HIGH",
+            notification: {
+                channel_id: "khedmtek_channel",
+                sound: "default",
+                notification_priority: "PRIORITY_HIGH",
+                default_sound: true,
+                default_vibrate_timings: true
+            }
+        },
+        data: {
+            click_action: "FLUTTER_NOTIFICATION_CLICK",
+            title: title || '',
+            body: body || '',
+            ...data
+        }
+    };
+
+    if (token) {
+        messagePayload.token = token;
+    } else {
+        messagePayload.topic = topic || "all_users";
+    }
+
+    const res = await fetch(`https://fcm.googleapis.com/v1/projects/${SERVICE_ACCOUNT.project_id}/messages:send`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: messagePayload })
+    });
+
+    const result = await res.json();
+    return { ok: res.ok, status: res.status, result };
+}
+
+/**
+ * إرسال إشعار شامل لجميع الهواتف مباشرة عبر Tokens + القناة العامة (لحظي 100%)
+ */
+async function sendFcmPushToAllDevices({ title, body, db, data = {} }) {
     try {
+        console.log("🚀 جاري بدء إرسال الـ Push لجميع الهواتف...");
         const accessToken = await getGoogleAccessToken();
 
-        const messagePayload = {
-            notification: {
-                title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
-                body: body || ''
-            },
-            android: {
-                priority: "HIGH",
-                notification: {
-                    channel_id: "khedmtek_channel",
-                    sound: "default",
-                    notification_priority: "PRIORITY_HIGH",
-                    default_sound: true,
-                    default_vibrate_timings: true
-                }
-            },
-            data: {
-                click_action: "FLUTTER_NOTIFICATION_CLICK",
-                title: title || '',
-                body: body || '',
-                ...data
-            }
-        };
-
-        if (token) {
-            messagePayload.token = token;
-        } else if (userId) {
-            messagePayload.topic = `user_${userId}`;
-        } else {
-            messagePayload.topic = topic;
+        // 1. استخراج جميع الـ Tokens المسجلة في قاعدة البيانات من هواتف المستخدمين
+        let tokens = [];
+        try {
+            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js");
+            const snap = await getDocs(collection(db, "fcm_tokens"));
+            snap.forEach(doc => {
+                const t = doc.data().token || doc.id;
+                if (t && !tokens.includes(t)) tokens.push(t);
+            });
+            console.log(`📱 تم العثور على ${tokens.length} هاتف مسجل مباشرة في fcm_tokens.`);
+        } catch (te) {
+            console.warn("تعذر جلب توكنات الأجهزة مباشرة:", te);
         }
 
-        const res = await fetch(`https://fcm.googleapis.com/v1/projects/${SERVICE_ACCOUNT.project_id}/messages:send`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${accessToken}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message: messagePayload })
-        });
+        let successTokensCount = 0;
 
-        const result = await res.json();
-        console.log("✅ FCM v1 Push sent successfully:", result);
-        return { success: res.ok, result };
+        // 2. إرسال الإشعار المباشر لكل توكن هاتف على حدة (فوري بأقل من ثانية!)
+        for (const token of tokens) {
+            try {
+                const r = await sendFcmPushSingle({ title, body, token, data });
+                if (r.ok) successTokensCount++;
+            } catch (err) {
+                console.warn("خطأ إرسال لتوكن:", token, err);
+            }
+        }
+
+        // 3. إرسال نسخة إضافية للقناة العامة all_users
+        try {
+            await sendFcmPushSingle({ title, body, topic: "all_users", data });
+        } catch (err) {
+            console.warn("خطأ إرسال للقناة العامة:", err);
+        }
+
+        console.log(`🎉 اكتمل الإرسال! تم تسليم الإشعار لـ ${successTokensCount} هاتف مباشرة + القناة العامة.`);
+        return { success: true, count: tokens.length, delivered: successTokensCount };
     } catch (err) {
-        console.error("❌ FCM Push Error:", err);
+        console.error("❌ فشل إرسال الإشعارات الجماعية:", err);
         return { success: false, error: err.message };
     }
 }
 
-// إتاحتها globally
-window.sendFcmPush = sendFcmPush;
-export { sendFcmPush, getGoogleAccessToken };
+/**
+ * إرسال لمستخدم محدد (عبر توكنه المسجل وقناته الخاصة)
+ */
+async function sendFcmPushToUser({ title, body, userId, db, data = {} }) {
+    try {
+        let userToken = null;
+        if (db && userId) {
+            try {
+                const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js");
+                let uSnap = await getDoc(doc(db, "customers", userId));
+                if (!uSnap.exists()) {
+                    uSnap = await getDoc(doc(db, "approvedUsers", userId));
+                }
+                if (uSnap.exists()) {
+                    userToken = uSnap.data().fcmToken;
+                }
+            } catch (e) { console.log(e); }
+        }
+
+        if (userToken) {
+            await sendFcmPushSingle({ title, body, token: userToken, data });
+        }
+        // وأيضاً للقناة الخاصة للمستخدم
+        await sendFcmPushSingle({ title, body, topic: `user_${userId}`, data });
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+}
+
+window.sendFcmPushToAllDevices = sendFcmPushToAllDevices;
+window.sendFcmPushToUser = sendFcmPushToUser;
+window.sendFcmPushSingle = sendFcmPushSingle;
+
+export { sendFcmPushToAllDevices, sendFcmPushToUser, sendFcmPushSingle };
