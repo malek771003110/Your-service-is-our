@@ -935,6 +935,26 @@
                 </div>
 
                 <div class="detail-box-single">
+                    <span class="detail-box-label">🌐 الجنسية</span>
+                    <span class="detail-box-value" id="modalNationality">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📅 تاريخ الولادة</span>
+                    <span class="detail-box-value" id="modalBirthDate">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">👤 الجنس</span>
+                    <span class="detail-box-value" id="modalGender">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">🎓 المؤهل العلمي / المستوى</span>
+                    <span class="detail-box-value" id="modalEducation">-</span>
+                </div>
+
+                <div class="detail-box-single">
                     <span class="detail-box-label">⏳ سنوات الخبرة</span>
                     <span class="detail-box-value" id="modalExperience">-</span>
                 </div>
@@ -2100,6 +2120,10 @@
             document.getElementById('modalCity').textContent = req.city || 'غير محدد';
             document.getElementById('modalPhone').textContent = req.phone || 'غير محدد';
             document.getElementById('modalEmail').textContent = req.email || 'غير محدد';
+            document.getElementById('modalNationality').textContent = req.nationality || 'أردني 🇯🇴';
+            document.getElementById('modalBirthDate').textContent = req.birthDate || 'غير محدد';
+            document.getElementById('modalGender').textContent = req.gender || 'ذكر';
+            document.getElementById('modalEducation').textContent = req.educationLevel || req.careerLevel || 'غير محدد';
             document.getElementById('modalExperience').textContent = req.experienceYears || 'غير محدد';
             document.getElementById('modalPrice').textContent = req.hourlyPrice ? `${req.hourlyPrice} دينار / ساعة` : 'غير محدد';
             document.getElementById('modalHours').textContent = (req.workStartTime && req.workEndTime) ? `من ${req.workStartTime} إلى ${req.workEndTime}` : 'طوال اليوم';
