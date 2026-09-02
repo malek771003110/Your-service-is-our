@@ -1156,7 +1156,7 @@
             getDoc, 
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
-        import { sendFcmPush } from "./fcm-sender.js";
+        import { sendFcmPushToAllDevices, sendFcmPushToUser } from "./fcm-sender.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
@@ -1342,16 +1342,20 @@
                     isRead: false
                 });
 
-                // 2. Send REAL Push Notification via Google FCM v1 (wakes up closed phones)
-                const pushResult = await sendFcmPush({
+                // 2. Send REAL Push Notification via Google FCM v1 directly to all registered device tokens + topic
+                const pushResult = await sendFcmPushToAllDevices({
                     title: title,
                     body: body,
-                    topic: "all_users",
+                    db: db,
                     data: { type: "admin_broadcast" }
                 });
 
                 console.log("FCM Push Result:", pushResult);
-                alert("🎉 تم إرسال التنبيه بنجاح لجميع الأجهزة المحملة للتطبيق كإشعار فوري في شريط الهاتف حتى والتطبيق مغلق!");
+                if (pushResult.success) {
+                    alert(`🎉 تم إرسال التنبيه بنجاح لجميع الأجهزة المحملة للتطبيق!\nتم إيصال الإشعار لـ ${pushResult.delivered} جهاز مسجل مباشرة + القناة العامة.`);
+                } else {
+                    alert(`⚠️ تم حفظ التنبيه في قاعدة البيانات، ولكن حدث خطأ أثناء إرسال الـ Push: ${pushResult.error}`);
+                }
                 document.getElementById('broadcastPresetSelect').value = "";
             } catch (err) {
                 console.error("Error sending broadcast:", err);
@@ -1708,10 +1712,11 @@
                             createdAt: serverTimestamp(),
                             isRead: false
                         });
-                        await sendFcmPush({
+                        await sendFcmPushToUser({
                             title: '📬 رد من إدارة خدمتك',
                             body: replyText,
                             userId: fb.userId,
+                            db: db,
                             data: { type: 'feedback_reply' }
                         });
                     } catch (ne) { console.log(ne); }
@@ -2012,10 +2017,11 @@
                         });
 
                         // Real FCM Push
-                        await sendFcmPush({
+                        await sendFcmPushToUser({
                             title: enforceTitle,
                             body: adminMessage,
                             userId: reportedId,
+                            db: db,
                             data: { type: 'admin_enforcement' }
                         });
                     } catch (e) { console.log(e); }
@@ -2034,10 +2040,11 @@
                         });
 
                         // Real FCM Push
-                        await sendFcmPush({
+                        await sendFcmPushToUser({
                             title: '🛡️ تحديث بخصوص بلاغك',
                             body: reporterFeedback,
                             userId: activeEnforceReport.reporterId,
+                            db: db,
                             data: { type: 'report_reply' }
                         });
                     } catch (e) { console.log(e); }
@@ -2091,10 +2098,11 @@
                     isRead: false
                 });
 
-                await sendFcmPush({
+                await sendFcmPushToUser({
                     title: unbanTitle,
                     body: unbanBody,
                     userId: userId,
+                    db: db,
                     data: { type: 'admin_enforcement' }
                 });
 
