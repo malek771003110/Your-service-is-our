@@ -1151,11 +1151,12 @@
             getDocs, 
             doc, 
             setDoc, 
-            addDoc,
-            deleteDoc,
-            getDoc,
+            addDoc, 
+            deleteDoc, 
+            getDoc, 
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+        import { sendFcmPush } from "./fcm-sender.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
@@ -1330,7 +1331,7 @@
 
             try {
                 showLoading(true);
-                // Add broadcast document in notifications collection
+                // 1. Add broadcast document in notifications collection for in-app history
                 await addDoc(collection(db, "notifications"), {
                     userId: "ALL",
                     targetAudience: target,
@@ -1341,7 +1342,16 @@
                     isRead: false
                 });
 
-                alert("🎉 تم إرسال التنبيه بنجاح لجميع الأجهزة المحملة للتطبيق وسيظهر كإشعار فوري في شريط الهاتف!");
+                // 2. Send REAL Push Notification via Google FCM v1 (wakes up closed phones)
+                const pushResult = await sendFcmPush({
+                    title: title,
+                    body: body,
+                    topic: "all_users",
+                    data: { type: "admin_broadcast" }
+                });
+
+                console.log("FCM Push Result:", pushResult);
+                alert("🎉 تم إرسال التنبيه بنجاح لجميع الأجهزة المحملة للتطبيق كإشعار فوري في شريط الهاتف حتى والتطبيق مغلق!");
                 document.getElementById('broadcastPresetSelect').value = "";
             } catch (err) {
                 console.error("Error sending broadcast:", err);
@@ -1687,19 +1697,29 @@
 
             try {
                 showLoading(true);
-                const replyText = elements.feedbackReplyInput.value.trim();
-                const newStatus = elements.feedbackStatusSelect.value;
-
-                await setDoc(doc(db, "feedbacks", activeFeedbackId), {
-                    adminReply: replyText,
-                    status: newStatus,
-                    repliedAt: serverTimestamp(),
-                    lastUpdated: serverTimestamp()
-                }, { merge: true });
+                const fb = allFeedbacks.find(f => f.id === activeFeedbackId);
+                if (fb && fb.userId && replyText) {
+                    try {
+                        await addDoc(collection(db, "notifications"), {
+                            userId: fb.userId,
+                            title: '📬 رد من إدارة خدمتك',
+                            body: replyText,
+                            type: 'feedback_reply',
+                            createdAt: serverTimestamp(),
+                            isRead: false
+                        });
+                        await sendFcmPush({
+                            title: '📬 رد من إدارة خدمتك',
+                            body: replyText,
+                            userId: fb.userId,
+                            data: { type: 'feedback_reply' }
+                        });
+                    } catch (ne) { console.log(ne); }
+                }
 
                 closeFeedbackModal();
                 await loadAllData();
-                alert('✅ تم حفظ وإرسال رد الإدارة بنجاح وسيظهر للمستخدم في تطبيقه فوراً!');
+                alert('✅ تم حفظ وإرسال رد الإدارة بنجاح كإشعار فوري في هاتف المستخدم!');
             } catch (err) {
                 console.error("Feedback update error:", err);
                 alert("حدث خطأ أثناء حفظ الرد: " + err.message);
@@ -1977,11 +1997,12 @@
                         }
                     } catch (e) { console.log(e); }
 
-                    // 2. Create In-App Notification for Reported User
+                    // 2. Create In-App Notification & Send FCM Push to Reported User
+                    const enforceTitle = isBanned ? '🚫 تنبيه حظر وإيقاف الحساب' : (actionType === 'unban' ? '🔓 تم تفعيل الحساب' : '⚠️ تحذير إداري رسمي');
                     try {
                         await setDoc(doc(collection(db, "notifications")), {
                             userId: reportedId,
-                            title: isBanned ? '🚫 تنبيه حظر وإيقاف الحساب' : (actionType === 'unban' ? '🔓 تم تفعيل الحساب' : '⚠️ تحذير إداري رسمي'),
+                            title: enforceTitle,
                             body: adminMessage,
                             type: 'admin_enforcement',
                             isBanned: isBanned,
@@ -1989,10 +2010,18 @@
                             createdAt: serverTimestamp(),
                             isRead: false
                         });
+
+                        // Real FCM Push
+                        await sendFcmPush({
+                            title: enforceTitle,
+                            body: adminMessage,
+                            userId: reportedId,
+                            data: { type: 'admin_enforcement' }
+                        });
                     } catch (e) { console.log(e); }
                 }
 
-                // 3. Create In-App Notification for Reporter (if reporterId exists)
+                // 3. Create In-App Notification & Send FCM Push to Reporter
                 if (activeEnforceReport.reporterId && reporterFeedback) {
                     try {
                         await setDoc(doc(collection(db, "notifications")), {
@@ -2002,6 +2031,14 @@
                             type: 'report_reply',
                             createdAt: serverTimestamp(),
                             isRead: false
+                        });
+
+                        // Real FCM Push
+                        await sendFcmPush({
+                            title: '🛡️ تحديث بخصوص بلاغك',
+                            body: reporterFeedback,
+                            userId: activeEnforceReport.reporterId,
+                            data: { type: 'report_reply' }
                         });
                     } catch (e) { console.log(e); }
                 }
@@ -2018,7 +2055,7 @@
 
                 closeEnforceModal();
                 await loadAllData();
-                alert(`✅ تم تطبيق الإجراء بنجاح: ${getActionLabel(actionType)}\nتم إشعار المستخدم فورياً.`);
+                alert(`✅ تم تطبيق الإجراء بنجاح: ${getActionLabel(actionType)}\nتم إرسال إشعار فوري لهاتف المستخدم.`);
             } catch (err) {
                 console.error("Enforce action error:", err);
                 alert("حدث خطأ أثناء تطبيق الإجراء: " + err.message);
@@ -2042,17 +2079,27 @@
                 await setDoc(doc(db, "customers", userId), unbanPayload, { merge: true });
                 await setDoc(doc(db, "approvedUsers", userId), unbanPayload, { merge: true });
 
+                const unbanTitle = '🔓 تم فك الحظر عن حسابك';
+                const unbanBody = 'لقد قامت الإدارة بإلغاء الحظر وتفعيل حسابك بالكامل. مرحباً بعودتك.';
+
                 await setDoc(doc(collection(db, "notifications")), {
                     userId: userId,
-                    title: '🔓 تم فك الحظر عن حسابك',
-                    body: 'لقد قامت الإدارة بإلغاء الحظر وتفعيل حسابك بالكامل. مرحباً بعودتك.',
+                    title: unbanTitle,
+                    body: unbanBody,
                     type: 'admin_enforcement',
                     createdAt: serverTimestamp(),
                     isRead: false
                 });
 
+                await sendFcmPush({
+                    title: unbanTitle,
+                    body: unbanBody,
+                    userId: userId,
+                    data: { type: 'admin_enforcement' }
+                });
+
                 await loadAllData();
-                alert('🔓 تم فك الحظر وتفعيل الحساب بنجاح!');
+                alert('🔓 تم فك الحظر وإشعار المستخدم فورياً بنجاح!');
             } catch (err) {
                 alert("فشل فك الحظر: " + err.message);
             } finally {
