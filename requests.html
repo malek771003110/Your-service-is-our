@@ -1197,17 +1197,27 @@ fVh/iDbZh47XGbcsNDXrrw==
             return btoa(str).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
         }
 
+        function arrayBufferToBase64Url(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+        }
+
         async function getGoogleAccessToken() {
             const now = Math.floor(Date.now() / 1000);
             if (cachedGoogleToken && now < (tokenExpiresAt - 120)) {
                 return cachedGoogleToken;
             }
 
-            const pem = SERVICE_ACCOUNT.private_key;
-            const pemHeader = "-----BEGIN PRIVATE KEY-----";
-            const pemFooter = "-----END PRIVATE KEY-----";
-            const pemContents = pem.substring(pem.indexOf(pemHeader) + pemHeader.length, pem.indexOf(pemFooter)).replace(/\s/g, '');
-            const binaryDerString = window.atob(pemContents);
+            const cleanKey = SERVICE_ACCOUNT.private_key
+                .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+                .replace(/-----END PRIVATE KEY-----/g, '')
+                .replace(/\s+/g, '');
+
+            const binaryDerString = window.atob(cleanKey);
             const binaryDer = new Uint8Array(binaryDerString.length);
             for (let i = 0; i < binaryDerString.length; i++) {
                 binaryDer[i] = binaryDerString.charCodeAt(i);
@@ -1222,12 +1232,13 @@ fVh/iDbZh47XGbcsNDXrrw==
             );
 
             const header = { alg: "RS256", typ: "JWT" };
+            // iat: now - 60 لتجنب أي فارق توقيت بالثواني بين جهاز المستخدم وسيرفرات جوجل
             const claimSet = {
                 iss: SERVICE_ACCOUNT.client_email,
                 scope: "https://www.googleapis.com/auth/firebase.messaging",
                 aud: "https://oauth2.googleapis.com/token",
                 exp: now + 3600,
-                iat: now
+                iat: now - 60
             };
 
             const unsignedToken = base64Url(JSON.stringify(header)) + "." + base64Url(JSON.stringify(claimSet));
@@ -1237,9 +1248,7 @@ fVh/iDbZh47XGbcsNDXrrw==
                 new TextEncoder().encode(unsignedToken)
             );
 
-            const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
-                .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-
+            const signatureB64 = arrayBufferToBase64Url(signature);
             const jwt = unsignedToken + "." + signatureB64;
 
             const res = await fetch("https://oauth2.googleapis.com/token", {
