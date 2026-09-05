@@ -580,24 +580,229 @@
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
         }
 
+        .admin-tabs-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* ✂️ Text Truncation & Clean Display */
+        .clamp-1 {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+        .clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+        .break-word {
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        /* 📱 Comprehensive Mobile Responsive Optimization */
         @media (max-width: 768px) {
-            .table-responsive {
+            body {
+                font-size: 13.5px;
+            }
+
+            .admin-dashboard-layout {
+                padding: 12px 10px 80px;
+            }
+
+            /* Header on Mobile */
+            .admin-top-bar {
+                padding: 12px 14px;
+                margin-bottom: 14px;
+                border-radius: var(--radius-md);
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .admin-brand {
+                justify-content: flex-start;
+                gap: 10px;
+            }
+            .admin-brand-badge {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+                flex-shrink: 0;
+            }
+            .admin-brand h1 {
+                font-size: 15px;
+                margin-bottom: 1px;
+            }
+            .admin-brand span {
+                font-size: 11px;
+            }
+            .admin-top-actions {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+                gap: 6px;
+            }
+            .btn-admin-action {
+                padding: 7px 10px;
+                font-size: 11.5px;
+                flex: 1;
+                justify-content: center;
+                border-radius: 8px;
+            }
+
+            /* Swipeable Pill Tabs on Mobile */
+            .admin-tabs-nav {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                gap: 8px;
+                margin-bottom: 14px;
+                padding-bottom: 4px;
+                scrollbar-width: none;
+            }
+            .admin-tabs-nav::-webkit-scrollbar {
                 display: none;
             }
+            .btn-admin-tab {
+                flex-shrink: 0;
+                padding: 9px 15px;
+                font-size: 12.5px;
+                border-radius: var(--radius-pill);
+                white-space: nowrap;
+            }
+
+            /* Balanced 2x2 Stats Grid on Mobile */
+            .admin-stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+            .admin-stat-card {
+                padding: 12px 14px;
+                border-radius: 12px;
+            }
+            .stat-meta h3 {
+                font-size: 20px;
+                margin-bottom: 2px;
+            }
+            .stat-meta p {
+                font-size: 11px;
+            }
+            .stat-icon-wrapper {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            /* Filters on Mobile */
+            .admin-filter-bar {
+                padding: 12px;
+                gap: 10px;
+                margin-bottom: 15px;
+                flex-direction: column;
+                border-radius: 14px;
+            }
+            .search-field-admin, .select-field-admin {
+                width: 100%;
+                min-width: unset;
+                font-size: 13.5px;
+                padding: 11px 14px;
+                box-sizing: border-box;
+            }
+
+            /* Content box & cards */
+            .admin-content-box {
+                padding: 14px 10px;
+                border-radius: 16px;
+            }
+
+            .table-responsive {
+                display: none !important;
+            }
             .mobile-requests-grid {
-                display: grid;
+                display: grid !important;
+                gap: 12px;
+            }
+
+            .mobile-req-card {
+                padding: 14px;
+                border-radius: 14px;
+                background: rgba(15, 23, 42, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.09);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            }
+            .mobile-req-name {
+                font-size: 14.5px;
+            }
+            .mobile-req-info-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+                font-size: 12px;
+                margin-bottom: 12px;
+            }
+            .mobile-req-actions {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+            .mobile-req-actions .btn-table-action {
+                flex: 1;
+                min-width: 80px;
+                padding: 9px 8px;
+                font-size: 11.5px;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Responsive Modals on Mobile */
+            .modal-overlay-drawer {
+                padding: 10px;
+                align-items: flex-end;
+            }
+            .modal-card-drawer {
+                padding: 20px 16px;
+                border-radius: 20px 20px 0 0;
+                max-height: 88vh;
+                width: 100%;
+            }
+            .modal-header-title h2 {
+                font-size: 17px;
             }
             .detail-section-grid {
                 grid-template-columns: 1fr;
+                gap: 8px;
             }
             .detail-box-single.full-width {
                 grid-column: span 1;
             }
-            .admin-filter-bar {
-                flex-direction: column;
+            .detail-box-single {
+                padding: 10px 12px;
             }
-            .search-field-admin, .select-field-admin {
+            .modal-action-buttons {
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+            .btn-modal-action {
                 width: 100%;
+                padding: 12px;
+                font-size: 13.5px;
             }
         }
     </style>
@@ -633,7 +838,7 @@
         </header>
 
         <!-- Top Navigation Tabs -->
-        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+        <div class="admin-tabs-nav">
             <button class="btn-admin-tab active" id="tabBtnRequests" onclick="switchAdminTab('requests')">
                 📋 طلبات انضمام المهنيين (<span id="tabBadgeRequests">0</span>)
             </button>
@@ -1143,6 +1348,138 @@
         </div>
     </div>
 
+    <!-- 🔍 Feedback Full Details Modal -->
+    <div class="modal-overlay-drawer" id="feedbackDetailModal" style="display: none; z-index: 10000;">
+        <div class="modal-card-drawer" style="max-width: 620px;">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <h2 id="fbDetailTitle">تفاصيل الشكوى / الاقتراح 📬</h2>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
+                        <span id="fbDetailTypeBadge" class="badge-status pending">نوع الطلب</span>
+                        <span id="fbDetailStatusBadge" class="badge-status total">الحالة</span>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeFeedbackDetailModal()">✕</button>
+            </div>
+
+            <div class="detail-section-grid">
+                <!-- User Info Box -->
+                <div class="detail-box-single full-width" style="background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.25);">
+                    <span class="detail-box-label" style="color: #a5b4fc;">👤 معلومات صاحب الطلب</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px;">
+                        <div>
+                            <strong style="font-size: 14.5px; color: var(--text-pure);" id="fbDetailUserName">-</strong>
+                            <span style="font-size: 11.5px; color: var(--text-muted); margin-right: 6px;" id="fbDetailUserType">(-)</span>
+                        </div>
+                        <div id="fbDetailContactLinks" style="display: flex; align-items: center; gap: 6px;"></div>
+                    </div>
+                    <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 6px;" id="fbDetailMeta">-</div>
+                </div>
+
+                <!-- Complaint Title & Content -->
+                <div class="detail-box-single full-width">
+                    <span class="detail-box-label">📌 الموضوع / العنوان</span>
+                    <div style="font-size: 14.5px; font-weight: 800; color: #fbbf24; margin-top: 2px; line-height: 1.5;" class="break-word" id="fbDetailSubject">-</div>
+                </div>
+
+                <div class="detail-box-single full-width">
+                    <span class="detail-box-label">📝 نص وتفاصيل الرسالة الكاملة</span>
+                    <div style="font-size: 13.5px; color: var(--text-pure); line-height: 1.65; white-space: pre-wrap; margin-top: 4px; background: rgba(0,0,0,0.28); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); max-height: 220px; overflow-y: auto;" class="break-word" id="fbDetailBody">-</div>
+                </div>
+
+                <!-- Attached Images -->
+                <div class="detail-box-single full-width" id="fbDetailImagesBox" style="display: none;">
+                    <span class="detail-box-label" style="color: #38bdf8;">📸 الصور المرفقة (انقر على أي صورة لفتحها بحجم كامل)</span>
+                    <div id="fbDetailImagesContainer" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;"></div>
+                </div>
+
+                <!-- Admin Reply if exists -->
+                <div class="detail-box-single full-width" id="fbDetailReplyBox" style="display: none; background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="detail-box-label" style="color: #34d399;">💬 رد الإدارة المسجل</span>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="fbDetailRepliedAt">-</span>
+                    </div>
+                    <p style="font-size: 13px; color: #a7f3d0; line-height: 1.5; margin-top: 4px; white-space: pre-wrap;" class="break-word" id="fbDetailReplyText">-</p>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="modal-action-buttons">
+                <button class="btn-modal-action accept" id="btnFbDetailReply" onclick="triggerReplyFromDetails()">الرد والتحديث 💬</button>
+                <button class="btn-modal-action reject" id="btnFbDetailDelete" onclick="triggerDeleteFromDetails()">حذف 🗑️</button>
+                <button class="btn-admin-action" style="padding: 12px 20px; justify-content: center;" onclick="closeFeedbackDetailModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔍 Report Full Details Modal (المشتكي والمشتكي عليه والتفاصيل) -->
+    <div class="modal-overlay-drawer" id="reportDetailModal" style="display: none; z-index: 10000;">
+        <div class="modal-card-drawer" style="max-width: 650px;">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <h2>تفاصيل البلاغ والمخالفة 🚨</h2>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
+                        <span id="repDetailTypeBadge" class="badge-status rejected">نوع البلاغ</span>
+                        <span id="repDetailActionBadge" class="badge-status pending">حالة الإجراء</span>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeReportDetailModal()">✕</button>
+            </div>
+
+            <div class="detail-section-grid">
+                <!-- المشتكي والمشتكي عليه في صناديق متوازية وواضحة جداً -->
+                <div class="detail-box-single" style="background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.3);">
+                    <span class="detail-box-label" style="color: #60a5fa;">🛡️ الطرف المشتكي (المُبلّغ):</span>
+                    <strong style="font-size: 14.5px; color: var(--text-pure); display: block; margin-top: 2px;" id="repDetailReporterName">-</strong>
+                    <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;" id="repDetailReporterId">المعرف: -</div>
+                </div>
+
+                <div class="detail-box-single" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.35);">
+                    <span class="detail-box-label" style="color: #f87171;">⚠️ الطرف المشتكى عليه (المُبلّغ عنه):</span>
+                    <strong style="font-size: 14.5px; color: #fca5a5; display: block; margin-top: 2px;" id="repDetailReportedName">-</strong>
+                    <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;" id="repDetailReportedId">المعرف: -</div>
+                    <div id="repDetailReportedStatus" style="margin-top: 6px;"></div>
+                </div>
+
+                <!-- السبب ونوع البلاغ والتاريخ -->
+                <div class="detail-box-single">
+                    <span class="detail-box-label">⚖️ سبب البلاغ المذكور</span>
+                    <strong style="font-size: 13.5px; color: #fbbf24;" id="repDetailReason">-</strong>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📅 تاريخ ووقت تقديم البلاغ</span>
+                    <span class="detail-box-value" id="repDetailDate">-</span>
+                </div>
+
+                <!-- المحتوى المسيء المُبلّغ عنه إن وجد -->
+                <div class="detail-box-single full-width" id="repDetailTargetContentBox" style="display: none; background: rgba(244, 63, 94, 0.08); border-color: rgba(244, 63, 94, 0.25);">
+                    <span class="detail-box-label" style="color: #fb7185;">💬 نص المحتوى المُبلّغ عنه:</span>
+                    <p style="font-size: 13px; color: #fecdd3; line-height: 1.5; margin-top: 4px; white-space: pre-wrap; font-style: italic;" class="break-word" id="repDetailTargetContent">-</p>
+                </div>
+
+                <!-- تفاصيل وشرح البلاغ الكامل -->
+                <div class="detail-box-single full-width">
+                    <span class="detail-box-label">📝 الشرح والتفاصيل الإضافية للبلاغ:</span>
+                    <div style="font-size: 13px; color: var(--text-pure); line-height: 1.6; white-space: pre-wrap; margin-top: 4px; background: rgba(0,0,0,0.28); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); max-height: 200px; overflow-y: auto;" class="break-word" id="repDetailDescription">-</div>
+                </div>
+
+                <!-- إجراءات الإدارة المتخذة وملاحظات -->
+                <div class="detail-box-single full-width" id="repDetailAdminNotesBox" style="display: none; background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25);">
+                    <span class="detail-box-label" style="color: #34d399;">✅ الإجراء المتخذ وملاحظات الإدارة:</span>
+                    <p style="font-size: 13px; color: #a7f3d0; line-height: 1.5; margin-top: 4px;" class="break-word" id="repDetailAdminNotes">-</p>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="modal-action-buttons">
+                <button class="btn-modal-action view" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);" id="btnRepDetailEnforce" onclick="triggerEnforceFromDetails()">اتخاذ إجراء / عقوبة ⚖️</button>
+                <button class="btn-modal-action reject" id="btnRepDetailDelete" onclick="triggerDeleteReportFromDetails()">حذف البلاغ 🗑️</button>
+                <button class="btn-admin-action" style="padding: 12px 20px; justify-content: center;" onclick="closeReportDetailModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
@@ -1479,18 +1816,22 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             if (tab === 'requests') {
                 document.getElementById('tabBtnRequests').classList.add('active');
                 elements.requestsTable.style.display = 'table';
+                elements.requestsCardView.style.display = '';
                 renderRequests();
             } else if (tab === 'feedback') {
                 document.getElementById('tabBtnFeedback').classList.add('active');
                 elements.requestsTable.style.display = 'table';
+                elements.requestsCardView.style.display = '';
                 renderFeedback();
             } else if (tab === 'reports') {
                 document.getElementById('tabBtnReports').classList.add('active');
                 elements.requestsTable.style.display = 'table';
+                elements.requestsCardView.style.display = '';
                 renderReports();
             } else if (tab === 'broadcast') {
                 document.getElementById('tabBtnBroadcast').classList.add('active');
                 elements.requestsTable.style.display = 'none';
+                elements.requestsCardView.style.display = 'none';
                 elements.emptyState.style.display = 'none';
             }
         };
@@ -1727,7 +2068,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 // Table Row
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${req.name || 'غير محدد'}</strong></td>
+                    <td><strong class="break-word">${req.name || 'غير محدد'}</strong></td>
                     <td>${req.job || 'غير محدد'}</td>
                     <td>${req.city || 'غير محدد'}</td>
                     <td dir="ltr" style="text-align: right;">${req.phone || 'غير محدد'}</td>
@@ -1751,7 +2092,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 card.className = 'mobile-req-card';
                 card.innerHTML = `
                     <div class="mobile-req-header">
-                        <span class="mobile-req-name">${req.name || 'غير محدد'}</span>
+                        <span class="mobile-req-name break-word">${req.name || 'غير محدد'}</span>
                         ${statusBadge}
                     </div>
                     <div class="mobile-req-info-grid">
@@ -1832,7 +2173,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><span class="badge-status ${typeClass}">${typeLabel}</span></td>
-                    <td><strong>${fb.userName || 'مستخدم'}</strong> <br><small style="color: var(--text-muted);">${fb.userType === 'professional' ? 'مهني' : 'عميل'}</small></td>
+                    <td><strong class="break-word">${fb.userName || 'مستخدم'}</strong> <br><small style="color: var(--text-muted);">${fb.userType === 'professional' ? 'مهني' : 'عميل'}</small></td>
                     <td dir="ltr" style="text-align: right;">
                         ${fb.userPhone || '-'}
                         <div style="margin-top: 4px;">
@@ -1840,22 +2181,26 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                             <a href="https://wa.me/${waPhone}" target="_blank" class="btn-quick-contact" style="background: rgba(37,211,102,0.2); color:#4ade80;">💬</a>
                         </div>
                     </td>
-                    <td>
-                        <strong>${fb.title || '-'}</strong>
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px; max-width: 250px;">${fb.description || ''}</p>
+                    <td style="max-width: 250px;">
+                        <strong class="clamp-1 break-word" style="display: block; color: #fbbf24;" title="${fb.title || ''}">${fb.title || '-'}</strong>
+                        <p class="clamp-2 break-word" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">${fb.description || ''}</p>
                         ${fb.imageUrls && fb.imageUrls.length > 0 ? `
-                            <div style="display:flex; gap:4px; margin-top:4px;">
-                                ${fb.imageUrls.map(url => `<a href="${url}" target="_blank"><img src="${url}" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(255,255,255,0.2);" /></a>`).join('')}
+                            <div style="display:flex; gap:5px; margin-top:5px; align-items:center;">
+                                <span style="font-size:11px; color:#38bdf8;">📸 ${fb.imageUrls.length} صور</span>
+                                ${fb.imageUrls.slice(0, 3).map(url => `<a href="${url}" target="_blank"><img src="${url}" style="width:26px; height:26px; border-radius:6px; object-fit:cover; border:1px solid rgba(255,255,255,0.25);" /></a>`).join('')}
                             </div>
                         ` : ''}
                     </td>
                     <td>${formatDate(fb.createdAt)}</td>
                     <td>${statusBadge}</td>
-                    <td style="max-width: 200px; font-size: 12px; color: #a5b4fc;">${fb.adminReply || '<span style="color:var(--text-muted);">لم يتم الرد بعد</span>'}</td>
+                    <td style="max-width: 180px;">
+                        <div class="clamp-2 break-word" style="font-size: 12px; color: #a5b4fc;">${fb.adminReply || '<span style="color:var(--text-muted);">لم يتم الرد بعد</span>'}</div>
+                    </td>
                     <td>
-                        <div style="display: flex; gap: 6px;">
-                            <button class="btn-table-action accept" onclick="openFeedbackReply('${fb.id}')">الرد والتحديث 💬</button>
-                            <button class="btn-table-action reject" onclick="deleteFeedbackRecord('${fb.id}')">حذف 🗑️</button>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <button class="btn-table-action view" onclick="openFeedbackDetails('${fb.id}')">التفاصيل 🔍</button>
+                            <button class="btn-table-action accept" onclick="openFeedbackReply('${fb.id}')">الرد 💬</button>
+                            <button class="btn-table-action reject" onclick="deleteFeedbackRecord('${fb.id}')">🗑️</button>
                         </div>
                     </td>
                 `;
@@ -1870,17 +2215,24 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                         ${statusBadge}
                     </div>
                     <div style="margin: 10px 0;">
-                        <h4 style="color:var(--text-pure); margin-bottom:4px;">${fb.title}</h4>
-                        <p style="font-size: 13px; color: var(--text-secondary);">${fb.description}</p>
+                        <h4 class="clamp-1 break-word" style="color:var(--text-pure); margin-bottom:4px; font-size: 14.5px;">${fb.title || 'بدون عنوان'}</h4>
+                        <p class="clamp-2 break-word" style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.45;">${fb.description || ''}</p>
+                        ${fb.imageUrls && fb.imageUrls.length > 0 ? `
+                            <div style="display:flex; gap:6px; margin-top:8px; align-items:center;">
+                                <span style="font-size:11.5px; color:#38bdf8;">📸 صور مرفقة (${fb.imageUrls.length}):</span>
+                                ${fb.imageUrls.slice(0, 4).map(url => `<a href="${url}" target="_blank"><img src="${url}" style="width:34px; height:34px; border-radius:6px; object-fit:cover; border:1px solid rgba(255,255,255,0.25);" /></a>`).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                     <div class="mobile-req-info-grid">
-                        <span>المستخدم: <strong>${fb.userName}</strong></span>
-                        <span>الهاتف: <strong>${fb.userPhone}</strong></span>
+                        <span>المستخدم: <strong class="break-word">${fb.userName || 'مستخدم'}</strong></span>
+                        <span>الهاتف: <strong>${fb.userPhone || '-'}</strong></span>
                     </div>
-                    ${fb.adminReply ? `<div style="background:rgba(16,185,129,0.1); padding:8px; border-radius:8px; margin:8px 0; font-size:12px; color:#6ee7b7;">رد الإدارة: ${fb.adminReply}</div>` : ''}
+                    ${fb.adminReply ? `<div class="clamp-2 break-word" style="background:rgba(16,185,129,0.1); padding:8px 10px; border-radius:8px; margin:8px 0; font-size:12px; color:#6ee7b7; border: 1px solid rgba(16,185,129,0.2);">رد الإدارة: ${fb.adminReply}</div>` : ''}
                     <div class="mobile-req-actions">
-                        <button class="btn-table-action accept" style="flex: 1; padding: 10px;" onclick="openFeedbackReply('${fb.id}')">الرد والتحديث 💬</button>
-                        <button class="btn-table-action reject" style="padding: 10px;" onclick="deleteFeedbackRecord('${fb.id}')">🗑️</button>
+                        <button class="btn-table-action view" style="flex: 1.2;" onclick="openFeedbackDetails('${fb.id}')">التفاصيل 🔍</button>
+                        <button class="btn-table-action accept" style="flex: 1;" onclick="openFeedbackReply('${fb.id}')">الرد 💬</button>
+                        <button class="btn-table-action reject" style="padding: 9px 14px;" onclick="deleteFeedbackRecord('${fb.id}')">🗑️</button>
                     </div>
                 `;
                 cardView.appendChild(card);
@@ -1892,6 +2244,104 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             if (status === 'resolved') return `<span class="badge-status approved">✅ تم الحل</span>`;
             return `<span class="badge-status total">🆕 جديد</span>`;
         }
+
+        let activeDetailFeedbackId = null;
+
+        window.openFeedbackDetails = function(id) {
+            const fb = allFeedbacks.find(f => f.id === id);
+            if (!fb) return;
+
+            activeDetailFeedbackId = id;
+
+            // Badges
+            const typeLabel = fb.type === 'complaint' ? '⚠️ شكوى' : (fb.type === 'suggestion' ? '💡 اقتراح' : '📩 استفسار');
+            const typeClass = fb.type === 'complaint' ? 'rejected' : (fb.type === 'suggestion' ? 'pending' : 'total');
+            const typeBadge = document.getElementById('fbDetailTypeBadge');
+            typeBadge.textContent = typeLabel;
+            typeBadge.className = `badge-status ${typeClass}`;
+
+            const statusBadge = document.getElementById('fbDetailStatusBadge');
+            if (fb.status === 'in_progress') {
+                statusBadge.textContent = '⏳ قيد المتابعة والحل';
+                statusBadge.className = 'badge-status pending';
+            } else if (fb.status === 'resolved') {
+                statusBadge.textContent = '✅ تم الحل والإغلاق';
+                statusBadge.className = 'badge-status approved';
+            } else {
+                statusBadge.textContent = '🆕 جديدة قيد المراجعة';
+                statusBadge.className = 'badge-status total';
+            }
+
+            // User info
+            document.getElementById('fbDetailUserName').textContent = fb.userName || 'مستخدم غير معروف';
+            document.getElementById('fbDetailUserType').textContent = `(${fb.userType === 'professional' ? 'مهني' : 'عميل'})`;
+
+            const cleanPhone = (fb.userPhone || '').replace(/\D/g, '');
+            let waPhone = cleanPhone;
+            if (waPhone.startsWith('07')) waPhone = '962' + waPhone.substring(1);
+
+            const contactDiv = document.getElementById('fbDetailContactLinks');
+            contactDiv.innerHTML = '';
+            if (cleanPhone) {
+                contactDiv.innerHTML = `
+                    <a href="tel:${cleanPhone}" class="btn-quick-contact" style="background: rgba(16,185,129,0.2); color:#6ee7b7; padding: 4px 10px; border-radius: 8px;">📞 اتصال</a>
+                    <a href="https://wa.me/${waPhone}" target="_blank" class="btn-quick-contact" style="background: rgba(37,211,102,0.2); color:#4ade80; padding: 4px 10px; border-radius: 8px;">💬 واتساب</a>
+                `;
+            }
+
+            document.getElementById('fbDetailMeta').textContent = `رقم الهاتف: ${fb.userPhone || '-'} | تاريخ الإرسال: ${formatDate(fb.createdAt)} | المعرف: ${fb.userId || fb.id}`;
+            document.getElementById('fbDetailSubject').textContent = fb.title || 'بدون عنوان';
+            document.getElementById('fbDetailBody').textContent = fb.description || 'لا توجد تفاصيل مرفقة';
+
+            // Images
+            const imgBox = document.getElementById('fbDetailImagesBox');
+            const imgContainer = document.getElementById('fbDetailImagesContainer');
+            imgContainer.innerHTML = '';
+            if (fb.imageUrls && fb.imageUrls.length > 0) {
+                imgBox.style.display = 'block';
+                fb.imageUrls.forEach(url => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.target = '_blank';
+                    a.title = 'انقر لفتح الصورة بحجم كامل';
+                    a.innerHTML = `<img src="${url}" style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover; border: 1.5px solid rgba(56, 189, 248, 0.4); box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />`;
+                    imgContainer.appendChild(a);
+                });
+            } else {
+                imgBox.style.display = 'none';
+            }
+
+            // Previous Reply
+            const replyBox = document.getElementById('fbDetailReplyBox');
+            if (fb.adminReply) {
+                replyBox.style.display = 'block';
+                document.getElementById('fbDetailReplyText').textContent = fb.adminReply;
+                document.getElementById('fbDetailRepliedAt').textContent = fb.repliedAt ? `بتاريخ: ${formatDate(fb.repliedAt)}` : '';
+            } else {
+                replyBox.style.display = 'none';
+            }
+
+            document.getElementById('feedbackDetailModal').style.display = 'flex';
+        };
+
+        window.closeFeedbackDetailModal = function() {
+            document.getElementById('feedbackDetailModal').style.display = 'none';
+            activeDetailFeedbackId = null;
+        };
+
+        window.triggerReplyFromDetails = function() {
+            const id = activeDetailFeedbackId;
+            closeFeedbackDetailModal();
+            if (id) openFeedbackReply(id);
+        };
+
+        window.triggerDeleteFromDetails = function() {
+            const id = activeDetailFeedbackId;
+            if (id) {
+                closeFeedbackDetailModal();
+                deleteFeedbackRecord(id);
+            }
+        };
 
         window.openFeedbackReply = function(id) {
             const fb = allFeedbacks.find(f => f.id === id);
@@ -2067,23 +2517,24 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
                 tr.innerHTML = `
                     <td><span class="badge-status rejected">🚨 ${rep.reportType || 'بلاغ'}</span></td>
-                    <td><strong>${rep.reporterName || 'مجهول'}</strong></td>
+                    <td><strong class="break-word">${rep.reporterName || 'مجهول'}</strong></td>
                     <td>
-                        <strong style="color:#fb7185;">${rep.reportedName || 'مستخدم'}</strong>
+                        <strong class="break-word" style="color:#fb7185;">${rep.reportedName || 'مستخدم'}</strong>
                         ${rep.reportedUserBanned ? '<div style="margin-top:2px;"><span class="badge-status rejected" style="font-size:10px;">🔴 محظور حالياً</span></div>' : ''}
                     </td>
-                    <td><span style="font-weight:700; color:#fbbf24;">${rep.reason || '-'}</span></td>
-                    <td>
-                        <div style="font-size:12.5px; color:var(--text-pure);">${rep.details || 'لا توجد تفاصيل إضافية'}</div>
-                        ${rep.targetContent ? `<div style="font-size:11px; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px; margin-top:4px; color:#fca5a5;">المحتوى: "${rep.targetContent}"</div>` : ''}
-                        ${rep.adminActionNotes ? `<div style="font-size:11px; color:#a5b4fc; margin-top:4px;">ملاحظة الإدارة: ${rep.adminActionNotes}</div>` : ''}
+                    <td><span style="font-weight:700; color:#fbbf24;" class="break-word">${rep.reason || '-'}</span></td>
+                    <td style="max-width: 250px;">
+                        <div class="clamp-2 break-word" style="font-size: 12px; color: var(--text-pure);">${rep.details || 'لا توجد تفاصيل إضافية'}</div>
+                        ${rep.targetContent ? `<div class="clamp-1 break-word" style="font-size: 11px; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 6px; margin-top: 4px; color: #fca5a5;">المحتوى: "${rep.targetContent}"</div>` : ''}
+                        ${rep.adminActionNotes ? `<div class="clamp-1 break-word" style="font-size: 11px; color: #a5b4fc; margin-top: 4px;">ملاحظة: ${rep.adminActionNotes}</div>` : ''}
                     </td>
                     <td>${actionBadge}</td>
                     <td>${formatDate(rep.createdAt)}</td>
                     <td>
-                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                            <button class="btn-table-action view" style="background:rgba(245,158,11,0.2); color:#fbbf24; border-color:rgba(245,158,11,0.4);" onclick="openEnforceModal('${rep.id}')">اتخاذ إجراء ⚖️</button>
-                            <button class="btn-table-action reject" onclick="deleteReportRecord('${rep.id}')">حذف 🗑️</button>
+                        <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                            <button class="btn-table-action view" onclick="openReportDetails('${rep.id}')">التفاصيل 🔍</button>
+                            <button class="btn-table-action accept" style="background:rgba(245,158,11,0.2); color:#fbbf24; border-color:rgba(245,158,11,0.4);" onclick="openEnforceModal('${rep.id}')">إجراء ⚖️</button>
+                            <button class="btn-table-action reject" onclick="deleteReportRecord('${rep.id}')">🗑️</button>
                         </div>
                     </td>
                 `;
@@ -2093,18 +2544,22 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 card.className = 'mobile-req-card';
                 card.innerHTML = `
                     <div class="mobile-req-header">
-                        <span class="badge-status rejected">🚨 بلاغ: ${rep.reportType}</span>
+                        <span class="badge-status rejected">🚨 بلاغ: ${rep.reportType || 'مخالفة'}</span>
                         ${actionBadge}
                     </div>
                     <div style="margin: 10px 0;">
-                        <div>المُبلّغ عنه: <strong style="color:#fb7185;">${rep.reportedName}</strong> (من: ${rep.reporterName})</div>
-                        <div style="margin-top:4px; color:#fbbf24;">السبب: <strong>${rep.reason}</strong></div>
-                        <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">${rep.details || ''}</p>
-                        ${rep.targetContent ? `<div style="font-size:12px; background:rgba(0,0,0,0.3); padding:6px; border-radius:6px; margin-top:4px;">المحتوى: "${rep.targetContent}"</div>` : ''}
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+                            <span>المُبلّغ: <strong class="break-word">${rep.reporterName || 'مجهول'}</strong></span>
+                            <span style="color: #fb7185;">المُبلّغ عنه: <strong class="break-word">${rep.reportedName || 'مستخدم'}</strong></span>
+                        </div>
+                        <div style="color: #fbbf24; font-size: 13px; margin-bottom: 4px;">السبب: <strong class="break-word">${rep.reason || '-'}</strong></div>
+                        <p class="clamp-2 break-word" style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.45;">${rep.details || 'لا توجد تفاصيل إضافية'}</p>
+                        ${rep.targetContent ? `<div class="clamp-2 break-word" style="font-size: 11.5px; background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 8px; margin-top: 6px; color: #fca5a5; font-style: italic;">المحتوى: "${rep.targetContent}"</div>` : ''}
                     </div>
                     <div class="mobile-req-actions">
-                        <button class="btn-table-action view" style="flex:1; padding:10px; background:rgba(245,158,11,0.2); color:#fbbf24;" onclick="openEnforceModal('${rep.id}')">اتخاذ إجراء ⚖️</button>
-                        <button class="btn-table-action reject" style="padding:10px;" onclick="deleteReportRecord('${rep.id}')">🗑️</button>
+                        <button class="btn-table-action view" style="flex: 1.2;" onclick="openReportDetails('${rep.id}')">التفاصيل 🔍</button>
+                        <button class="btn-table-action accept" style="flex: 1; background: rgba(245,158,11,0.2); color: #fbbf24; border-color: rgba(245,158,11,0.4);" onclick="openEnforceModal('${rep.id}')">إجراء ⚖️</button>
+                        <button class="btn-table-action reject" style="padding: 9px 14px;" onclick="deleteReportRecord('${rep.id}')">🗑️</button>
                     </div>
                 `;
                 cardView.appendChild(card);
@@ -2118,6 +2573,109 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             if (type === 'unban') return 'فك الحظر';
             return type || 'إجراء إداري';
         }
+
+        let activeDetailReportId = null;
+
+        window.openReportDetails = async function(id) {
+            const rep = allReports.find(r => r.id === id);
+            if (!rep) return;
+
+            activeDetailReportId = id;
+
+            // Badges
+            document.getElementById('repDetailTypeBadge').textContent = `🚨 ${rep.reportType || 'بلاغ'}`;
+            const actionBadge = document.getElementById('repDetailActionBadge');
+            if (rep.actionTaken) {
+                actionBadge.textContent = `✅ تم اتخاذ: ${getActionLabel(rep.actionType)}`;
+                actionBadge.className = 'badge-status approved';
+            } else {
+                actionBadge.textContent = '⏳ بانتظار اتخاذ الإجراء';
+                actionBadge.className = 'badge-status pending';
+            }
+
+            // الطرف المشتكي
+            document.getElementById('repDetailReporterName').textContent = rep.reporterName || 'مستخدم مجهول';
+            document.getElementById('repDetailReporterId').textContent = `معرف المشتكي: ${rep.reporterId || '-'}`;
+
+            // الطرف المشتكى عليه
+            document.getElementById('repDetailReportedName').textContent = rep.reportedName || 'مستخدم غير محدد';
+            document.getElementById('repDetailReportedId').textContent = `معرف المشتكى عليه: ${rep.reportedId || '-'}`;
+
+            const statusEl = document.getElementById('repDetailReportedStatus');
+            statusEl.innerHTML = '<span style="color: var(--text-muted); font-size: 11px;">جاري فحص حالة الحساب...</span>';
+
+            // فحص حالة الحساب للمُبلّغ عنه
+            if (rep.reportedId) {
+                try {
+                    let userSnap = await getDoc(doc(db, "customers", rep.reportedId));
+                    if (!userSnap.exists()) {
+                        userSnap = await getDoc(doc(db, "approvedUsers", rep.reportedId));
+                    }
+                    if (userSnap.exists()) {
+                        const uData = userSnap.data();
+                        const isBanned = uData.isBanned || false;
+                        const warnings = uData.warningCount || 0;
+                        if (isBanned) {
+                            statusEl.innerHTML = `<span class="badge-status rejected" style="font-size: 11px;">🔴 محظور حالياً (${uData.banDuration || 'مؤقت'})</span>`;
+                        } else {
+                            statusEl.innerHTML = `<span class="badge-status approved" style="font-size: 11px;">🟢 الحساب نشط (${warnings} إنذارات سابقة)</span>`;
+                        }
+                    } else {
+                        statusEl.innerHTML = `<span style="color: var(--text-muted); font-size: 11px;">حساب عادي</span>`;
+                    }
+                } catch (e) {
+                    statusEl.innerHTML = '';
+                }
+            } else {
+                statusEl.innerHTML = '';
+            }
+
+            // السبب والتاريخ
+            document.getElementById('repDetailReason').textContent = rep.reason || 'غير محدد';
+            document.getElementById('repDetailDate').textContent = formatDate(rep.createdAt);
+
+            // المحتوى المُبلّغ عنه
+            const targetBox = document.getElementById('repDetailTargetContentBox');
+            if (rep.targetContent) {
+                targetBox.style.display = 'block';
+                document.getElementById('repDetailTargetContent').textContent = rep.targetContent;
+            } else {
+                targetBox.style.display = 'none';
+            }
+
+            // الشرح والتفاصيل
+            document.getElementById('repDetailDescription').textContent = rep.details || 'لا توجد تفاصيل إضافية مكتوبة في البلاغ.';
+
+            // ملاحظات الإجراء
+            const notesBox = document.getElementById('repDetailAdminNotesBox');
+            if (rep.adminActionNotes || rep.actionTaken) {
+                notesBox.style.display = 'block';
+                document.getElementById('repDetailAdminNotes').textContent = rep.adminActionNotes || `تم تنفيذ الإجراء: ${getActionLabel(rep.actionType)}`;
+            } else {
+                notesBox.style.display = 'none';
+            }
+
+            document.getElementById('reportDetailModal').style.display = 'flex';
+        };
+
+        window.closeReportDetailModal = function() {
+            document.getElementById('reportDetailModal').style.display = 'none';
+            activeDetailReportId = null;
+        };
+
+        window.triggerEnforceFromDetails = function() {
+            const id = activeDetailReportId;
+            closeReportDetailModal();
+            if (id) openEnforceModal(id);
+        };
+
+        window.triggerDeleteReportFromDetails = function() {
+            const id = activeDetailReportId;
+            if (id) {
+                closeReportDetailModal();
+                deleteReportRecord(id);
+            }
+        };
 
         window.openEnforceModal = async function(reportId) {
             const rep = allReports.find(r => r.id === reportId);
