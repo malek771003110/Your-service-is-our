@@ -1040,6 +1040,7 @@
                 <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);">
                     <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">تفاصيل الرسالة:</div>
                     <div id="feedbackModalDetails" style="font-size: 13.5px; color: var(--text-pure); line-height: 1.5;">-</div>
+                    <div id="feedbackModalImages" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;"></div>
                 </div>
 
                 <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 6px;">
@@ -1151,6 +1152,7 @@
             getDocs, 
             doc, 
             setDoc, 
+            updateDoc,
             addDoc, 
             deleteDoc, 
             getDoc, 
@@ -1896,11 +1898,35 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             if (!fb) return;
 
             activeFeedbackId = id;
-            elements.feedbackModalTitle.textContent = `${fb.type === 'complaint' ? '⚠️ شكوى' : '💡 اقتراح'}: ${fb.title}`;
-            elements.feedbackModalUser.textContent = `من: ${fb.userName} (${fb.userPhone})`;
-            elements.feedbackModalDetails.textContent = fb.description;
+            elements.feedbackModalTitle.textContent = `${fb.type === 'complaint' ? '⚠️ شكوى' : '💡 اقتراح'}: ${fb.title || 'بدون عنوان'}`;
+            elements.feedbackModalUser.textContent = `من: ${fb.userName || 'مستخدم'} (${fb.userPhone || '-'})`;
+            elements.feedbackModalDetails.textContent = fb.description || '';
             elements.feedbackStatusSelect.value = fb.status || 'pending';
             elements.feedbackReplyInput.value = fb.adminReply || '';
+
+            // عرض الصور المرفقة بالشكوى في نافذة الرد
+            const imgContainer = document.getElementById('feedbackModalImages');
+            if (imgContainer) {
+                imgContainer.innerHTML = '';
+                if (fb.imageUrls && fb.imageUrls.length > 0) {
+                    const imgLabel = document.createElement('div');
+                    imgLabel.style.width = '100%';
+                    imgLabel.style.fontSize = '11.5px';
+                    imgLabel.style.color = '#38bdf8';
+                    imgLabel.style.marginBottom = '4px';
+                    imgLabel.textContent = `📸 الصور المرفقة (${fb.imageUrls.length}): انقر للتكبير`;
+                    imgContainer.appendChild(imgLabel);
+
+                    fb.imageUrls.forEach(url => {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.target = '_blank';
+                        a.title = 'انقر لفتح الصورة بحجم كامل';
+                        a.innerHTML = `<img src="${url}" style="width: 70px; height: 70px; border-radius: 8px; object-fit: cover; border: 1.5px solid rgba(56, 189, 248, 0.4); box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'" />`;
+                        imgContainer.appendChild(a);
+                    });
+                }
+            }
 
             elements.replyFeedbackModal.style.display = 'flex';
         };
@@ -1915,14 +1941,33 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
             try {
                 showLoading(true);
+                const replyText = elements.feedbackReplyInput.value.trim();
+                const newStatus = elements.feedbackStatusSelect.value;
+
+                if (!replyText) {
+                    alert('⚠️ يرجى كتابة نص الرد قبل الإرسال.');
+                    showLoading(false);
+                    return;
+                }
+
                 const fb = allFeedbacks.find(f => f.id === activeFeedbackId);
-                if (fb && fb.userId && replyText) {
+
+                // 1. تحديث مستند الشكوى في الفايربيس بحفظ الرد وحالة الشكوى وتاريخ الرد
+                await updateDoc(doc(db, "feedbacks", activeFeedbackId), {
+                    adminReply: replyText,
+                    status: newStatus,
+                    repliedAt: serverTimestamp()
+                });
+
+                // 2. إرسال إشعار فوري وتنبيه للمستخدم صاحب الشكوى في التطبيق
+                if (fb && fb.userId) {
                     try {
                         await addDoc(collection(db, "notifications"), {
                             userId: fb.userId,
                             title: '📬 رد من إدارة خدمتك',
                             body: replyText,
                             type: 'feedback_reply',
+                            feedbackId: activeFeedbackId,
                             createdAt: serverTimestamp(),
                             isRead: false
                         });
@@ -1931,14 +1976,19 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                             body: replyText,
                             userId: fb.userId,
                             db: db,
-                            data: { type: 'feedback_reply' }
+                            data: { 
+                                type: 'feedback_reply',
+                                feedbackId: activeFeedbackId
+                            }
                         });
-                    } catch (ne) { console.log(ne); }
+                    } catch (ne) { 
+                        console.log("FCM Notification error:", ne); 
+                    }
                 }
 
                 closeFeedbackModal();
                 await loadAllData();
-                alert('✅ تم حفظ وإرسال رد الإدارة بنجاح كإشعار فوري في هاتف المستخدم!');
+                alert('✅ تم حفظ رد الإدارة بنجاح وتحديث الحالة وإرسال إشعار فوري في هاتف المستخدم!');
             } catch (err) {
                 console.error("Feedback update error:", err);
                 alert("حدث خطأ أثناء حفظ الرد: " + err.message);
