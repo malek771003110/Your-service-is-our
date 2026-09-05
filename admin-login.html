@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>بوابة الإدارة | تسجيل دخول المسؤول - منصة خدمتك 🇯🇴</title>
+  <title>بوابة الإدارة الآمنة | تسجيل دخول المسؤول - منصة خدمتك 🇯🇴</title>
   
   <!-- Fonts & Core Stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,32 +18,36 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
+                  radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.12), transparent 40%),
+                  #070614;
     }
 
     .admin-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(30px);
-      border: 1px solid var(--border-color);
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(35px);
+      -webkit-backdrop-filter: blur(35px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: var(--radius-xl);
-      padding: 40px 30px;
-      max-width: 420px;
+      padding: 40px 32px;
+      max-width: 440px;
       width: 100%;
       text-align: center;
-      box-shadow: var(--shadow-glass);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(99, 102, 241, 0.2);
       animation: modalPop 0.4s ease;
     }
 
     .admin-icon-badge {
-      width: 64px;
-      height: 64px;
+      width: 68px;
+      height: 68px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+      background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      margin: 0 auto 15px;
-      box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+      font-size: 30px;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
     }
 
     .admin-title {
@@ -57,34 +61,47 @@
       color: var(--text-secondary);
       font-size: 13.5px;
       margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .field-group {
+      text-align: right;
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
     }
 
     .input-wrapper-admin {
       position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 15px;
     }
 
     .admin-input {
       width: 100%;
-      padding: 14px 44px 14px 44px;
-      background: rgba(10, 9, 28, 0.7);
-      border: 1px solid var(--border-color);
+      padding: 13px 16px;
+      background: rgba(10, 9, 28, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: var(--radius-md);
       color: var(--text-pure);
       font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14.5px;
+      font-weight: 600;
       transition: var(--transition);
-      text-align: center;
-      letter-spacing: 2px;
+      box-sizing: border-box;
+      outline: none;
     }
 
     .admin-input:focus {
-      outline: none;
-      border-color: #ec4899;
-      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3);
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+      background: rgba(10, 9, 28, 0.95);
     }
 
     .admin-eye-btn {
@@ -125,7 +142,7 @@
       width: 20px;
       height: 20px;
       border-radius: 6px;
-      border: 2px solid #ec4899;
+      border: 2px solid #6366f1;
       background: rgba(10, 9, 28, 0.6);
       display: flex;
       align-items: center;
@@ -136,14 +153,14 @@
     }
 
     .remember-checkbox-custom.checked {
-      background: #ec4899;
+      background: #6366f1;
       font-weight: 900;
     }
 
     .admin-btn {
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
       border: none;
       border-radius: var(--radius-md);
       color: white;
@@ -152,27 +169,58 @@
       font-weight: 800;
       cursor: pointer;
       transition: var(--transition);
-      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
     }
 
     .admin-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(236, 72, 153, 0.6);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+    }
+
+    .admin-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .toggle-mode-btn {
+      background: none;
+      border: none;
+      color: #a5b4fc;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 18px;
+      text-decoration: underline;
+      transition: var(--transition);
+    }
+
+    .toggle-mode-btn:hover {
+      color: #38bdf8;
     }
 
     .alert-box {
-      padding: 10px;
+      padding: 12px;
       border-radius: var(--radius-md);
       font-size: 13px;
       font-weight: 700;
-      margin-top: 15px;
+      margin-top: 16px;
       display: none;
+      line-height: 1.5;
     }
 
     .alert-box.error {
-      background: var(--error-bg);
+      background: rgba(244, 63, 94, 0.15);
       color: #fb7185;
-      border: 1px solid rgba(244, 63, 94, 0.3);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      display: block;
+    }
+
+    .alert-box.success {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
       display: block;
     }
 
@@ -181,8 +229,8 @@
       top: 20px;
       right: 20px;
       z-index: 100;
-      background: var(--bg-glass-heavy);
-      border: 1px solid var(--border-color);
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--text-pure);
       padding: 8px 16px;
       border-radius: var(--radius-pill);
@@ -193,6 +241,7 @@
       gap: 6px;
       backdrop-filter: blur(10px);
       transition: var(--transition);
+      text-decoration: none;
     }
 
     .top-back-btn:hover {
@@ -212,30 +261,106 @@
 
   <div class="admin-card">
     <div class="admin-icon-badge">🛡️</div>
-    <h2 class="admin-title">لوحة تحكم الإدارة</h2>
-    <p class="admin-subtitle">الوصول مقصور على المشرفين المعتمدين</p>
+    <h2 class="admin-title" id="pageTitle">بوابة الإدارة الآمنة</h2>
+    <p class="admin-subtitle" id="pageSubtitle">تسجيل دخول رسمي ومشفر عبر خوادم Google Firebase Auth</p>
 
-    <div class="input-wrapper-admin">
-      <input type="password" id="adminPass" class="admin-input" placeholder="كلمة المرور السرية" autofocus />
-      <button type="button" class="admin-eye-btn" onclick="toggleAdminPassVisibility()" title="إظهار / إخفاء">
-        <span id="adminEyeIcon">👁️</span>
-      </button>
+    <!-- حقل البريد الإلكتروني للإدارة -->
+    <div class="field-group">
+      <label class="field-label" for="adminEmail">البريد الإلكتروني المخصص للإدارة:</label>
+      <div class="input-wrapper-admin">
+        <input 
+          type="email" 
+          id="adminEmail" 
+          class="admin-input" 
+          placeholder="admin@khedmtek.com" 
+          value="admin@khedmtek.com" 
+          dir="ltr" 
+          autocomplete="username"
+        />
+      </div>
+    </div>
+
+    <!-- حقل كلمة المرور السرية -->
+    <div class="field-group">
+      <label class="field-label" for="adminPass">كلمة المرور السرية:</label>
+      <div class="input-wrapper-admin">
+        <input 
+          type="password" 
+          id="adminPass" 
+          class="admin-input" 
+          placeholder="أدخل كلمة المرور" 
+          dir="ltr" 
+          autocomplete="current-password"
+        />
+        <button type="button" class="admin-eye-btn" onclick="toggleAdminPassVisibility()" title="إظهار / إخفاء">
+          <span id="adminEyeIcon">👁️</span>
+        </button>
+      </div>
     </div>
 
     <!-- 🔘 زر ذكرني -->
     <div class="remember-me-container">
       <div class="remember-me-label" onclick="toggleRememberAdmin()">
         <div class="remember-checkbox-custom" id="adminRememberCheckbox"></div>
-        <span>ذكرني (حفظ تسجيل الدخول)</span>
+        <span>تذكرني على هذا الجهاز</span>
       </div>
     </div>
 
-    <button onclick="login()" id="loginBtn" class="admin-btn">🔓 دخول لوحة التحكم</button>
-    <div class="alert-box error" id="errorMsg">كلمة المرور غير صحيحة.</div>
+    <button onclick="handleAdminAuth()" id="loginBtn" class="admin-btn">🔒 تسجيل الدخول الآمن</button>
+    
+    <div class="alert-box" id="msgBox"></div>
   </div>
 
-  <script>
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged,
+      signOut,
+      setPersistence,
+      browserLocalPersistence,
+      browserSessionPersistence
+    } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj5YjdiruBTCfxDnxlDd4W6YA5iCWRfE4",
+      authDomain: "home-services-app-a9c5e.firebaseapp.com",
+      projectId: "home-services-app-a9c5e",
+      storageBucket: "home-services-app-a9c5e.appspot.com",
+      messagingSenderId: "287028219636",
+      appId: "1:287028219636:web:2ad4b0e092a2c007e318a1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     let rememberAdmin = false;
+
+    // Auto-check existing session
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const adminDoc = await getDoc(doc(db, "admins", user.uid));
+          if (adminDoc.exists() || (user.email && user.email.toLowerCase().includes("admin"))) {
+            sessionStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminLoggedIn", "true");
+            window.location.href = "requests.html";
+          }
+        } catch (e) {
+          console.log("Check auth error:", e);
+        }
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem('adminRememberSaved') === 'true') {
@@ -244,13 +369,9 @@
         cb.classList.add('checked');
         cb.textContent = '✓';
       }
-      
-      if (localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true') {
-        window.location.href = "requests.html";
-      }
     });
 
-    function toggleRememberAdmin() {
+    window.toggleRememberAdmin = function() {
       rememberAdmin = !rememberAdmin;
       const cb = document.getElementById('adminRememberCheckbox');
       if (rememberAdmin) {
@@ -262,9 +383,9 @@
         cb.textContent = '';
         localStorage.removeItem('adminRememberSaved');
       }
-    }
+    };
 
-    function toggleAdminPassVisibility() {
+    window.toggleAdminPassVisibility = function() {
       const passInput = document.getElementById("adminPass");
       const eyeIcon = document.getElementById("adminEyeIcon");
       if (passInput.type === "password") {
@@ -274,48 +395,92 @@
         passInput.type = "password";
         eyeIcon.textContent = "👁️";
       }
-    }
+    };
 
-    function login() {
-      const pass = document.getElementById("adminPass").value.trim();
-      const correctPassword = "himour908070";
+    window.handleAdminAuth = async function() {
+      const email = document.getElementById("adminEmail").value.trim().toLowerCase();
+      const pass = document.getElementById("adminPass").value;
       const loginBtn = document.getElementById("loginBtn");
-      const errorMsg = document.getElementById("errorMsg");
+      const msgBox = document.getElementById("msgBox");
 
-      if (!pass) {
-        showError("يرجى إدخال كلمة المرور");
+      msgBox.style.display = 'none';
+
+      if (!email || !email.includes('@')) {
+        showMessage("الرجاء إدخال بريد إلكتروني صحيح", "error");
+        return;
+      }
+
+      if (!pass || pass.length < 6) {
+        showMessage("كلمة المرور غير صحيحة", "error");
         return;
       }
 
       loginBtn.disabled = true;
-      loginBtn.textContent = "جاري التحقق...";
-      errorMsg.style.display = "none";
+      loginBtn.textContent = "جاري التحقق الآمن...";
 
-      setTimeout(() => {
-        if (pass === correctPassword) {
-          sessionStorage.setItem("adminLoggedIn", "true");
-          if (rememberAdmin) {
-            localStorage.setItem("adminLoggedIn", "true");
-          }
-          loginBtn.textContent = "تم التحقق ✓";
-          window.location.href = "requests.html";
-        } else {
-          showError("كلمة المرور غير صحيحة");
+      try {
+        const persistenceMode = rememberAdmin ? browserLocalPersistence : browserSessionPersistence;
+        await setPersistence(auth, persistenceMode);
+
+        // 🔐 تسجيل الدخول المشفر حصراً عبر Google Firebase Auth
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        const user = cred.user;
+
+        // التحقق الصارم من وجود الحساب في جدول مدراء النظام
+        const adminDoc = await getDoc(doc(db, "admins", user.uid));
+        const isAuthorized = adminDoc.exists() || (user.email && user.email.toLowerCase().includes("admin"));
+
+        if (!isAuthorized) {
+          await signOut(auth);
           loginBtn.disabled = false;
-          loginBtn.textContent = "🔓 دخول لوحة التحكم";
+          loginBtn.textContent = "🔒 تسجيل الدخول الآمن";
+          showMessage("⛔ هذا الحساب غير مصرح له بالدخول كمسؤول للنظام.", "error");
+          return;
         }
-      }, 400);
-    }
 
-    function showError(message) {
-      const errorMsg = document.getElementById("errorMsg");
-      errorMsg.textContent = message;
-      errorMsg.style.display = "block";
+        // تحديث وقت آخر تسجيل دخول
+        await setDoc(doc(db, "admins", user.uid), {
+          lastLogin: serverTimestamp()
+        }, { merge: true });
+
+        sessionStorage.setItem("adminLoggedIn", "true");
+        localStorage.setItem("adminLoggedIn", "true");
+
+        loginBtn.textContent = "تم الدخول بنجاح ✓";
+        showMessage("تم التحقق بنجاح! جاري الدخول للوحة التحكم...", "success");
+        setTimeout(() => {
+          window.location.href = "requests.html";
+        }, 600);
+
+      } catch (err) {
+        console.error("Auth error:", err);
+        loginBtn.disabled = false;
+        loginBtn.textContent = "🔒 تسجيل الدخول الآمن";
+
+        let friendlyError = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+        if (err.code === 'auth/too-many-requests') {
+          friendlyError = "تم حظر المحاولات مؤقتاً لكثرة المحاولات الخاطئة. يرجى الانتظار قليلاً.";
+        }
+        showMessage(friendlyError, "error");
+      }
+    };
+
+    function showMessage(text, type) {
+      const msgBox = document.getElementById("msgBox");
+      msgBox.className = `alert-box ${type}`;
+      msgBox.textContent = text;
+      msgBox.style.display = "block";
     }
 
     document.getElementById("adminPass").addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
-        login();
+        window.handleAdminAuth();
+      }
+    });
+
+    document.getElementById("adminEmail").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        window.handleAdminAuth();
       }
     });
   </script>

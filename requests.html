@@ -815,10 +815,11 @@
         <header class="admin-top-bar">
             <div class="admin-brand">
                 <div class="admin-brand-badge">🛡️</div>
-                <div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                     <h1>لوحة تحكم المشرفين</h1>
-                    <span>إدارة ومراجعة طلبات انضمام المهنيين 🇯🇴</span>
+                    <span id="adminUserEmailBadge" style="background:rgba(99,102,241,0.2); color:#a5b4fc; border:1px solid rgba(99,102,241,0.35); padding:2px 10px; border-radius:20px; font-size:11px; font-weight:700; direction:ltr; display:inline-block;">admin@khedmtek.com</span>
                 </div>
+                <span>إدارة ومراجعة طلبات انضمام المهنيين وبلاغات النظام 🇯🇴</span>
             </div>
 
             <div class="admin-top-actions">
@@ -1484,6 +1485,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
         import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+        import { 
             getFirestore, 
             collection, 
             getDocs, 
@@ -1722,12 +1728,56 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        let currentAdminUser = null;
+        let hasInitialDataLoaded = false;
 
-        // Security check
-        const isAuth = sessionStorage.getItem("adminLoggedIn") || localStorage.getItem("adminLoggedIn");
-        if (!isAuth || isAuth !== "true") {
-            window.location.href = "admin-login.html";
-        }
+        // --- نظام حماية ومصادقة Google Firebase Auth الرسمي ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                sessionStorage.removeItem("adminLoggedIn");
+                localStorage.removeItem("adminLoggedIn");
+                window.location.href = "admin-login.html";
+                return;
+            }
+
+            try {
+                // التحقق من أن المستخدم مسجل في وثائق الأدمن أو يحمل بريد الإدارة الرسمي
+                const adminDoc = await getDoc(doc(db, "admins", user.uid));
+                const userEmail = (user.email || "").toLowerCase();
+                const isAuthorized = adminDoc.exists() || userEmail.includes("admin") || userEmail.includes("khedmtek");
+
+                if (!isAuthorized) {
+                    alert("⛔ تنبيه أمني: هذا الحساب غير مصرح له بالدخول كمسؤول!");
+                    await signOut(auth);
+                    sessionStorage.removeItem("adminLoggedIn");
+                    localStorage.removeItem("adminLoggedIn");
+                    window.location.href = "admin-login.html";
+                    return;
+                }
+
+                currentAdminUser = user;
+                sessionStorage.setItem("adminLoggedIn", "true");
+
+                // تحديث بادج اسم/إيميل الأدمن في الشريط العلوي
+                const adminBadge = document.getElementById("adminUserEmailBadge");
+                if (adminBadge) {
+                    adminBadge.textContent = user.email || "حساب الإدارة";
+                }
+
+                // تحميل البيانات فقط بعد التحقق التام من الهوية
+                if (!hasInitialDataLoaded) {
+                    hasInitialDataLoaded = true;
+                    await loadAllData();
+                }
+            } catch (err) {
+                console.error("خطأ أثناء التحقق من صلاحيات الأدمن:", err);
+                if (!hasInitialDataLoaded) {
+                    hasInitialDataLoaded = true;
+                    await loadAllData();
+                }
+            }
+        });
 
         let currentAdminTab = 'requests';
         let allRequests = [];
@@ -1786,9 +1836,8 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             reportsTypeFilter: document.getElementById('reportsTypeFilter'),
         };
 
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
-            await loadAllData();
         });
 
         function setupEventListeners() {
@@ -3243,8 +3292,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             await loadAllData();
         };
 
-        window.logout = function() {
+        window.logout = async function() {
             if (confirm('هل تريد تسجيل الخروج من لوحة الإدارة؟')) {
+                try {
+                    await signOut(auth);
+                } catch (err) {
+                    console.error("Sign out error:", err);
+                }
                 sessionStorage.removeItem("adminLoggedIn");
                 localStorage.removeItem("adminLoggedIn");
                 localStorage.removeItem("adminRememberSaved");
