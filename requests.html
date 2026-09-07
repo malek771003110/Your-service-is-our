@@ -852,6 +852,9 @@
             <button class="btn-admin-tab" id="tabBtnBroadcast" onclick="switchAdminTab('broadcast')">
                 📢 تنبيه المستخدمين والتذكيرات
             </button>
+            <button class="btn-admin-tab" id="tabBtnArrivals" onclick="switchAdminTab('arrivals')">
+                📍 متابعة وصول الفنيين ومطابقة الموقع (<span id="tabBadgeArrivals">0</span>)
+            </button>
         </div>
 
         <!-- SECTION 1: REQUESTS VIEW -->
@@ -1063,6 +1066,66 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: FIELD ARRIVALS VIEW -->
+        <div id="sectionArrivals" style="display: none; margin-bottom: 20px;">
+            <!-- Stats Overview Cards -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="arrivalsTotalCount">0</h3>
+                        <p>إجمالي المهام الميدانية</p>
+                    </div>
+                    <div class="stat-icon-wrapper total">📍</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="arrivalsWithProofCount">0</h3>
+                        <p>إثباتات وصول مرفقة بالصور</p>
+                    </div>
+                    <div class="stat-icon-wrapper approved">📸</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="arrivalsCustomerConfirmedCount">0</h3>
+                        <p>تأكيدات استلام من العملاء</p>
+                    </div>
+                    <div class="stat-icon-wrapper pending">🤝</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="arrivalsJudgedCount">0</h3>
+                        <p>أحكام وتوجيهات إدارية صادرة</p>
+                    </div>
+                    <div class="stat-icon-wrapper" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">⚖️</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="admin-filter-bar">
+                <input type="text" class="search-field-admin" id="searchArrivalsInput" placeholder="🔍 ابحث باسم الفني، اسم العميل، رقم الهاتف أو الخدمة...">
+                
+                <select class="select-field-admin" id="arrivalsStatusFilter">
+                    <option value="">جميع الحالات الميدانية</option>
+                    <option value="on_the_way">🚗 في الطريق للعميل</option>
+                    <option value="arrived">📍 وصل لموقع العميل</option>
+                    <option value="in_progress">🛠️ جاري تنفيذ العمل</option>
+                    <option value="completed">✅ تم إنجاز الخدمة</option>
+                </select>
+
+                <select class="select-field-admin" id="arrivalsProofFilter">
+                    <option value="">جميع الحالات التدقيقية</option>
+                    <option value="with_proof">📸 صور إثبات مرفقة فقط</option>
+                    <option value="customer_confirmed">✅ تأكيد العميل نعم</option>
+                    <option value="customer_denied">❌ العميل أفاد بعدم الوصول</option>
+                    <option value="unjudged">⚖️ بانتظار قرار الإدارة</option>
+                    <option value="judged">🌟 تم إصدار الحكم والاعتماد</option>
+                </select>
             </div>
         </div>
 
@@ -1481,6 +1544,117 @@
         </div>
     </div>
 
+    <!-- 🔍 Comprehensive Booking & Field Inspection Details Modal -->
+    <div class="modal-overlay-drawer" id="arrivalVerdictModal" style="display: none; z-index: 10000;">
+        <div class="modal-card-drawer" style="max-width: 680px;">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <h2 style="color: #38bdf8;">🔍 تفاصيل المعاملة الميدانية والمطابقة</h2>
+                    <span id="verdictModalSubtitle" style="color: var(--text-secondary); font-size: 13px;">متابعة سير الخدمة، صور الإثبات، ومطابقة الاتفاق</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeArrivalVerdictModal()">✕</button>
+            </div>
+
+            <div style="padding: 15px 0;">
+                <!-- Party Info Cards -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+                    <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 12px; padding: 12px;">
+                        <span style="font-size: 11px; color: #a5b4fc; display: block; margin-bottom: 4px;">🛠️ المهني (مقدم الخدمة):</span>
+                        <strong id="verdictProName" style="color: #fff; font-size: 14.5px; display: block;">-</strong>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; flex-wrap: wrap; gap: 4px;">
+                            <span id="verdictProPhone" style="font-size: 12px; color: var(--text-secondary); direction: ltr;">-</span>
+                            <a id="verdictProCallBtn" href="#" class="btn-quick-contact" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35);">
+                                📞 اتصال بالفني
+                            </a>
+                        </div>
+                        <div id="verdictServiceMeta" style="font-size: 11.5px; color: #c7d2fe; margin-top: 6px; border-top: 1px dashed rgba(99, 102, 241, 0.3); padding-top: 5px;">-</div>
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 12px;">
+                        <span style="font-size: 11px; color: #6ee7b7; display: block; margin-bottom: 4px;">👤 العميل (صاحب الطلب):</span>
+                        <strong id="verdictCustomerName" style="color: #fff; font-size: 14.5px; display: block;">-</strong>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; flex-wrap: wrap; gap: 4px;">
+                            <span id="verdictCustomerPhone" style="font-size: 12px; color: var(--text-secondary); direction: ltr;">-</span>
+                            <a id="verdictCustomerCallBtn" href="#" class="btn-quick-contact" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">
+                                📞 اتصال بالعميل
+                            </a>
+                        </div>
+                        <div id="verdictLocationMeta" style="font-size: 11.5px; color: #a7f3d0; margin-top: 6px; border-top: 1px dashed rgba(16, 185, 129, 0.3); padding-top: 5px;">-</div>
+                    </div>
+                </div>
+
+                <!-- Problem Images Box (if attached by customer) -->
+                <div id="verdictProblemImagesBox" style="display: none; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 15px;">
+                    <span style="font-size: 12px; color: #fbbf24; font-weight: bold; display: block; margin-bottom: 8px;">📷 صور المشكلة المرفقة من العميل:</span>
+                    <div id="verdictProblemImagesContainer" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                </div>
+
+                <!-- 1. Arrival Proof Image & Verification -->
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 12.5px; color: #38bdf8; font-weight: bold;">📸 صورة إثبات الوصول في موقع الزبون:</span>
+                        <span id="verdictArrivalTime" style="font-size: 11px; color: var(--text-muted);">-</span>
+                    </div>
+                    <div id="verdictImageContainer" style="text-align: center; margin: 10px 0;"></div>
+                    <div id="verdictCustomerConfirmationState" style="margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 12.5px;"></div>
+                </div>
+
+                <!-- 2. Job Completion & Customer Agreement Confirmation (هل انتهى كما اتفقتما؟) -->
+                <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.28); border-radius: 14px; padding: 14px; margin-bottom: 15px;">
+                    <span style="font-size: 12.5px; color: #c084fc; font-weight: bold; display: block; margin-bottom: 8px;">
+                        🤝 التحقق من انتهاء العمل ومطابقة الاتفاق:
+                    </span>
+                    <div id="verdictCompletionState" style="padding: 10px 12px; border-radius: 8px; font-size: 12.5px; margin-bottom: 8px;"></div>
+                    <div id="verdictCompletionNotesBox" style="display: none; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                        <span style="font-size: 11px; color: #d8b4fe; display: block; margin-bottom: 2px;">📝 ملاحظات العميل المسجلة:</span>
+                        <div id="verdictCompletionNotesText" style="font-size: 12.5px; color: #fff; line-height: 1.5;" class="break-word">-</div>
+                    </div>
+                </div>
+
+                <!-- Preset Verdicts -->
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 8px;">
+                    قوالب أحكام وتوجيهات الإدارة السريعة:
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+                    <button type="button" class="btn-admin-action" style="justify-content: flex-start; padding: 8px 12px; font-size: 12px;" onclick="setVerdictPreset('شكراً لك على الأمانة والالتزام بالموقع! 🌟')">
+                        🌟 شكراً لك على الأمانة
+                    </button>
+                    <button type="button" class="btn-admin-action" style="justify-content: flex-start; padding: 8px 12px; font-size: 12px;" onclick="setVerdictPreset('تم التحقق ومطابقة الموقع بنجاح ✅ بالتوفيق في تنفيذ العمل')">
+                        ✅ تم التحقق والمطابقة
+                    </button>
+                    <button type="button" class="btn-admin-action" style="justify-content: flex-start; padding: 8px 12px; font-size: 12px;" onclick="setVerdictPreset('يرجى التقاط صورة أوضح لواجهة المبنى أو رقم المنزل 📷')">
+                        📷 طلب صورة أوضح
+                    </button>
+                    <button type="button" class="btn-admin-action" style="justify-content: flex-start; padding: 8px 12px; font-size: 12px;" onclick="setVerdictPreset('تنبيه: تم رصد عدم تطابق في الموقع أو إفادة العميل ⚠️')">
+                        ⚠️ تنبيه عدم تطابق
+                    </button>
+                </div>
+
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-pure); margin-bottom: 6px;">
+                    نص الحكم أو الرسالة الإدارية (تصل للفني كإشعار فوري وتظهر في تفاصيل الطلب):
+                </label>
+                <textarea id="verdictTextInput" rows="3" placeholder="اكتب حكمك الإداري هنا..." style="width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-pure); font-family: inherit; font-size: 13.5px; resize: vertical; outline: none;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                <button class="btn-modal-action reject" style="margin: 0; padding: 10px 18px; flex: 0 0 auto; background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4);" onclick="deleteActiveBookingRecord()">
+                    <span>🗑️ حذف المعاملة نهائياً</span>
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-admin-action" onclick="closeArrivalVerdictModal()">إلغاء</button>
+                    <button class="btn-modal-action accept" style="margin: 0; padding: 10px 24px;" onclick="submitArrivalVerdict()">حفظ وإرسال التوجيه 🚀</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🖼️ Image Lightbox Preview Modal -->
+    <div class="modal-overlay-drawer" id="imageLightboxModal" style="display: none; z-index: 10001; background: rgba(0,0,0,0.88); align-items: center; justify-content: center;" onclick="closeImageLightbox()">
+        <div style="position: relative; max-width: 90vw; max-height: 90vh; text-align: center;" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" style="position: absolute; top: -45px; right: 0; background: rgba(255,255,255,0.25); color: white; width: 36px; height: 36px;" onclick="closeImageLightbox()">✕</button>
+            <img id="lightboxImg" src="" style="max-width: 100%; max-height: 82vh; border-radius: 14px; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.2);" />
+        </div>
+    </div>
+
     <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
@@ -1786,10 +1960,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         let filteredFeedbacks = [];
         let allReports = [];
         let filteredReports = [];
+        let allBookings = [];
+        let filteredArrivals = [];
 
         let activeModalRequestId = null;
         let activeRejectRequestId = null;
         let activeFeedbackId = null;
+        let activeVerdictBookingId = null;
 
         const elements = {
             loadingState: document.getElementById('loadingState'),
@@ -1813,12 +1990,14 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             tabBadgeRequests: document.getElementById('tabBadgeRequests'),
             tabBadgeFeedback: document.getElementById('tabBadgeFeedback'),
             tabBadgeReports: document.getElementById('tabBadgeReports'),
+            tabBadgeArrivals: document.getElementById('tabBadgeArrivals'),
 
             // Section containers
             sectionRequests: document.getElementById('sectionRequests'),
             sectionFeedback: document.getElementById('sectionFeedback'),
             sectionReports: document.getElementById('sectionReports'),
             sectionBroadcast: document.getElementById('sectionBroadcast'),
+            sectionArrivals: document.getElementById('sectionArrivals'),
 
             // Feedback controls
             searchFeedbackInput: document.getElementById('searchFeedbackInput'),
@@ -1834,6 +2013,17 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             // Reports controls
             searchReportsInput: document.getElementById('searchReportsInput'),
             reportsTypeFilter: document.getElementById('reportsTypeFilter'),
+
+            // Arrivals controls
+            searchArrivalsInput: document.getElementById('searchArrivalsInput'),
+            arrivalsStatusFilter: document.getElementById('arrivalsStatusFilter'),
+            arrivalsProofFilter: document.getElementById('arrivalsProofFilter'),
+            arrivalsTotalCount: document.getElementById('arrivalsTotalCount'),
+            arrivalsWithProofCount: document.getElementById('arrivalsWithProofCount'),
+            arrivalsCustomerConfirmedCount: document.getElementById('arrivalsCustomerConfirmedCount'),
+            arrivalsJudgedCount: document.getElementById('arrivalsJudgedCount'),
+            arrivalVerdictModal: document.getElementById('arrivalVerdictModal'),
+            verdictTextInput: document.getElementById('verdictTextInput'),
         };
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1851,6 +2041,12 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
             elements.searchReportsInput.addEventListener('input', filterReports);
             elements.reportsTypeFilter.addEventListener('change', filterReports);
+
+            if (elements.searchArrivalsInput) {
+                elements.searchArrivalsInput.addEventListener('input', filterArrivals);
+                elements.arrivalsStatusFilter.addEventListener('change', filterArrivals);
+                elements.arrivalsProofFilter.addEventListener('change', filterArrivals);
+            }
         }
 
         window.switchAdminTab = function(tab) {
@@ -1861,6 +2057,9 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             elements.sectionFeedback.style.display = tab === 'feedback' ? 'block' : 'none';
             elements.sectionReports.style.display = tab === 'reports' ? 'block' : 'none';
             elements.sectionBroadcast.style.display = tab === 'broadcast' ? 'block' : 'none';
+            if (elements.sectionArrivals) {
+                elements.sectionArrivals.style.display = tab === 'arrivals' ? 'block' : 'none';
+            }
 
             if (tab === 'requests') {
                 document.getElementById('tabBtnRequests').classList.add('active');
@@ -1882,6 +2081,12 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 elements.requestsTable.style.display = 'none';
                 elements.requestsCardView.style.display = 'none';
                 elements.emptyState.style.display = 'none';
+            } else if (tab === 'arrivals') {
+                const btnArrivals = document.getElementById('tabBtnArrivals');
+                if (btnArrivals) btnArrivals.classList.add('active');
+                elements.requestsTable.style.display = 'table';
+                elements.requestsCardView.style.display = '';
+                renderArrivals();
             }
         };
 
@@ -1989,12 +2194,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         async function loadAllData() {
             try {
                 showLoading(true);
-                const [pendingSnap, approvedSnap, rejectedSnap, feedbackSnap, reportsSnap] = await Promise.all([
+                const [pendingSnap, approvedSnap, rejectedSnap, feedbackSnap, reportsSnap, bookingsSnap] = await Promise.all([
                     getDocs(collection(db, "pendingUsers")),
                     getDocs(collection(db, "approvedUsers")),
                     getDocs(collection(db, "rejectedUsers")),
                     getDocs(collection(db, "feedbacks")),
-                    getDocs(collection(db, "reports"))
+                    getDocs(collection(db, "reports")),
+                    getDocs(collection(db, "bookings"))
                 ]);
 
                 allRequests = [];
@@ -2029,15 +2235,27 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     return tB - tA;
                 });
 
+                allBookings = [];
+                bookingsSnap.forEach((d) => {
+                    allBookings.push({ id: d.id, ...d.data() });
+                });
+                allBookings.sort((a, b) => {
+                    const tA = a.arrivedAt?.seconds || a.createdAt?.seconds || 0;
+                    const tB = b.arrivedAt?.seconds || b.createdAt?.seconds || 0;
+                    return tB - tA;
+                });
+
                 filteredRequests = [...allRequests];
                 filteredFeedbacks = [...allFeedbacks];
                 filteredReports = [...allReports];
+                filteredArrivals = [...allBookings];
 
                 updateStats();
 
                 if (currentAdminTab === 'requests') renderRequests();
                 else if (currentAdminTab === 'feedback') renderFeedback();
                 else if (currentAdminTab === 'reports') renderReports();
+                else if (currentAdminTab === 'arrivals') renderArrivals();
 
             } catch (err) {
                 console.error("Error loading data:", err);
@@ -2060,6 +2278,19 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             elements.tabBadgeRequests.textContent = pending;
             elements.tabBadgeFeedback.textContent = allFeedbacks.filter(f => f.status !== 'resolved').length;
             elements.tabBadgeReports.textContent = allReports.length;
+
+            // Arrivals stats
+            const totalField = allBookings.length;
+            const withProof = allBookings.filter(b => b.arrivalProofImage).length;
+            const confirmedCust = allBookings.filter(b => b.customerConfirmedArrival === true).length;
+            const judged = allBookings.filter(b => b.adminArrivalVerdict).length;
+            const unjudgedWithProof = allBookings.filter(b => b.arrivalProofImage && !b.adminArrivalVerdict).length;
+
+            if (elements.arrivalsTotalCount) elements.arrivalsTotalCount.textContent = totalField;
+            if (elements.arrivalsWithProofCount) elements.arrivalsWithProofCount.textContent = withProof;
+            if (elements.arrivalsCustomerConfirmedCount) elements.arrivalsCustomerConfirmedCount.textContent = confirmedCust;
+            if (elements.arrivalsJudgedCount) elements.arrivalsJudgedCount.textContent = judged;
+            if (elements.tabBadgeArrivals) elements.tabBadgeArrivals.textContent = unjudgedWithProof;
         }
 
         function filterRequests() {
@@ -3286,6 +3517,424 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             } finally {
                 showLoading(false);
             }
+        };
+
+        // --- 📍 Field Arrivals Tracking & Inspection Lifecycle ---
+        function filterArrivals() {
+            const query = elements.searchArrivalsInput ? elements.searchArrivalsInput.value.toLowerCase().trim() : '';
+            const status = elements.arrivalsStatusFilter ? elements.arrivalsStatusFilter.value : '';
+            const proof = elements.arrivalsProofFilter ? elements.arrivalsProofFilter.value : '';
+
+            filteredArrivals = allBookings.filter(b => {
+                const matchesQuery = !query ||
+                    (b.professionalName && b.professionalName.toLowerCase().includes(query)) ||
+                    (b.customerName && b.customerName.toLowerCase().includes(query)) ||
+                    (b.customerPhone && b.customerPhone.includes(query)) ||
+                    (b.serviceType && b.serviceType.toLowerCase().includes(query)) ||
+                    (b.location && b.location.toLowerCase().includes(query));
+
+                const matchesStatus = !status || b.status === status;
+
+                let matchesProof = true;
+                if (proof === 'with_proof') {
+                    matchesProof = !!b.arrivalProofImage;
+                } else if (proof === 'customer_confirmed') {
+                    matchesProof = b.customerConfirmedArrival === true;
+                } else if (proof === 'customer_denied') {
+                    matchesProof = b.customerConfirmedArrival === false;
+                } else if (proof === 'unjudged') {
+                    matchesProof = (!!b.arrivalProofImage || b.status === 'arrived' || b.status === 'in_progress') && !b.adminArrivalVerdict;
+                } else if (proof === 'judged') {
+                    matchesProof = !!b.adminArrivalVerdict;
+                }
+
+                return matchesQuery && matchesStatus && matchesProof;
+            });
+
+            renderArrivals();
+        }
+
+        function renderArrivals() {
+            const tableBody = elements.requestsTableBody;
+            const cardView = elements.requestsCardView;
+            tableBody.innerHTML = '';
+            cardView.innerHTML = '';
+
+            document.querySelector('#requestsTable thead tr').innerHTML = `
+                <th>الفني (مقدم الخدمة)</th>
+                <th>العميل والموقع</th>
+                <th>الخدمة والموعد</th>
+                <th>الحالة الميدانية</th>
+                <th>إثبات الحضور (الصورة)</th>
+                <th>إفادة العميل</th>
+                <th>حكم وقرار الإدارة</th>
+                <th>الإجراءات</th>
+            `;
+
+            if (filteredArrivals.length === 0) {
+                elements.emptyState.style.display = 'block';
+                elements.requestsTable.style.display = 'none';
+                return;
+            }
+
+            elements.emptyState.style.display = 'none';
+            elements.requestsTable.style.display = 'table';
+
+            filteredArrivals.forEach(b => {
+                let statusBadge = '';
+                if (b.status === 'on_the_way') {
+                    statusBadge = `<span class="badge-status pending" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);">🚗 في الطريق</span>`;
+                } else if (b.status === 'arrived') {
+                    statusBadge = `<span class="badge-status approved" style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid rgba(16,185,129,0.35);">📍 وصل للموقع</span>`;
+                } else if (b.status === 'in_progress') {
+                    statusBadge = `<span class="badge-status pending" style="background:rgba(245,158,11,0.2); color:#fbbf24; border:1px solid rgba(245,158,11,0.35);">🛠️ جاري العمل</span>`;
+                } else if (b.status === 'completed') {
+                    statusBadge = `<span class="badge-status approved" style="background:rgba(16,185,129,0.25); color:#10b981; border:1px solid rgba(16,185,129,0.4);">✅ منجز بالكامل</span>`;
+                } else {
+                    statusBadge = getStatusBadgeHtml(b.status || 'pending');
+                }
+
+                // Customer confirmation badge
+                let customerConfirmHtml = '';
+                if (b.customerConfirmedArrival === true) {
+                    customerConfirmHtml = `<span class="badge-status approved" style="font-size:11px;">✅ أكد العميل وصوله</span>`;
+                } else if (b.customerConfirmedArrival === false) {
+                    customerConfirmHtml = `<span class="badge-status rejected" style="font-size:11px;">❌ العميل نفى الوصول</span>`;
+                } else {
+                    customerConfirmHtml = `<span style="color:var(--text-muted); font-size:11px;">⏳ بانتظار رد العميل</span>`;
+                }
+
+                // Proof image thumbnail
+                let proofHtml = '';
+                if (b.arrivalProofImage) {
+                    proofHtml = `
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img src="${b.arrivalProofImage}" 
+                                 alt="إثبات الوصول" 
+                                 onclick="openImageLightbox('${b.arrivalProofImage}')"
+                                 style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1.5px solid #38bdf8; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: transform 0.2s;"
+                                 onmouseover="this.style.transform='scale(1.08)'" 
+                                 onmouseout="this.style.transform='scale(1)'"
+                                 title="انقر للتكبير بحجم كامل" />
+                            <div style="font-size: 11px;">
+                                <span style="color:#38bdf8; cursor:pointer; font-weight:bold;" onclick="openImageLightbox('${b.arrivalProofImage}')">معاينة 🔍</span>
+                                <div style="color:var(--text-muted); font-size:10px;">${formatDate(b.arrivedAt || b.createdAt)}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    proofHtml = `<span style="color:var(--text-muted); font-size:11.5px;">لم ترفق صورة بعد</span>`;
+                }
+
+                // Admin verdict badge
+                let verdictHtml = '';
+                if (b.adminArrivalVerdict) {
+                    verdictHtml = `
+                        <div style="max-width: 170px;">
+                            <div class="clamp-2 break-word" style="font-size: 12px; color: #c084fc; font-weight: bold;" title="${b.adminArrivalVerdict}">
+                                🌟 ${b.adminArrivalVerdict}
+                            </div>
+                            <span style="font-size: 10px; color: var(--text-muted);">${formatDate(b.adminVerdictAt)}</span>
+                        </div>
+                    `;
+                } else {
+                    verdictHtml = `<span style="color:var(--text-muted); font-size:11px;">بانتظار حكم الإدارة ⚖️</span>`;
+                }
+
+                // Table Row
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <strong class="break-word">${b.professionalName || 'مهني'}</strong>
+                    </td>
+                    <td>
+                        <strong class="break-word">${b.customerName || 'عميل'}</strong>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                            📍 ${b.location || 'غير محدد'}
+                        </div>
+                        ${b.customerPhone ? `<div style="font-size: 11px; color: var(--text-secondary);" dir="ltr">${b.customerPhone}</div>` : ''}
+                    </td>
+                    <td>
+                        <strong>${b.serviceType || 'خدمة صيانة'}</strong>
+                        <div style="font-size: 11px; color: var(--text-muted);">${b.date ? formatDate(b.date) : ''} ${b.time || ''}</div>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td>${proofHtml}</td>
+                    <td>${customerConfirmHtml}</td>
+                    <td>${verdictHtml}</td>
+                    <td>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <button class="btn-table-action view" style="background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 7px 11px; font-size: 11.5px; border-radius: 8px;" onclick="openArrivalVerdictModal('${b.id}')">
+                                تفاصيل المعاملة 🔍
+                            </button>
+                            <button class="btn-table-action reject" style="background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); padding: 7px 10px; font-size: 11.5px; border-radius: 8px;" onclick="deleteBookingRecord('${b.id}')" title="حذف المعاملة لتوفير المساحة">
+                                حذف 🗑️
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+
+                // Mobile Card
+                const card = document.createElement('div');
+                card.className = 'mobile-req-card';
+                card.innerHTML = `
+                    <div class="mobile-req-header">
+                        <span class="mobile-req-name break-word">🛠️ ${b.professionalName || 'المهني'} ⬅️ 👤 ${b.customerName || 'العميل'}</span>
+                        ${statusBadge}
+                    </div>
+                    <div class="mobile-req-info-grid">
+                        <span>الخدمة: <strong>${b.serviceType || '-'}</strong></span>
+                        <span>الموقع: <strong>${b.location || '-'}</strong></span>
+                        <span>إفادة الوصول: <strong>${b.customerConfirmedArrival === true ? '✅ وصل واستلمه' : (b.customerConfirmedArrival === false ? '❌ لم يصل' : '⏳ قيد الانتظار')}</strong></span>
+                        <span>مطابقة الإنجاز: <strong>${b.customerConfirmedCompletion === true ? '✅ أنجز كما اتفقا' : (b.customerConfirmedCompletion === false ? '❌ يوجد ملاحظات' : '⏳ بانتظار العميل')}</strong></span>
+                    </div>
+                    ${b.arrivalProofImage ? `
+                        <div style="display:flex; align-items:center; gap:10px; margin: 10px 0; background:rgba(0,0,0,0.25); padding:8px; border-radius:10px;">
+                            <img src="${b.arrivalProofImage}" onclick="openImageLightbox('${b.arrivalProofImage}')" style="width:55px; height:55px; border-radius:8px; object-fit:cover; border:1px solid #38bdf8;" />
+                            <div>
+                                <strong style="font-size:12px; color:#38bdf8; display:block;" onclick="openImageLightbox('${b.arrivalProofImage}')">📸 صورة إثبات الوصول</strong>
+                                <span style="font-size:11px; color:var(--text-muted);">${formatDate(b.arrivedAt || b.createdAt)}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="mobile-req-actions" style="display: flex; gap: 8px;">
+                        <button class="btn-table-action view" style="flex: 2; padding: 10px; background: rgba(56, 189, 248, 0.18); color: #38bdf8; font-weight: bold; border-radius: 10px;" onclick="openArrivalVerdictModal('${b.id}')">
+                            تفاصيل المعاملة الشاملة 🔍
+                        </button>
+                        <button class="btn-table-action reject" style="flex: 1; padding: 10px; background: rgba(239, 68, 68, 0.18); color: #fca5a5; font-weight: bold; border-radius: 10px;" onclick="deleteBookingRecord('${b.id}')">
+                            حذف 🗑️
+                        </button>
+                    </div>
+                `;
+                cardView.appendChild(card);
+            });
+        }
+
+        // Delete Booking Record to Free Up Database Storage
+        window.deleteBookingRecord = async function(bookingId) {
+            if (!confirm('⚠️ هل أنت متأكد من رغبتك في حذف هذه المعاملة نهائياً من قاعدة البيانات؟\nسيتم حذفها بالكامل لتوفير المساحة وتنظيف السجلات.')) return;
+
+            try {
+                showLoading(true);
+                await deleteDoc(doc(db, "bookings", bookingId));
+
+                if (activeVerdictBookingId === bookingId) {
+                    closeArrivalVerdictModal();
+                }
+
+                allBookings = allBookings.filter(b => b.id !== bookingId);
+                filterArrivals();
+                updateStats();
+                alert('🗑️ تم حذف المعاملة بالكامل من قاعدة البيانات وتوفير المساحة بنجاح.');
+            } catch (err) {
+                console.error("Delete booking error:", err);
+                alert("حدث خطأ أثناء حذف المعاملة: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        window.deleteActiveBookingRecord = function() {
+            if (activeVerdictBookingId) {
+                deleteBookingRecord(activeVerdictBookingId);
+            }
+        };
+
+        window.openArrivalVerdictModal = function(bookingId) {
+            const b = allBookings.find(x => x.id === bookingId);
+            if (!b) return;
+
+            activeVerdictBookingId = bookingId;
+
+            document.getElementById('verdictProName').textContent = b.professionalName || 'المهني';
+            document.getElementById('verdictProPhone').textContent = b.professionalPhone || 'غير مسجل';
+            const proCallBtn = document.getElementById('verdictProCallBtn');
+            if (b.professionalPhone) {
+                proCallBtn.href = `tel:${b.professionalPhone}`;
+                proCallBtn.style.display = 'inline-flex';
+            } else {
+                proCallBtn.style.display = 'none';
+            }
+
+            document.getElementById('verdictCustomerName').textContent = b.customerName || 'العميل';
+            document.getElementById('verdictCustomerPhone').textContent = b.customerPhone || 'غير مسجل';
+            const custCallBtn = document.getElementById('verdictCustomerCallBtn');
+            if (b.customerPhone) {
+                custCallBtn.href = `tel:${b.customerPhone}`;
+                custCallBtn.style.display = 'inline-flex';
+            } else {
+                custCallBtn.style.display = 'none';
+            }
+
+            document.getElementById('verdictServiceMeta').textContent = `الخدمة: ${b.serviceType || 'صيانة'} | الموعد: ${b.date ? formatDate(b.date) : '-'} ${b.time || ''} ${b.totalPrice ? ' | السعر: ' + b.totalPrice + ' د.أ' : ''}`;
+            document.getElementById('verdictLocationMeta').textContent = `📍 الموقع: ${b.location || 'غير محدد'} | الحالة: ${b.status || 'pending'}`;
+
+            // Problem Images
+            const probBox = document.getElementById('verdictProblemImagesBox');
+            const probContainer = document.getElementById('verdictProblemImagesContainer');
+            if (b.problemImages && Array.isArray(b.problemImages) && b.problemImages.length > 0) {
+                probBox.style.display = 'block';
+                probContainer.innerHTML = b.problemImages.map(imgUrl => `
+                    <img src="${imgUrl}" onclick="openImageLightbox('${imgUrl}')" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1.5px solid #fbbf24; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);" title="انقر لتكبير الصورة" />
+                `).join('');
+            } else {
+                probBox.style.display = 'none';
+                probContainer.innerHTML = '';
+            }
+
+            document.getElementById('verdictArrivalTime').textContent = `وقت الوصول: ${formatDate(b.arrivedAt || b.createdAt)}`;
+
+            // Arrival proof image
+            const imgContainer = document.getElementById('verdictImageContainer');
+            if (b.arrivalProofImage) {
+                imgContainer.innerHTML = `
+                    <img src="${b.arrivalProofImage}" 
+                         alt="صورة إثبات الوصول" 
+                         onclick="openImageLightbox('${b.arrivalProofImage}')"
+                         style="max-width: 100%; max-height: 220px; border-radius: 12px; object-fit: cover; border: 2px solid #38bdf8; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);" />
+                    <div style="font-size: 11.5px; color: #38bdf8; margin-top: 6px; cursor: pointer;" onclick="openImageLightbox('${b.arrivalProofImage}')">
+                        🔍 انقر على الصورة لتكبيرها وفحص تفاصيل الموقع
+                    </div>
+                `;
+            } else {
+                imgContainer.innerHTML = `
+                    <div style="padding: 16px; color: var(--text-muted); font-size: 13px;">
+                        ⚠️ لم يقم الفني بإرفاق صورة إثبات الوصول بعد.
+                    </div>
+                `;
+            }
+
+            // Customer Arrival Confirmation
+            const stateBox = document.getElementById('verdictCustomerConfirmationState');
+            if (b.customerConfirmedArrival === true) {
+                stateBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                stateBox.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+                stateBox.style.color = '#6ee7b7';
+                stateBox.innerHTML = `✅ <strong>تأكيد العميل على الحضور:</strong> [نعم، وصل المهني واستلمته في الموقع]`;
+            } else if (b.customerConfirmedArrival === false) {
+                stateBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                stateBox.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+                stateBox.style.color = '#fca5a5';
+                stateBox.innerHTML = `❌ <strong>تأكيد العميل على الحضور:</strong> [لا، لم يصل المهني للموقع بعد] ⚠️`;
+            } else {
+                stateBox.style.background = 'rgba(255, 255, 255, 0.05)';
+                stateBox.style.border = '1px solid var(--border-color)';
+                stateBox.style.color = 'var(--text-secondary)';
+                stateBox.innerHTML = `⏳ <strong>تأكيد العميل على الحضور:</strong> بانتظار استجابة العميل.`;
+            }
+
+            // Customer Job Completion Confirmation (هل انتهى كما اتفقتما؟)
+            const compStateBox = document.getElementById('verdictCompletionState');
+            const compNotesBox = document.getElementById('verdictCompletionNotesBox');
+            const compNotesText = document.getElementById('verdictCompletionNotesText');
+
+            if (b.customerConfirmedCompletion === true) {
+                compStateBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                compStateBox.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+                compStateBox.style.color = '#6ee7b7';
+                compStateBox.innerHTML = `✅ <strong>إفادة العميل:</strong> تم إنجاز العمل تماماً كما اتفقنا وبجودة مرضية 🤝`;
+            } else if (b.customerConfirmedCompletion === false) {
+                compStateBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                compStateBox.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+                compStateBox.style.color = '#fca5a5';
+                compStateBox.innerHTML = `❌ <strong>إفادة العميل:</strong> لم ينتهِ العمل كما اتفقنا - يوجد نقص أو ملاحظات ⚠️`;
+            } else {
+                compStateBox.style.background = 'rgba(255, 255, 255, 0.05)';
+                compStateBox.style.border = '1px solid var(--border-color)';
+                compStateBox.style.color = 'var(--text-secondary)';
+                compStateBox.innerHTML = `⏳ <strong>إفادة العميل حول انتهاء العمل:</strong> بانتظار رد العميل وتأكيده في التطبيق.`;
+            }
+
+            if (b.customerCompletionNotes && b.customerCompletionNotes.trim().length > 0) {
+                compNotesBox.style.display = 'block';
+                compNotesText.textContent = b.customerCompletionNotes;
+            } else {
+                compNotesBox.style.display = 'none';
+                compNotesText.textContent = '';
+            }
+
+            document.getElementById('verdictTextInput').value = b.adminArrivalVerdict || 'شكراً لك على الأمانة والالتزام بالموقع! 🌟';
+
+            document.getElementById('arrivalVerdictModal').style.display = 'flex';
+        };
+
+        window.closeArrivalVerdictModal = function() {
+            document.getElementById('arrivalVerdictModal').style.display = 'none';
+            activeVerdictBookingId = null;
+        };
+
+        window.setVerdictPreset = function(presetText) {
+            document.getElementById('verdictTextInput').value = presetText;
+        };
+
+        window.submitArrivalVerdict = async function() {
+            if (!activeVerdictBookingId) return;
+
+            const verdictText = document.getElementById('verdictTextInput').value.trim();
+            if (!verdictText) {
+                alert('⚠️ يرجى كتابة نص الحكم أو التوجيه الإداري قبل الحفظ.');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                const b = allBookings.find(x => x.id === activeVerdictBookingId);
+
+                // 1. تحديث مستند الحجز في الفايربيس
+                await updateDoc(doc(db, "bookings", activeVerdictBookingId), {
+                    adminArrivalVerdict: verdictText,
+                    adminVerdictAt: serverTimestamp()
+                });
+
+                // 2. إرسال إشعار فوري للفني (المهني) بالقرار
+                if (b && b.professionalId) {
+                    try {
+                        await addDoc(collection(db, "notifications"), {
+                            userId: b.professionalId,
+                            title: '⚖️ قرار إدارة خدمتك حول تأكيد وصولك',
+                            body: verdictText,
+                            type: 'arrival_verdict',
+                            bookingId: activeVerdictBookingId,
+                            createdAt: serverTimestamp(),
+                            isRead: false
+                        });
+                        await sendFcmPushToUser({
+                            title: '⚖️ قرار إدارة خدمتك حول تأكيد وصولك',
+                            body: verdictText,
+                            userId: b.professionalId,
+                            db: db,
+                            data: {
+                                type: 'arrival_verdict',
+                                bookingId: activeVerdictBookingId
+                            }
+                        });
+                    } catch (e) {
+                        console.warn("FCM error to pro:", e);
+                    }
+                }
+
+                closeArrivalVerdictModal();
+                await loadAllData();
+                alert('✅ تم إصدار وحفظ حكم الإدارة بنجاح وإشعار الفني فوراً!');
+
+            } catch (err) {
+                console.error("Arrival verdict error:", err);
+                alert("حدث خطأ أثناء حفظ حكم الإدارة: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        window.openImageLightbox = function(url) {
+            if (!url) return;
+            document.getElementById('lightboxImg').src = url;
+            document.getElementById('imageLightboxModal').style.display = 'flex';
+        };
+
+        window.closeImageLightbox = function() {
+            document.getElementById('imageLightboxModal').style.display = 'none';
+            document.getElementById('lightboxImg').src = '';
         };
 
         window.refreshData = async function() {
