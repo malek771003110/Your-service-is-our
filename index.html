@@ -18,18 +18,58 @@
     <meta name="keywords" content="خدمات منزلية, صيانة, تنظيف, كهرباء, سباكة, تصميم, خدمتك عنا, مهنيين, أعمال منزلية, خدمات احترافية">
     <meta name="author" content="خدمتك عنا">
 
-    <!-- 🔗 تحسين المشاركة على وسائل التواصل (Open Graph) -->
-    <meta property="og:title" content="خدمتك عنا | أفضل المهنيين والخدمات في منطقتك">
-    <meta property="og:description" content="خدمتك عنا هو موقعك الأول للعثور على أفضل المهنيين والخدمات بسهولة وسرعة.">
+    <!-- 🖼️ أيقونة الموقع وشعار البحث (Favicon & App Icon) -->
+    <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/icon-192.png">
+    <link rel="image_src" href="https://khedmtek.netlify.app/images/logo.png">
+
+    <!-- 🔗 تحسين المشاركة ومحركات البحث ووسائل التواصل (Open Graph) -->
+    <meta property="og:title" content="منصة خدمتك 🇯🇴 | أفضل المهنيين والحرفيين في الأردن">
+    <meta property="og:description" content="منصة خدمتك - المنصة الأولى لربط أفضل المهنيين والحرفيين في الأردن مع العملاء بكل سهولة وأمان.">
     <meta property="og:image" content="https://khedmtek.netlify.app/images/logo.png">
+    <meta property="og:image:secure_url" content="https://khedmtek.netlify.app/images/logo.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="1024">
+    <meta property="og:image:alt" content="شعار منصة خدمتك الرسمي">
     <meta property="og:url" content="https://khedmtek.netlify.app/">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="ar_JO">
+
+    <!-- 🐦 Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="منصة خدمتك 🇯🇴 | Khedmtek">
+    <meta name="twitter:description" content="دليلك الأول لطلب وحجز أفضل المهنيين والحرفيين في الأردن بكل سهولة وأمان.">
+    <meta name="twitter:image" content="https://khedmtek.netlify.app/images/logo.png">
+
+    <!-- 🔍 Google Search Structured Data (Schema.org) for Logo & Knowledge Graph -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "منصة خدمتك",
+      "alternateName": "Khedmtek",
+      "url": "https://khedmtek.netlify.app/",
+      "description": "منصة خدمتك - المنصة الأولى لربط أفضل المهنيين والحرفيين في الأردن مع العملاء بكل سهولة وأمان.",
+      "image": "https://khedmtek.netlify.app/images/logo.png",
+      "publisher": {
+        "@type": "Organization",
+        "name": "منصة خدمتك",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://khedmtek.netlify.app/images/logo.png"
+        }
+      }
+    }
+    </script>
 
     <!-- Fonts & Modern CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/theme.js"></script>
 </head>
 
 <body>
@@ -57,6 +97,7 @@
             </nav>
 
             <div class="nav-actions">
+                <button class="theme-switch-btn" id="themeToggleBtn" onclick="toggleTheme()" title="تبديل المظهر">☀️</button>
                 <a href="register.html" class="btn-nav-register" id="navRegisterBtn">
                     <span>✨</span>
                     <span>انضم كمهني</span>

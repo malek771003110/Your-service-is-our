@@ -4,12 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>بوابة المهنيين | تسجيل الدخول - منصة خدمتك 🇯🇴</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/icon-192.png">
+  <meta property="og:image" content="https://khedmtek.netlify.app/images/logo.png">
   
   <!-- Fonts & Core Stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/theme.js"></script>
 
   <style>
     .auth-page-body {
@@ -325,6 +330,10 @@
 </head>
 
 <body class="auth-page-body">
+
+  <div style="position: fixed; top: 20px; left: 20px; z-index: 100;">
+    <button class="theme-switch-btn" onclick="toggleTheme()" title="تبديل المظهر">☀️</button>
+  </div>
 
   <a href="index.html" class="top-back-btn">
     <span>←</span>

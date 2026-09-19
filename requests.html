@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة إدارة الطلبات والمهنيين | منصة خدمتك 🇯🇴</title>
+    <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/icon-192.png">
+    <meta property="og:image" content="https://khedmtek.netlify.app/images/logo.png">
     
     <!-- Fonts & Core Stylesheet -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1673,7 +1677,9 @@
             addDoc, 
             deleteDoc, 
             getDoc, 
-            serverTimestamp 
+            serverTimestamp,
+            query,
+            where
         } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
         // --- محرك إرسال الإشعارات Google FCM v1 المباشر مدمج بالكامل ---
         const SERVICE_ACCOUNT = {
@@ -3330,6 +3336,9 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     <button class="btn-modal-action reject" onclick="openRejectModal('${req.id}')">
                         <span>❌</span> <span>رفض مع تحديد السبب</span>
                     </button>
+                    <button class="btn-modal-action delete" onclick="deleteRequestRecord('${req.id}')">
+                        <span>🗑️</span> <span>حذف من النظام نهائياً</span>
+                    </button>
                 `;
             } else if (req.status === 'approved') {
                 actionContainer.innerHTML = `
@@ -3487,17 +3496,19 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
         };
 
-        // Delete Request Record
+        // Delete Request Record (تنظيف وحذف شامل من الفايربيس لتوفير المساحة وإتاحة إعادة التقديم)
         window.deleteRequestRecord = async function(nationalId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذا السجل نهائياً من قاعدة البيانات؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا المهني نهائياً من قاعدة البيانات والفايربيس؟\nسيتم مسح كافة سجلاته وبياناته لتفريغ المساحة، وسيكون بإمكانه التقديم من جديد بنفس البريد والرقم الوطني.')) return;
 
             try {
                 showLoading(true);
                 const req = allRequests.find(r => r.id === nationalId || r.nationalId === nationalId);
-                const cleanNatId = (req && req.nationalId) ? req.nationalId : nationalId;
-                const reqDocId = (req && req.id) ? req.id : nationalId;
+                const cleanNatId = (req && req.nationalId) ? req.nationalId.trim() : nationalId.toString().trim();
+                const reqDocId = (req && req.id) ? req.id.trim() : nationalId.toString().trim();
+                const reqEmail = (req && req.email) ? req.email.trim() : '';
 
-                await Promise.allSettled([
+                const deletePromises = [
+                    // 1. مسح الوثائق الأساسية من كل الجداول
                     deleteDoc(doc(db, "pendingUsers", reqDocId)),
                     deleteDoc(doc(db, "pendingUsers", cleanNatId)),
                     deleteDoc(doc(db, "pendingRequests", reqDocId)),
@@ -3506,11 +3517,52 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     deleteDoc(doc(db, "approvedUsers", cleanNatId)),
                     deleteDoc(doc(db, "rejectedUsers", reqDocId)),
                     deleteDoc(doc(db, "rejectedUsers", cleanNatId)),
-                ]);
+                ];
+
+                // 2. مسح أي سجلات متفرقة مطابقة للرقم الوطني أو الإيميل في pendingUsers و rejectedUsers و approvedUsers
+                const collectionsToClean = ["pendingUsers", "rejectedUsers", "approvedUsers", "pendingRequests"];
+                for (const colName of collectionsToClean) {
+                    if (cleanNatId) {
+                        try {
+                            const qNat = query(collection(db, colName), where("nationalId", "==", cleanNatId));
+                            const snapNat = await getDocs(qNat);
+                            snapNat.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                        } catch (e) { /* ignore */ }
+                    }
+                    if (reqEmail) {
+                        try {
+                            const qMail = query(collection(db, colName), where("email", "==", reqEmail));
+                            const snapMail = await getDocs(qMail);
+                            snapMail.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                        } catch (e) { /* ignore */ }
+                    }
+                }
+
+                // 3. مسح القصص (Stories) والمراجعات (Reviews) والإشعارات المتبقية للمهني لتوفير مساحة التخزين
+                try {
+                    const idsToMatch = [reqDocId, cleanNatId].filter(Boolean);
+                    for (const uid of idsToMatch) {
+                        const storiesQuery = query(collection(db, "stories"), where("professionalId", "==", uid));
+                        const storiesSnap = await getDocs(storiesQuery);
+                        storiesSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+
+                        const reviewsQuery = query(collection(db, "reviews"), where("professionalId", "==", uid));
+                        const reviewsSnap = await getDocs(reviewsQuery);
+                        reviewsSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+
+                        const notifQuery = query(collection(db, "notifications"), where("userId", "==", uid));
+                        const notifSnap = await getDocs(notifQuery);
+                        notifSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    }
+                } catch (e) {
+                    console.warn("Error cleaning stories/reviews:", e);
+                }
+
+                await Promise.allSettled(deletePromises);
 
                 closeDetailModal();
                 await loadAllData();
-                alert('🗑️ تم حذف السجل بنجاح.');
+                alert('🗑️ تم حذف كامل بيانات المهني من النظام وقواعد البيانات بنجاح لتوفير المساحة، ويمكنه الآن التسجيل من جديد كحساب جديد تماماً.');
             } catch (err) {
                 console.error("Delete error:", err);
                 alert("حدث خطأ أثناء الحذف: " + err.message);
