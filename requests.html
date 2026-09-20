@@ -1011,10 +1011,161 @@
         .toast-close-btn:hover {
             color: #fff;
         }
+
+        /* 🚨 High-Visibility Square Alert Box Styles (صندوق تنبيه مربع وبارز لا يمكن تفويته) */
+        .urgent-alert-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 10000000;
+            background: rgba(10, 15, 30, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            animation: fadeInBackdrop 0.25s ease-out;
+        }
+        @keyframes fadeInBackdrop {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .urgent-alert-box {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            background: linear-gradient(165deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.99));
+            border: 2px solid rgba(99, 102, 241, 0.65);
+            border-radius: 28px;
+            padding: 26px 22px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(99, 102, 241, 0.4);
+            text-align: center;
+            direction: rtl;
+            animation: alertSquarePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        @keyframes alertSquarePop {
+            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .alert-box-icon-pulse {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 14px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.65);
+            animation: pulseGlowBox 1.8s infinite ease-in-out;
+        }
+        @keyframes pulseGlowBox {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
+            50% { transform: scale(1.08); box-shadow: 0 0 35px rgba(168, 85, 247, 0.85); }
+        }
+        .alert-box-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: rgba(99, 102, 241, 0.22);
+            border: 1px solid rgba(99, 102, 241, 0.45);
+            color: #a5b4fc;
+            font-size: 11.5px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+        .urgent-alert-box h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+        .urgent-alert-box p {
+            margin: 0 0 14px;
+            font-size: 13.5px;
+            color: #cbd5e1;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        .alert-box-time {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 18px;
+        }
+        .alert-box-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn-alert-action.primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 13px 18px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px;
+            transition: all 0.2s ease;
+        }
+        .btn-alert-action.primary:active {
+            transform: scale(0.97);
+        }
+        .btn-alert-action.secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #94a3b8;
+            border-radius: 16px;
+            padding: 11px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            min-height: 44px;
+            transition: all 0.2s ease;
+        }
+        .btn-alert-action.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
     </style>
 </head>
 
 <body>
+    <!-- 🚨 High-Visibility Live Alert Box (مربع تنبيه فوري وبارز للأدمن) -->
+    <div id="urgentAlertCardBackdrop" class="urgent-alert-backdrop" style="display: none;" onclick="if(event.target === this) closeUrgentAlertBox()">
+        <div class="urgent-alert-box">
+            <div class="alert-box-icon-pulse" id="alertBoxIconWrapper">
+                <span id="alertBoxIcon">📬</span>
+            </div>
+            <div class="alert-box-badge" id="alertBoxBadge">تنبيه إداري جديد</div>
+            <div class="alert-box-content">
+                <h3 id="alertBoxTitle">شكوى جديدة وردت الآن!</h3>
+                <p id="alertBoxBody">قام المستخدم بتقديم شكوى جديدة في المنصة، بانتظار رد ومتابعة الإدارة.</p>
+                <div class="alert-box-time" id="alertBoxTime">الآن</div>
+            </div>
+            <div class="alert-box-actions">
+                <button class="btn-alert-action primary" id="btnAlertOpenAction" onclick="handleAlertBoxAction()">
+                    <span>🔍</span> <span id="btnAlertOpenActionText">عرض ومتابعة فوراً</span>
+                </button>
+                <button class="btn-alert-action secondary" onclick="closeUrgentAlertBox()">
+                    <span>حسناً، إغلاق</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Live Activity Toast Notification -->
     <div id="adminNotificationToast" class="admin-floating-toast">
         <div class="toast-icon" id="toastIcon">🔔</div>
@@ -2359,14 +2510,117 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
         }
 
-        async function showAdminAlert({ title, body, icon = '🔔', tag = 'admin_alert_' + Date.now() }) {
-            // 1. Audible Sound Chime
+        // --- 🚨 High-Visibility Square Alert Box Logic (مربع التنبيه البارز) ---
+        let pendingAlertTargetTab = 'requests';
+
+        function showUrgentAlertBox({ title, body, icon = '🔔', tab = 'requests', badge = 'تنبيه إداري فوري' }) {
+            pendingAlertTargetTab = tab;
+            const backdrop = document.getElementById('urgentAlertCardBackdrop');
+            if (!backdrop) return;
+
+            const titleEl = document.getElementById('alertBoxTitle');
+            const bodyEl = document.getElementById('alertBoxBody');
+            const iconEl = document.getElementById('alertBoxIcon');
+            const badgeEl = document.getElementById('alertBoxBadge');
+            const timeEl = document.getElementById('alertBoxTime');
+            const btnTextEl = document.getElementById('btnAlertOpenActionText');
+
+            if (titleEl) titleEl.textContent = title;
+            if (bodyEl) bodyEl.textContent = body;
+            if (iconEl) iconEl.textContent = icon;
+            if (badgeEl) badgeEl.textContent = badge;
+            if (timeEl) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('ar-JO', { hour: '2-digit', minute: '2-digit' });
+                timeEl.textContent = `الساعة ${timeStr} - الآن`;
+            }
+
+            const tabActionNames = {
+                'requests': 'عرض طلبات المهنيين 📋',
+                'customers': 'عرض العملاء المسجلين 👥',
+                'feedback': 'عرض ومتابعة الشكوى 📬',
+                'reports': 'فحص البلاغ فوراً 🚨',
+                'arrivals': 'متابعة وصول الفني 📍'
+            };
+            if (btnTextEl) btnTextEl.textContent = tabActionNames[tab] || 'عرض ومتابعة فوراً 🔍';
+
+            backdrop.style.display = 'flex';
+        }
+
+        window.closeUrgentAlertBox = function() {
+            const backdrop = document.getElementById('urgentAlertCardBackdrop');
+            if (backdrop) backdrop.style.display = 'none';
+        };
+
+        window.handleAlertBoxAction = function() {
+            closeUrgentAlertBox();
+            const tabFn = window.switchAdminTab || (typeof switchAdminTab === 'function' ? switchAdminTab : null);
+            if (pendingAlertTargetTab && tabFn) {
+                tabFn(pendingAlertTargetTab);
+                setTimeout(() => {
+                    const tableSection = document.getElementById('tableContainerSection') || document.querySelector('.admin-tabs-nav') || document.getElementById('requestsTable');
+                    if (tableSection) {
+                        tableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        };
+
+        // --- 🤖 Automated Instant Reply Engine (نظام الرد التلقائي الفوري لكافة العمليات) ---
+        async function sendInstantAutoReply({ userId, type, documentRef = null, title, body }) {
+            if (!userId) return;
+            try {
+                console.log(`🤖 [Auto-Reply] جاري إرسال الرد التلقائي الفوري للمستخدم (${userId})...`);
+
+                // 1. إنشاء إشعار فوري داخل التطبيق في سجل notifications الخاص بالمستخدم
+                await addDoc(collection(db, "notifications"), {
+                    userId: userId,
+                    title: title,
+                    body: body,
+                    type: type || "auto_reply",
+                    isRead: false,
+                    createdAt: serverTimestamp()
+                });
+
+                // 2. تحديث الوثيقة الأصلية بعلامة الرد الآلي وتثبيت نص الرد
+                if (documentRef) {
+                    await updateDoc(documentRef, {
+                        autoReplied: true,
+                        adminReply: body,
+                        autoRepliedAt: serverTimestamp()
+                    });
+                }
+
+                // 3. إرسال Push Notification مباشر لهاتف المستخدم
+                try {
+                    await sendFcmPushToUser({
+                        title: title,
+                        body: body,
+                        userId: userId,
+                        db: db,
+                        data: { type: type || "auto_reply" }
+                    });
+                } catch (pushErr) {
+                    console.warn("FCM push auto-reply notice:", pushErr);
+                }
+
+                console.log(`✅ [Auto-Reply] تم إيصال الرد التلقائي للمستخدم (${userId}) بنجاح.`);
+            } catch (err) {
+                console.error("Error in sendInstantAutoReply:", err);
+            }
+        }
+
+        async function showAdminAlert({ title, body, icon = '🔔', tab = 'requests', badge = 'نشاط جديد بالمنصة', tag = 'admin_alert_' + Date.now() }) {
+            // 1. Audible Sound Chime (رنة واضحة للأذن)
             playNotificationChime();
 
-            // 2. In-App Floating Toast
+            // 2. High-Visibility Square Alert Box (المربع المنبثق البارز)
+            showUrgentAlertBox({ title, body, icon, tab, badge });
+
+            // 3. In-App Floating Toast
             showFloatingToast(title, body, icon);
 
-            // 3. System Push / Native Notification
+            // 4. System Push / Native Notification
             if ('Notification' in window && Notification.permission === 'granted') {
                 try {
                     if ('serviceWorker' in navigator) {
@@ -2377,7 +2631,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                                 icon: './images/favicon.png',
                                 badge: './images/favicon.png',
                                 tag: tag,
-                                vibrate: [250, 120, 250],
+                                vibrate: [300, 150, 300],
                                 data: { url: './requests.html' }
                             });
                             return;
@@ -3041,17 +3295,32 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             realtimeListenersAttached = true;
             console.log("⚡ [Real-time] تفعيل الاستماع الفوري التلقائي للبيانات في الخلفية...");
 
-            // 1. مزامنة العملاء المسجلين فوراً في الخلفية مع إشعار صوتي وتنبيه
+            // 1. مزامنة العملاء المسجلين فوراً في الخلفية مع رد تلقائي وتنبيه مربع بارز
             try {
                 onSnapshot(collection(db, "customers"), (snapshot) => {
                     snapshot.docChanges().forEach(change => {
-                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                        if (change.type === 'added') {
                             const c = change.doc.data();
-                            showAdminAlert({
-                                title: '👥 تسجيل عميل جديد بالمنصة!',
-                                body: `قام العميل (${c.name || 'مستخدم جديد'}) بإنشاء حساب في التطبيق الآن.`,
-                                icon: '👥'
-                            });
+                            // إرسال رد ترحيبي تلقائي للمستخدم الجديد إن لم يسبق إرساله
+                            if (c.autoReplied !== true && (c.id || change.doc.id)) {
+                                sendInstantAutoReply({
+                                    userId: c.id || change.doc.id,
+                                    type: 'welcome_receipt',
+                                    documentRef: change.doc.ref,
+                                    title: '🎉 أهلاً بك في منصة خدمتك 🇯🇴',
+                                    body: `مرحباً بك ${c.name || ''}! تم إنشاء وتفعيل حسابك بنجاح. يمكنك الآن تصفح أفضل المهنيين والخدمات المنزلية بكل راحة وأمان.`
+                                });
+                            }
+
+                            if (isRealtimeNotificationsReady) {
+                                showAdminAlert({
+                                    title: '👥 عميل جديد انضم للمنصة!',
+                                    body: `قام العميل (${c.name || 'مستخدم جديد'}) بإنشاء حساب في التطبيق الآن.`,
+                                    icon: '👥',
+                                    tab: 'customers',
+                                    badge: 'عميل مسجل جديد'
+                                });
+                            }
                         }
                     });
 
@@ -3072,7 +3341,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 }, (err) => console.warn("Real-time customers sync warning:", err));
             } catch (e) { console.warn(e); }
 
-            // 2. مزامنة طلبات المهنيين (معلقة، مقبولة، مرفوضة) فوراً
+            // 2. مزامنة طلبات المهنيين (معلقة، مقبولة، مرفوضة) فوراً مع رد تلقائي وتنبيه
             let cachePending = [];
             let cacheApproved = [];
             let cacheRejected = [];
@@ -3098,13 +3367,28 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             try {
                 onSnapshot(collection(db, "pendingUsers"), (snap) => {
                     snap.docChanges().forEach(change => {
-                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                        if (change.type === 'added') {
                             const p = change.doc.data();
-                            showAdminAlert({
-                                title: '📋 طلب انضمام مهني جديد!',
-                                body: `ورد طلب جديد من المهني (${p.name || 'مهني'}) لمهنة (${p.job || 'خدمة'}) بانتظار موافقتك.`,
-                                icon: '📋'
-                            });
+                            // إرسال رد تلقائي فوري للمهني بوصول طلبه
+                            if (p.autoReplied !== true && (p.id || change.doc.id)) {
+                                sendInstantAutoReply({
+                                    userId: p.id || change.doc.id,
+                                    type: 'pro_request_receipt',
+                                    documentRef: change.doc.ref,
+                                    title: '🛠️ تم استلام طلب انضمامك بنجاح',
+                                    body: `أهلاً بك يا ${p.name || 'مهني'} كشريك نجاح في منصة خدمتك 🇯🇴! تم استلام طلبك لمهنة (${p.job || 'الخدمات'}) ووثائقك بنجاح، وطلبك الآن قيد التدقيق لدى الإدارة وسيصلك إشعار فور اعتماده.`
+                                });
+                            }
+
+                            if (isRealtimeNotificationsReady) {
+                                showAdminAlert({
+                                    title: '📋 طلب انضمام مهني جديد!',
+                                    body: `ورد طلب جديد من المهني (${p.name || 'مهني'}) لمهنة (${p.job || 'خدمة'}) في (${p.city || 'الأردن'}) بانتظار موافقتك.`,
+                                    icon: '📋',
+                                    tab: 'requests',
+                                    badge: 'طلب مهني جديد'
+                                });
+                            }
                         }
                     });
 
@@ -3126,17 +3410,36 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 }, (err) => console.warn("Real-time rejected sync warning:", err));
             } catch (e) { console.warn(e); }
 
-            // 3. مزامنة الشكاوى والاستفسارات في الوقت الفعلي
+            // 3. مزامنة الشكاوى والاستفسارات في الوقت الفعلي مع رد تلقائي فوري وتنبيه مربع بارز
             try {
                 onSnapshot(collection(db, "feedbacks"), (snap) => {
                     snap.docChanges().forEach(change => {
-                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                        if (change.type === 'added') {
                             const f = change.doc.data();
-                            showAdminAlert({
-                                title: '📬 رسالة / شكوى جديدة!',
-                                body: `وصلت رسالة جديدة من (${f.userName || 'مستخدم'}): ${f.subject || f.message || 'تفاصيل جديدة'}`,
-                                icon: '📬'
-                            });
+                            // إرسال رد تلقائي فوري لصاحب الشكوى/الاقتراح
+                            if (f.autoReplied !== true && f.userId) {
+                                const typeLabel = f.type === 'complaint' ? 'شكواك' : (f.type === 'suggestion' ? 'اقتراحك' : 'رسالتك واستفسارك');
+                                const autoReplyText = `أهلاً بك في منصة خدمتك 🇯🇴، تم استلام ${typeLabel} بنجاح من قِبل النظام الآلي. طلبك حالياً قيد المتابعة والتدقيق لدى فريق الإدارة، وسيقوم المشرف بالرد عليك هنا في أقرب وقت ممكن. شكراً لتعاونك!`;
+
+                                sendInstantAutoReply({
+                                    userId: f.userId,
+                                    type: 'feedback_reply',
+                                    documentRef: change.doc.ref,
+                                    title: `📩 تم استلام ${typeLabel} بنجاح`,
+                                    body: autoReplyText
+                                });
+                            }
+
+                            if (isRealtimeNotificationsReady) {
+                                const isComplaint = f.type === 'complaint';
+                                showAdminAlert({
+                                    title: isComplaint ? '⚠️ شكوى جديدة وردت الآن!' : '📬 رسالة / اقتراح جديد ورد الآن!',
+                                    body: `قام (${f.userName || 'مستخدم'}) بتقديم ${isComplaint ? 'شكوى' : 'رسالة'}: "${f.title || f.subject || f.description || 'تفاصيل جديدة'}"`,
+                                    icon: isComplaint ? '⚠️' : '📬',
+                                    tab: 'feedback',
+                                    badge: isComplaint ? 'شكوى عاجلة' : 'رسالة جديدة'
+                                });
+                            }
                         }
                     });
 
@@ -3149,17 +3452,32 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 }, (err) => console.warn("Real-time feedback sync warning:", err));
             } catch (e) { console.warn(e); }
 
-            // 4. مزامنة البلاغات والمخالفات في الوقت الفعلي
+            // 4. مزامنة البلاغات والمخالفات في الوقت الفعلي مع رد تلقائي وتنبيه طارئ
             try {
                 onSnapshot(collection(db, "reports"), (snap) => {
                     snap.docChanges().forEach(change => {
-                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                        if (change.type === 'added') {
                             const r = change.doc.data();
-                            showAdminAlert({
-                                title: '🚨 بلاغ طارئ عن مخالفة!',
-                                body: `ورد بلاغ جديد في النظام: ${r.reason || 'مخالفة سلوك'}. يرجى اتخاذ الإجراء.`,
-                                icon: '🚨'
-                            });
+                            // إرسال رد تلقائي فوري للمُبلّغ
+                            if (r.autoReplied !== true && r.reporterId) {
+                                sendInstantAutoReply({
+                                    userId: r.reporterId,
+                                    type: 'report_receipt',
+                                    documentRef: change.doc.ref,
+                                    title: '🚨 تم استلام بلاغك بنجاح',
+                                    body: 'شكراً لحرصك على مجتمع خدمتك وأمانه. تم استلام بلاغك وجاري مراجعته والتحقق منه من قِبل الإدارة لاتخاذ الإجراء الصارم المناسب.'
+                                });
+                            }
+
+                            if (isRealtimeNotificationsReady) {
+                                showAdminAlert({
+                                    title: '🚨 بلاغ طارئ عن مخالفة سلوك!',
+                                    body: `قام (${r.reporterName || 'مستخدم'}) بتقديم بلاغ: "${r.reason || 'مخالفة سلوك أو محتوى'}" بانتظار فحصك.`,
+                                    icon: '🚨',
+                                    tab: 'reports',
+                                    badge: 'بلاغ طارئ'
+                                });
+                            }
                         }
                     });
 
@@ -3182,7 +3500,9 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                                 showAdminAlert({
                                     title: '📍 وصول ميداني لفني!',
                                     body: `أكد الفني (${b.professionalName || 'المهني'}) وصوله لموقع العميل بنجاح.`,
-                                    icon: '📍'
+                                    icon: '📍',
+                                    tab: 'arrivals',
+                                    badge: 'إثبات وصول'
                                 });
                             }
                         }
