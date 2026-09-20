@@ -2,8 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>لوحة إدارة الطلبات والمهنيين | منصة خدمتك 🇯🇴</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="خدمتك أدمن">
     <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" sizes="192x192" href="images/icon-192.png">
@@ -808,11 +812,245 @@
                 padding: 12px;
                 font-size: 13.5px;
             }
+            /* iOS Safe Area & Touch Target Optimizations */
+            .btn-table-action, .btn-admin-action, .btn-admin-tab, .btn-modal-action, .search-field-admin, .select-field-admin {
+                min-height: 44px;
+            }
+            .btn-table-action:active, .btn-admin-tab:active, .btn-modal-action:active {
+                transform: scale(0.97);
+                opacity: 0.85;
+            }
+            .modal-card-drawer::before {
+                content: '';
+                display: block;
+                width: 44px;
+                height: 5px;
+                background: rgba(255, 255, 255, 0.25);
+                border-radius: 10px;
+                margin: 0 auto 14px;
+            }
+        }
+
+        /* 📲 Push Notification Status Banner & Toast Styles */
+        .admin-notification-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(168, 85, 247, 0.15));
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+        .admin-notification-banner.granted {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.12));
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+        .notif-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 260px;
+        }
+        .notif-banner-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: var(--grad-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        .notif-banner-text h4 {
+            margin: 0 0 4px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .notif-banner-text p {
+            margin: 0;
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .notif-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-enable-notif {
+            background: var(--grad-primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-pill);
+            padding: 10px 18px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            transition: var(--transition);
+            min-height: 44px;
+        }
+        .btn-enable-notif:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+        .btn-ios-guide {
+            background: rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-pill);
+            padding: 10px 14px;
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            min-height: 44px;
+        }
+        .btn-ios-guide:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .btn-dismiss-notif {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-secondary);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .btn-dismiss-notif:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
+        /* 🔔 In-App Floating Toast Alert */
+        .admin-floating-toast {
+            position: fixed;
+            top: max(20px, env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            z-index: 999999;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(99, 102, 241, 0.45);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 25px rgba(99, 102, 241, 0.35);
+            border-radius: 16px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: calc(100% - 30px);
+            max-width: 440px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            direction: rtl;
+        }
+        .admin-floating-toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .admin-floating-toast .toast-icon {
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+        .admin-floating-toast .toast-content {
+            flex: 1;
+        }
+        .admin-floating-toast h4 {
+            margin: 0 0 3px;
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .admin-floating-toast p {
+            margin: 0;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+        .toast-close-btn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toast-close-btn:hover {
+            color: #fff;
         }
     </style>
 </head>
 
 <body>
+    <!-- Floating Live Activity Toast Notification -->
+    <div id="adminNotificationToast" class="admin-floating-toast">
+        <div class="toast-icon" id="toastIcon">🔔</div>
+        <div class="toast-content">
+            <h4 id="toastTitle">إشعار جديد</h4>
+            <p id="toastBody">تفاصيل التنبيه الوارد</p>
+        </div>
+        <button class="toast-close-btn" onclick="hideFloatingToast()">✕</button>
+    </div>
+
+    <!-- iOS Install PWA Guide Modal -->
+    <div id="iosInstallModal" class="modal-overlay-drawer" style="display: none;">
+        <div class="modal-card-drawer" style="max-width: 480px;">
+            <div class="modal-header-title">
+                <h2>📲 تفعيل الإشعارات على الآيفون (iOS)</h2>
+                <button class="btn-close-modal" onclick="closeIosGuideModal()">✕</button>
+            </div>
+            <div style="padding: 10px 0; font-size: 13.5px; line-height: 1.8; color: var(--text-secondary);">
+                <p style="margin-bottom: 12px; color: var(--text-pure); font-weight: 700;">لإتاحة استقبال الإشعارات على شاشة قفل الآيفون حتى عند إغلاق Safari تماماً، تتطلب Apple إضافة لوحة التحكم للشاشة الرئيسية:</p>
+                <ol style="padding-right: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 9px;">
+                    <li>اضغط على زر <strong>المشاركة (Share ⬆️)</strong> في شريط متصفح Safari بالأسفل.</li>
+                    <li>مرر للأسفل واختر <strong>(إضافة إلى الشاشة الرئيسية ➕ Add to Home Screen)</strong>.</li>
+                    <li>اضغط <strong>إضافة (Add)</strong> في أعلى اليمين.</li>
+                    <li>افتح أيقونة <strong>(خدمتك أدمن)</strong> من شاشتك الرئيسية.</li>
+                    <li>اضغط على زر <strong>تفعيل الإشعارات</strong> ووافق على السماح بالتنبيهات!</li>
+                </ol>
+                <div style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 12px; text-align: center; color: #c7d2fe;">
+                    ✨ بمجرد إتمام هذه الخطوات ستصلك أصوات وتنبيهات فورية عند وصول أي تسجيل أو طلب جديد!
+                </div>
+            </div>
+            <div class="modal-action-buttons" style="margin-top: 15px;">
+                <button class="btn-modal-action accept" onclick="closeIosGuideModal()">فهمت ذلك ✓</button>
+            </div>
+        </div>
+    </div>
+
     <div class="admin-dashboard-layout">
         
         <!-- Top Admin Header -->
@@ -842,10 +1080,33 @@
             </div>
         </header>
 
+        <!-- iOS & Mobile Push Notifications Banner -->
+        <div id="pushNotificationBanner" class="admin-notification-banner" style="display: none;">
+            <div class="notif-banner-content">
+                <div class="notif-banner-icon" id="notifBannerIcon">🔔</div>
+                <div class="notif-banner-text">
+                    <h4 id="notifBannerTitle">تفعيل إشعارات الآيفون والهاتف الفورية 📲</h4>
+                    <p id="notifBannerDesc">لتصلك تنبيهات فورية بصوت على هاتفك عند تسجيل عميل جديد، طلب مهني، أو بلاغ حتى لو كان هاتفك مغلقاً.</p>
+                </div>
+            </div>
+            <div class="notif-banner-actions">
+                <button class="btn-enable-notif" id="btnEnableNotifications" onclick="enablePushNotifications()">
+                    <span>🔔</span> <span id="btnEnableNotifText">تفعيل الإشعارات الآن</span>
+                </button>
+                <button class="btn-ios-guide" id="btnIosGuide" onclick="openIosGuideModal()" title="دليل تثبيت الآيفون" style="display: none;">
+                    <span>📱</span> <span>خطوات الآيفون</span>
+                </button>
+                <button class="btn-dismiss-notif" onclick="dismissNotifBanner()" title="إغلاق التنبيه">✕</button>
+            </div>
+        </div>
+
         <!-- Top Navigation Tabs -->
         <div class="admin-tabs-nav">
             <button class="btn-admin-tab active" id="tabBtnRequests" onclick="switchAdminTab('requests')">
                 📋 طلبات انضمام المهنيين (<span id="tabBadgeRequests">0</span>)
+            </button>
+            <button class="btn-admin-tab" id="tabBtnCustomers" onclick="switchAdminTab('customers')">
+                👥 العملاء المسجلين (<span id="tabBadgeCustomers">0</span>)
             </button>
             <button class="btn-admin-tab" id="tabBtnFeedback" onclick="switchAdminTab('feedback')">
                 📬 الشكاوى والاستفسارات والاقتراحات (<span id="tabBadgeFeedback">0</span>)
@@ -924,6 +1185,56 @@
                     <option value="مادبا">مادبا</option>
                     <option value="عجلون">عجلون</option>
                     <option value="جرش">جرش</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECTION: CUSTOMERS VIEW (العملاء المسجلين) -->
+        <div id="sectionCustomers" style="display: none;">
+            <!-- Stats Overview Cards -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersTotalCount">0</h3>
+                        <p>إجمالي العملاء المسجلين</p>
+                    </div>
+                    <div class="stat-icon-wrapper total">👥</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersWithPhoneCount">0</h3>
+                        <p>حسابات بأرقام هواتف موثقة</p>
+                    </div>
+                    <div class="stat-icon-wrapper approved">📱</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersActiveThisMonthCount">0</h3>
+                        <p>انضموا خلال هذا الشهر</p>
+                    </div>
+                    <div class="stat-icon-wrapper pending">📅</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersWithBioCount">0</h3>
+                        <p>ملفات شخصية مكتملة</p>
+                    </div>
+                    <div class="stat-icon-wrapper approved">✨</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="admin-filter-bar">
+                <input type="text" class="search-field-admin" id="searchCustomersInput" placeholder="🔍 ابحث في العملاء بالاسم، رقم الهاتف، البريد، أو الرقم الوطني...">
+                
+                <select class="select-field-admin" id="customersSortFilter">
+                    <option value="newest">🕒 الأحدث تسجيلاً أولاً</option>
+                    <option value="oldest">⏳ الأقدم تسجيلاً</option>
+                    <option value="name_asc">🔤 الترتيب الأبجدي (أ - ي)</option>
+                    <option value="with_phone">📱 العملاء الذين لديهم هواتف فقط</option>
                 </select>
             </div>
         </div>
@@ -1129,6 +1440,56 @@
                     <option value="customer_denied">❌ العميل أفاد بعدم الوصول</option>
                     <option value="unjudged">⚖️ بانتظار قرار الإدارة</option>
                     <option value="judged">🌟 تم إصدار الحكم والاعتماد</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECTION 6: REGISTERED CUSTOMERS VIEW -->
+        <div id="sectionCustomers" style="display: none; margin-bottom: 20px;">
+            <!-- Stats Overview Cards -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersTotalCount">0</h3>
+                        <p>إجمالي العملاء المسجلين</p>
+                    </div>
+                    <div class="stat-icon-wrapper total">👥</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersWithPhoneCount">0</h3>
+                        <p>عملاء بأرقام هواتف موثقة</p>
+                    </div>
+                    <div class="stat-icon-wrapper approved">📱</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersActiveThisMonthCount">0</h3>
+                        <p>انضموا هذا الشهر</p>
+                    </div>
+                    <div class="stat-icon-wrapper pending">✨</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="stat-meta">
+                        <h3 id="customersWithBioCount">0</h3>
+                        <p>ملفات شخصية مكتملة</p>
+                    </div>
+                    <div class="stat-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">📝</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="admin-filter-bar">
+                <input type="text" class="search-field-admin" id="searchCustomersInput" placeholder="🔍 ابحث باسم العميل، البريد الإلكتروني، رقم الهاتف أو الرقم الوطني...">
+                
+                <select class="select-field-admin" id="customersSortFilter">
+                    <option value="newest">الأحدث تسجيلاً أولاً</option>
+                    <option value="oldest">الأقدم تسجيلاً</option>
+                    <option value="name_asc">أبجدياً (أ - ي)</option>
+                    <option value="with_phone">المتوفر لديهم رقم هاتف فقط</option>
                 </select>
             </div>
         </div>
@@ -1659,6 +2020,79 @@
         </div>
     </div>
 
+    <!-- 👤 Customer Full Profile & Details Modal -->
+    <div class="modal-overlay-drawer" id="customerDetailModal" style="display: none; z-index: 10000;">
+        <div class="modal-card-drawer" style="max-width: 620px;">
+            <div class="modal-header-drawer">
+                <div class="modal-header-title">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div id="custDetailAvatar" style="width: 52px; height: 52px; border-radius: 50%; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; font-weight: 800; border: 2px solid var(--border-color); overflow: hidden; flex-shrink: 0;">
+                            ع
+                        </div>
+                        <div>
+                            <h2 id="custDetailName" style="color: var(--text-pure); margin-bottom: 2px;">اسم العميل</h2>
+                            <span class="badge-status approved" style="font-size: 11px;">👤 عميل مسجل</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeCustomerDetailModal()">✕</button>
+            </div>
+
+            <div class="detail-section-grid">
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📱 رقم الهاتف</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="detail-box-value" id="custDetailPhone" dir="ltr">-</span>
+                        <div id="custDetailPhoneActions" style="display: flex; gap: 4px;"></div>
+                    </div>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">✉️ البريد الإلكتروني</span>
+                    <span class="detail-box-value break-word" id="custDetailEmail">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">🆔 الرقم الوطني</span>
+                    <span class="detail-box-value" id="custDetailNationalId">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">🔑 معرّف الحساب بالنظام (Firebase UID)</span>
+                    <span class="detail-box-value" id="custDetailUid" style="font-family: monospace; font-size: 11.5px; color: #93c5fd; word-break: break-all;">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">📅 تاريخ التسجيل في المنصة</span>
+                    <span class="detail-box-value" id="custDetailCreatedAt">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">🌍 الجنسية</span>
+                    <span class="detail-box-value" id="custDetailNationality">أردني 🇯🇴</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">🚻 الجنس / تاريخ الميلاد</span>
+                    <span class="detail-box-value" id="custDetailGenderBirth">-</span>
+                </div>
+
+                <div class="detail-box-single full-width">
+                    <span class="detail-box-label">📝 النبذة الشخصية / الملاحظات</span>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-top: 4px;" id="custDetailBio">لا توجد نبذة مسجلة.</p>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="modal-action-buttons">
+                <button class="btn-modal-action reject" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4);" onclick="confirmDeleteCustomerFromModal()">
+                    <span>🗑️</span> <span>حذف العميل من قاعدة البيانات نهائياً</span>
+                </button>
+                <button class="btn-admin-action" style="padding: 12px 20px; justify-content: center;" onclick="closeCustomerDetailModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
@@ -1679,7 +2113,8 @@
             getDoc, 
             serverTimestamp,
             query,
-            where
+            where,
+            onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
         // --- محرك إرسال الإشعارات Google FCM v1 المباشر مدمج بالكامل ---
         const SERVICE_ACCOUNT = {
@@ -1751,7 +2186,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             const header = { alg: "RS256", typ: "JWT" };
             const claimSet = {
                 iss: SERVICE_ACCOUNT.client_email,
-                scope: "https://www.googleapis.com/auth/firebase.messaging",
+                scope: "https://www.googleapis.com/auth/firebase.messaging https://www.googleapis.com/auth/identitytoolkit https://www.googleapis.com/auth/cloud-platform",
                 aud: "https://oauth2.googleapis.com/token",
                 exp: now + 3600,
                 iat: now
@@ -1787,6 +2222,275 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             tokenExpiresAt = now + (data.expires_in || 3600);
             return cachedGoogleToken;
         }
+
+        async function deleteAuthUserAccount(uid, email = null) {
+            if (!uid && !email) return { success: false, error: 'No UID or Email provided' };
+            console.log("Attempting to delete user from Firebase Auth:", { uid, email });
+
+            // 1. Try Netlify Serverless Function (Server-side execution with service account)
+            try {
+                const netlifyRes = await fetch('/.netlify/functions/delete-auth-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid, email })
+                });
+                if (netlifyRes.ok) {
+                    const resJson = await netlifyRes.json();
+                    console.log("✅ User deleted from Firebase Auth via Netlify:", resJson);
+                    return resJson;
+                }
+            } catch (netErr) {
+                console.warn("Netlify function call error (running local file?):", netErr);
+            }
+
+            // 2. Direct Google Identity Toolkit API fallback
+            try {
+                const accessToken = await getGoogleAccessToken();
+                const uidsToDelete = new Set();
+                if (uid) uidsToDelete.add(uid);
+
+                // If email provided, lookup UID via accounts:lookup
+                if (email) {
+                    try {
+                        const lookupUrl = `https://identitytoolkit.googleapis.com/v1/projects/${SERVICE_ACCOUNT.project_id}/accounts:lookup`;
+                        const lookupRes = await fetch(lookupUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ email: [email.trim()] })
+                        });
+                        if (lookupRes.ok) {
+                            const lookupData = await lookupRes.json();
+                            if (lookupData.users && Array.isArray(lookupData.users)) {
+                                lookupData.users.forEach(u => {
+                                    if (u.localId) uidsToDelete.add(u.localId);
+                                });
+                            }
+                        }
+                    } catch (lErr) {
+                        console.warn("Direct lookup by email failed:", lErr);
+                    }
+                }
+
+                const deleteResults = [];
+                const authUrl = `https://identitytoolkit.googleapis.com/v1/projects/${SERVICE_ACCOUNT.project_id}/accounts:delete`;
+                for (const targetUid of uidsToDelete) {
+                    const gRes = await fetch(authUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ localId: targetUid })
+                    });
+                    const gData = await gRes.json();
+                    deleteResults.push({ uid: targetUid, success: gRes.ok, result: gData });
+                }
+                console.log("✅ User deleted from Firebase Auth via Identity Toolkit:", deleteResults);
+                return { success: deleteResults.some(r => r.success) || uidsToDelete.size === 0, results: deleteResults };
+            } catch (gErr) {
+                console.error("Direct Google Identity Toolkit delete error:", gErr);
+                return { success: false, error: gErr.message };
+            }
+        }
+
+        // --- 🔔 Sound & Push Notification Engine ---
+        let audioCtx = null;
+        function playNotificationChime() {
+            try {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) audioCtx = new AudioContextClass();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+                // Pleasant 2-tone chime (587Hz -> 880Hz)
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, now); // D5
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.linearRampToValueAtTime(0.35, now + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.65);
+            } catch (e) {
+                console.warn("Audio chime error:", e);
+            }
+        }
+
+        let toastHideTimer = null;
+        function showFloatingToast(title, body, icon = '🔔') {
+            const toastEl = document.getElementById('adminNotificationToast');
+            if (!toastEl) return;
+            const titleEl = document.getElementById('toastTitle');
+            const bodyEl = document.getElementById('toastBody');
+            const iconEl = document.getElementById('toastIcon');
+
+            if (titleEl) titleEl.textContent = title;
+            if (bodyEl) bodyEl.textContent = body;
+            if (iconEl) iconEl.textContent = icon;
+
+            toastEl.style.display = 'flex';
+            requestAnimationFrame(() => toastEl.classList.add('show'));
+
+            if (toastHideTimer) clearTimeout(toastHideTimer);
+            toastHideTimer = setTimeout(() => hideFloatingToast(), 6000);
+        }
+
+        function hideFloatingToast() {
+            const toastEl = document.getElementById('adminNotificationToast');
+            if (toastEl) {
+                toastEl.classList.remove('show');
+                setTimeout(() => { toastEl.style.display = 'none'; }, 350);
+            }
+        }
+
+        async function showAdminAlert({ title, body, icon = '🔔', tag = 'admin_alert_' + Date.now() }) {
+            // 1. Audible Sound Chime
+            playNotificationChime();
+
+            // 2. In-App Floating Toast
+            showFloatingToast(title, body, icon);
+
+            // 3. System Push / Native Notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    if ('serviceWorker' in navigator) {
+                        const reg = await navigator.serviceWorker.ready;
+                        if (reg && reg.showNotification) {
+                            await reg.showNotification(title, {
+                                body: body,
+                                icon: './images/favicon.png',
+                                badge: './images/favicon.png',
+                                tag: tag,
+                                vibrate: [250, 120, 250],
+                                data: { url: './requests.html' }
+                            });
+                            return;
+                        }
+                    }
+                    new Notification(title, {
+                        body: body,
+                        icon: './images/favicon.png',
+                        tag: tag
+                    });
+                } catch (e) {
+                    console.warn("System notification display error:", e);
+                }
+            }
+        }
+
+        // Check & Init Push Notification State
+        function initPushNotificationState() {
+            const banner = document.getElementById('pushNotificationBanner');
+            if (!banner) return;
+
+            const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            const btnIosGuide = document.getElementById('btnIosGuide');
+
+            if (isIos && btnIosGuide) {
+                btnIosGuide.style.display = 'inline-flex';
+            }
+
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    banner.classList.add('granted');
+                    const titleEl = document.getElementById('notifBannerTitle');
+                    const descEl = document.getElementById('notifBannerDesc');
+                    const iconEl = document.getElementById('notifBannerIcon');
+                    const btnText = document.getElementById('btnEnableNotifText');
+                    const btn = document.getElementById('btnEnableNotifications');
+
+                    if (titleEl) titleEl.textContent = '✅ الإشعارات الفورية مفعلة بنجاح على هذا الجهاز!';
+                    if (descEl) descEl.textContent = 'ستصلك تنبيهات حية فور حدوث أي نشاط في المنصة (تسجيل عميل، طلب مهني، شكوى، أو بلاغ).';
+                    if (iconEl) iconEl.textContent = '✅';
+                    if (btnText) btnText.textContent = 'اختبار صوت الإشعار 🔔';
+                    if (btn) btn.onclick = () => {
+                        showAdminAlert({
+                            title: '🔔 اختبار نظام الإشعارات',
+                            body: 'نظام الإشعارات والأصوات الفورية يعمل بكفاءة تامة على هاتفك 🇯🇴'
+                        });
+                    };
+                    banner.style.display = 'flex';
+                } else if (Notification.permission === 'default') {
+                    banner.style.display = 'flex';
+                } else {
+                    banner.style.display = 'flex';
+                    const titleEl = document.getElementById('notifBannerTitle');
+                    const descEl = document.getElementById('notifBannerDesc');
+                    if (titleEl) titleEl.textContent = '⚠️ تنبيه: الإشعارات محظورة في متصفحك';
+                    if (descEl) descEl.textContent = 'يرجى السماح بالإشعارات من إعدادات المتصفح لتتمكن من استقبال طلبات العمل فوراً.';
+                }
+            } else {
+                banner.style.display = 'flex';
+            }
+        }
+
+        window.enablePushNotifications = async function() {
+            if (!('Notification' in window)) {
+                alert("للأسف هذا المتصفح لا يدعم الإشعارات المباشرة.");
+                return;
+            }
+
+            try {
+                // Initialize audio context on user gesture
+                playNotificationChime();
+
+                const perm = await Notification.requestPermission();
+                if (perm === 'granted') {
+                    // Register service worker if not already registered
+                    if ('serviceWorker' in navigator) {
+                        try {
+                            const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                            console.log("Service worker registered:", reg.scope);
+                        } catch (swErr) {
+                            console.warn("SW register warning:", swErr);
+                        }
+                    }
+
+                    showAdminAlert({
+                        title: '🎉 تم تفعيل الإشعارات بنجاح!',
+                        body: 'ستصلك الآن تنبيهات صوتية وشاشية لكل حركة بالمنصة.'
+                    });
+                    initPushNotificationState();
+                } else if (perm === 'denied') {
+                    alert("تم رفض إذن الإشعارات من إعدادات المتصفح. يرجى تفعيلها يدوياً من إعدادات الموقع.");
+                }
+            } catch (err) {
+                console.error("Error requesting notifications:", err);
+            }
+        };
+
+        window.dismissNotifBanner = function() {
+            const banner = document.getElementById('pushNotificationBanner');
+            if (banner) banner.style.display = 'none';
+        };
+
+        window.openIosGuideModal = function() {
+            const modal = document.getElementById('iosInstallModal');
+            if (modal) modal.style.display = 'flex';
+        };
+
+        window.closeIosGuideModal = function() {
+            const modal = document.getElementById('iosInstallModal');
+            if (modal) modal.style.display = 'none';
+        };
+
 
         async function sendFcmPushSingle({ title, body, token = null, topic = null, data = {} }) {
             const accessToken = await getGoogleAccessToken();
@@ -1949,12 +2653,14 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 if (!hasInitialDataLoaded) {
                     hasInitialDataLoaded = true;
                     await loadAllData();
+                    initRealtimeListeners();
                 }
             } catch (err) {
                 console.error("خطأ أثناء التحقق من صلاحيات الأدمن:", err);
                 if (!hasInitialDataLoaded) {
                     hasInitialDataLoaded = true;
                     await loadAllData();
+                    initRealtimeListeners();
                 }
             }
         });
@@ -1968,11 +2674,14 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         let filteredReports = [];
         let allBookings = [];
         let filteredArrivals = [];
+        let allCustomers = [];
+        let filteredCustomers = [];
 
         let activeModalRequestId = null;
         let activeRejectRequestId = null;
         let activeFeedbackId = null;
         let activeVerdictBookingId = null;
+        let activeModalCustomerId = null;
 
         const elements = {
             loadingState: document.getElementById('loadingState'),
@@ -1994,16 +2703,27 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             
             // Tab badges
             tabBadgeRequests: document.getElementById('tabBadgeRequests'),
+            tabBadgeCustomers: document.getElementById('tabBadgeCustomers'),
             tabBadgeFeedback: document.getElementById('tabBadgeFeedback'),
             tabBadgeReports: document.getElementById('tabBadgeReports'),
             tabBadgeArrivals: document.getElementById('tabBadgeArrivals'),
 
             // Section containers
             sectionRequests: document.getElementById('sectionRequests'),
+            sectionCustomers: document.getElementById('sectionCustomers'),
             sectionFeedback: document.getElementById('sectionFeedback'),
             sectionReports: document.getElementById('sectionReports'),
             sectionBroadcast: document.getElementById('sectionBroadcast'),
             sectionArrivals: document.getElementById('sectionArrivals'),
+
+            // Customers controls
+            searchCustomersInput: document.getElementById('searchCustomersInput'),
+            customersSortFilter: document.getElementById('customersSortFilter'),
+            customersTotalCount: document.getElementById('customersTotalCount'),
+            customersWithPhoneCount: document.getElementById('customersWithPhoneCount'),
+            customersActiveThisMonthCount: document.getElementById('customersActiveThisMonthCount'),
+            customersWithBioCount: document.getElementById('customersWithBioCount'),
+            customerDetailModal: document.getElementById('customerDetailModal'),
 
             // Feedback controls
             searchFeedbackInput: document.getElementById('searchFeedbackInput'),
@@ -2041,6 +2761,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             elements.governorateFilter.addEventListener('change', filterRequests);
             elements.statusFilter.addEventListener('change', filterRequests);
 
+            if (elements.searchCustomersInput) {
+                elements.searchCustomersInput.addEventListener('input', filterCustomers);
+            }
+            if (elements.customersSortFilter) {
+                elements.customersSortFilter.addEventListener('change', filterCustomers);
+            }
+
             elements.searchFeedbackInput.addEventListener('input', filterFeedback);
             elements.feedbackTypeFilter.addEventListener('change', filterFeedback);
             elements.feedbackStatusFilter.addEventListener('change', filterFeedback);
@@ -2053,6 +2780,14 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 elements.arrivalsStatusFilter.addEventListener('change', filterArrivals);
                 elements.arrivalsProofFilter.addEventListener('change', filterArrivals);
             }
+
+            // Register Service Worker and initialize Push Notification banner
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./firebase-messaging-sw.js')
+                    .then(reg => console.log('✅ Service Worker active:', reg.scope))
+                    .catch(err => console.warn('SW registration warning:', err));
+            }
+            initPushNotificationState();
         }
 
         window.switchAdminTab = function(tab) {
@@ -2060,6 +2795,9 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             document.querySelectorAll('.btn-admin-tab').forEach(b => b.classList.remove('active'));
             
             elements.sectionRequests.style.display = tab === 'requests' ? 'block' : 'none';
+            if (elements.sectionCustomers) {
+                elements.sectionCustomers.style.display = tab === 'customers' ? 'block' : 'none';
+            }
             elements.sectionFeedback.style.display = tab === 'feedback' ? 'block' : 'none';
             elements.sectionReports.style.display = tab === 'reports' ? 'block' : 'none';
             elements.sectionBroadcast.style.display = tab === 'broadcast' ? 'block' : 'none';
@@ -2072,6 +2810,12 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 elements.requestsTable.style.display = 'table';
                 elements.requestsCardView.style.display = '';
                 renderRequests();
+            } else if (tab === 'customers') {
+                const btnCustomers = document.getElementById('tabBtnCustomers');
+                if (btnCustomers) btnCustomers.classList.add('active');
+                elements.requestsTable.style.display = 'table';
+                elements.requestsCardView.style.display = '';
+                renderCustomers();
             } else if (tab === 'feedback') {
                 document.getElementById('tabBtnFeedback').classList.add('active');
                 elements.requestsTable.style.display = 'table';
@@ -2200,13 +2944,14 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         async function loadAllData() {
             try {
                 showLoading(true);
-                const [pendingSnap, approvedSnap, rejectedSnap, feedbackSnap, reportsSnap, bookingsSnap] = await Promise.all([
+                const [pendingSnap, approvedSnap, rejectedSnap, feedbackSnap, reportsSnap, bookingsSnap, customersSnap] = await Promise.all([
                     getDocs(collection(db, "pendingUsers")),
                     getDocs(collection(db, "approvedUsers")),
                     getDocs(collection(db, "rejectedUsers")),
                     getDocs(collection(db, "feedbacks")),
                     getDocs(collection(db, "reports")),
-                    getDocs(collection(db, "bookings"))
+                    getDocs(collection(db, "bookings")),
+                    getDocs(collection(db, "customers"))
                 ]);
 
                 allRequests = [];
@@ -2251,17 +2996,34 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     return tB - tA;
                 });
 
+                allCustomers = [];
+                customersSnap.forEach((d) => {
+                    allCustomers.push({ id: d.id, ...d.data() });
+                });
+                allCustomers.sort((a, b) => {
+                    const tA = a.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
+                    const tB = b.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
+                    return tB - tA;
+                });
+
                 filteredRequests = [...allRequests];
                 filteredFeedbacks = [...allFeedbacks];
                 filteredReports = [...allReports];
                 filteredArrivals = [...allBookings];
+                filteredCustomers = [...allCustomers];
 
                 updateStats();
 
                 if (currentAdminTab === 'requests') renderRequests();
+                else if (currentAdminTab === 'customers') renderCustomers();
                 else if (currentAdminTab === 'feedback') renderFeedback();
                 else if (currentAdminTab === 'reports') renderReports();
                 else if (currentAdminTab === 'arrivals') renderArrivals();
+
+                setTimeout(() => {
+                    isRealtimeNotificationsReady = true;
+                    console.log("🔔 [Notifications Engine] جاهز لبث التنبيهات الصوتية والشاشية الحية.");
+                }, 2000);
 
             } catch (err) {
                 console.error("Error loading data:", err);
@@ -2269,6 +3031,171 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             } finally {
                 showLoading(false);
             }
+        }
+
+        let realtimeListenersAttached = false;
+        let isRealtimeNotificationsReady = false;
+
+        function initRealtimeListeners() {
+            if (realtimeListenersAttached) return;
+            realtimeListenersAttached = true;
+            console.log("⚡ [Real-time] تفعيل الاستماع الفوري التلقائي للبيانات في الخلفية...");
+
+            // 1. مزامنة العملاء المسجلين فوراً في الخلفية مع إشعار صوتي وتنبيه
+            try {
+                onSnapshot(collection(db, "customers"), (snapshot) => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                            const c = change.doc.data();
+                            showAdminAlert({
+                                title: '👥 تسجيل عميل جديد بالمنصة!',
+                                body: `قام العميل (${c.name || 'مستخدم جديد'}) بإنشاء حساب في التطبيق الآن.`,
+                                icon: '👥'
+                            });
+                        }
+                    });
+
+                    allCustomers = [];
+                    snapshot.forEach((d) => {
+                        allCustomers.push({ id: d.id, ...d.data() });
+                    });
+                    allCustomers.sort((a, b) => {
+                        const tA = a.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
+                        const tB = b.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
+                        return tB - tA;
+                    });
+                    filteredCustomers = [...allCustomers];
+                    updateStats();
+                    if (currentAdminTab === 'customers') {
+                        filterCustomers();
+                    }
+                }, (err) => console.warn("Real-time customers sync warning:", err));
+            } catch (e) { console.warn(e); }
+
+            // 2. مزامنة طلبات المهنيين (معلقة، مقبولة، مرفوضة) فوراً
+            let cachePending = [];
+            let cacheApproved = [];
+            let cacheRejected = [];
+
+            const syncRequestsRealtime = () => {
+                allRequests = [
+                    ...cachePending.map(d => ({ ...d, status: 'pending' })),
+                    ...cacheApproved.map(d => ({ ...d, status: 'approved' })),
+                    ...cacheRejected.map(d => ({ ...d, status: 'rejected' }))
+                ];
+                allRequests.sort((a, b) => {
+                    const tA = a.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
+                    const tB = b.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
+                    return tB - tA;
+                });
+                filteredRequests = [...allRequests];
+                updateStats();
+                if (currentAdminTab === 'requests') {
+                    filterRequests();
+                }
+            };
+
+            try {
+                onSnapshot(collection(db, "pendingUsers"), (snap) => {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                            const p = change.doc.data();
+                            showAdminAlert({
+                                title: '📋 طلب انضمام مهني جديد!',
+                                body: `ورد طلب جديد من المهني (${p.name || 'مهني'}) لمهنة (${p.job || 'خدمة'}) بانتظار موافقتك.`,
+                                icon: '📋'
+                            });
+                        }
+                    });
+
+                    cachePending = [];
+                    snap.forEach(d => cachePending.push({ id: d.id, ...d.data() }));
+                    syncRequestsRealtime();
+                }, (err) => console.warn("Real-time pending sync warning:", err));
+
+                onSnapshot(collection(db, "approvedUsers"), (snap) => {
+                    cacheApproved = [];
+                    snap.forEach(d => cacheApproved.push({ id: d.id, ...d.data() }));
+                    syncRequestsRealtime();
+                }, (err) => console.warn("Real-time approved sync warning:", err));
+
+                onSnapshot(collection(db, "rejectedUsers"), (snap) => {
+                    cacheRejected = [];
+                    snap.forEach(d => cacheRejected.push({ id: d.id, ...d.data() }));
+                    syncRequestsRealtime();
+                }, (err) => console.warn("Real-time rejected sync warning:", err));
+            } catch (e) { console.warn(e); }
+
+            // 3. مزامنة الشكاوى والاستفسارات في الوقت الفعلي
+            try {
+                onSnapshot(collection(db, "feedbacks"), (snap) => {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                            const f = change.doc.data();
+                            showAdminAlert({
+                                title: '📬 رسالة / شكوى جديدة!',
+                                body: `وصلت رسالة جديدة من (${f.userName || 'مستخدم'}): ${f.subject || f.message || 'تفاصيل جديدة'}`,
+                                icon: '📬'
+                            });
+                        }
+                    });
+
+                    allFeedbacks = [];
+                    snap.forEach(d => allFeedbacks.push({ id: d.id, ...d.data() }));
+                    allFeedbacks.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                    filteredFeedbacks = [...allFeedbacks];
+                    updateStats();
+                    if (currentAdminTab === 'feedback') filterFeedback();
+                }, (err) => console.warn("Real-time feedback sync warning:", err));
+            } catch (e) { console.warn(e); }
+
+            // 4. مزامنة البلاغات والمخالفات في الوقت الفعلي
+            try {
+                onSnapshot(collection(db, "reports"), (snap) => {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === 'added' && isRealtimeNotificationsReady) {
+                            const r = change.doc.data();
+                            showAdminAlert({
+                                title: '🚨 بلاغ طارئ عن مخالفة!',
+                                body: `ورد بلاغ جديد في النظام: ${r.reason || 'مخالفة سلوك'}. يرجى اتخاذ الإجراء.`,
+                                icon: '🚨'
+                            });
+                        }
+                    });
+
+                    allReports = [];
+                    snap.forEach(d => allReports.push({ id: d.id, ...d.data() }));
+                    allReports.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                    filteredReports = [...allReports];
+                    updateStats();
+                    if (currentAdminTab === 'reports') filterReports();
+                }, (err) => console.warn("Real-time reports sync warning:", err));
+            } catch (e) { console.warn(e); }
+
+            // 5. مزامنة الحجوزات وإثباتات الوصول الميداني في الوقت الفعلي
+            try {
+                onSnapshot(collection(db, "bookings"), (snap) => {
+                    snap.docChanges().forEach(change => {
+                        if (isRealtimeNotificationsReady) {
+                            const b = change.doc.data();
+                            if (change.type === 'modified' && b.status === 'arrived') {
+                                showAdminAlert({
+                                    title: '📍 وصول ميداني لفني!',
+                                    body: `أكد الفني (${b.professionalName || 'المهني'}) وصوله لموقع العميل بنجاح.`,
+                                    icon: '📍'
+                                });
+                            }
+                        }
+                    });
+
+                    allBookings = [];
+                    snap.forEach(d => allBookings.push({ id: d.id, ...d.data() }));
+                    allBookings.sort((a, b) => (b.arrivedAt?.seconds || b.createdAt?.seconds || 0) - (a.arrivedAt?.seconds || a.createdAt?.seconds || 0));
+                    filteredArrivals = [...allBookings];
+                    updateStats();
+                    if (currentAdminTab === 'arrivals') filterArrivals();
+                }, (err) => console.warn("Real-time bookings sync warning:", err));
+            } catch (e) { console.warn(e); }
         }
 
         function updateStats() {
@@ -2282,8 +3209,32 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             elements.totalCount.textContent = allRequests.length;
 
             elements.tabBadgeRequests.textContent = pending;
+            if (elements.tabBadgeCustomers) elements.tabBadgeCustomers.textContent = allCustomers.length;
             elements.tabBadgeFeedback.textContent = allFeedbacks.filter(f => f.status !== 'resolved').length;
             elements.tabBadgeReports.textContent = allReports.length;
+
+            // Customers Stats
+            if (elements.customersTotalCount) {
+                elements.customersTotalCount.textContent = allCustomers.length;
+            }
+            if (elements.customersWithPhoneCount) {
+                elements.customersWithPhoneCount.textContent = allCustomers.filter(c => c.phone && c.phone.trim().length > 0).length;
+            }
+            if (elements.customersWithBioCount) {
+                elements.customersWithBioCount.textContent = allCustomers.filter(c => c.bio && c.bio.trim().length > 0).length;
+            }
+            if (elements.customersActiveThisMonthCount) {
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+                const thisMonthCount = allCustomers.filter(c => {
+                    let d = null;
+                    if (c.createdAt?.toDate) d = c.createdAt.toDate().getTime();
+                    else if (c.createdAt?.seconds) d = c.createdAt.seconds * 1000;
+                    else if (c.createdAt) d = new Date(c.createdAt).getTime();
+                    return d && d >= startOfMonth;
+                }).length;
+                elements.customersActiveThisMonthCount.textContent = thisMonthCount;
+            }
 
             // Arrivals stats
             const totalField = allBookings.length;
@@ -2368,6 +3319,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                                 <button class="btn-table-action accept" onclick="quickAccept('${req.id}')">قبول ✓</button>
                                 <button class="btn-table-action reject" onclick="openRejectModal('${req.id}')">رفض ✕</button>
                             ` : ''}
+                            <button class="btn-table-action reject" style="background: rgba(239,68,68,0.2); color:#fca5a5; border-color:rgba(239,68,68,0.35);" onclick="deleteRequestRecord('${req.id}')" title="حذف نهائي من النظام">🗑️</button>
                         </div>
                     </td>
                 `;
@@ -2393,11 +3345,314 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                             <button class="btn-table-action accept" style="flex: 1; padding: 10px;" onclick="quickAccept('${req.id}')">قبول ✓</button>
                             <button class="btn-table-action reject" style="flex: 1; padding: 10px;" onclick="openRejectModal('${req.id}')">رفض ✕</button>
                         ` : ''}
+                        <button class="btn-table-action reject" style="padding: 10px 14px; background: rgba(239,68,68,0.2); color:#fca5a5;" onclick="deleteRequestRecord('${req.id}')" title="حذف نهائي">🗑️ حذف</button>
                     </div>
                 `;
                 cardView.appendChild(card);
             });
         }
+
+        // --- Customers Management ---
+        function filterCustomers() {
+            const query = (elements.searchCustomersInput?.value || '').toLowerCase().trim();
+            const sort = elements.customersSortFilter?.value || 'newest';
+
+            filteredCustomers = allCustomers.filter(cust => {
+                const matchesQuery = !query ||
+                    (cust.name && cust.name.toLowerCase().includes(query)) ||
+                    (cust.email && cust.email.toLowerCase().includes(query)) ||
+                    (cust.phone && cust.phone.includes(query)) ||
+                    (cust.nationalId && cust.nationalId.includes(query)) ||
+                    (cust.id && cust.id.toLowerCase().includes(query)) ||
+                    (cust.bio && cust.bio.toLowerCase().includes(query));
+
+                const matchesPhone = sort !== 'with_phone' || (cust.phone && cust.phone.trim().length > 0);
+
+                return matchesQuery && matchesPhone;
+            });
+
+            // Sorting
+            filteredCustomers.sort((a, b) => {
+                if (sort === 'name_asc') {
+                    return (a.name || '').localeCompare(b.name || '', 'ar');
+                } else if (sort === 'oldest') {
+                    const tA = a.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
+                    const tB = b.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
+                    return tA - tB;
+                } else {
+                    // newest default
+                    const tA = a.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
+                    const tB = b.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
+                    return tB - tA;
+                }
+            });
+
+            renderCustomers();
+        }
+
+        function renderCustomers() {
+            const tableBody = elements.requestsTableBody;
+            const cardView = elements.requestsCardView;
+            tableBody.innerHTML = '';
+            cardView.innerHTML = '';
+
+            // Table headers for customers
+            document.querySelector('#requestsTable thead tr').innerHTML = `
+                <th>العميل</th>
+                <th>رقم الهاتف</th>
+                <th>البريد الإلكتروني</th>
+                <th>الرقم الوطني</th>
+                <th>الجنسية</th>
+                <th>تاريخ التسجيل</th>
+                <th>الإجراءات</th>
+            `;
+
+            if (filteredCustomers.length === 0) {
+                elements.emptyState.style.display = 'block';
+                elements.requestsTable.style.display = 'none';
+                return;
+            }
+
+            elements.emptyState.style.display = 'none';
+            elements.requestsTable.style.display = 'table';
+
+            filteredCustomers.forEach(cust => {
+                const cleanPhone = (cust.phone || '').replace(/\D/g, '');
+                let waPhone = cleanPhone;
+                if (waPhone.startsWith('07')) waPhone = '962' + waPhone.substring(1);
+
+                const avatarLetter = (cust.name && cust.name.trim().length > 0) ? cust.name.trim().charAt(0) : 'ع';
+
+                // Table Row
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 15px; color: white; font-weight: 800; overflow: hidden; flex-shrink: 0;">
+                                ${cust.imageUrl ? `<img src="${cust.imageUrl}" style="width:100%; height:100%; object-fit:cover;" />` : avatarLetter}
+                            </div>
+                            <div>
+                                <strong class="break-word">${cust.name || 'عميل مسجل'}</strong>
+                                <div style="font-size: 11px; color: #10b981; font-weight: 700;">🟢 حساب نشط</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td dir="ltr" style="text-align: right;">
+                        ${cust.phone ? `
+                            ${cust.phone}
+                            <div style="margin-top: 4px;">
+                                <a href="tel:${cleanPhone}" class="btn-quick-contact" style="background: rgba(16,185,129,0.2); color:#6ee7b7;">📞</a>
+                                <a href="https://wa.me/${waPhone}" target="_blank" class="btn-quick-contact" style="background: rgba(37,211,102,0.2); color:#4ade80;">💬</a>
+                            </div>
+                        ` : '<span style="color:var(--text-muted); font-size:12px;">غير متوفر</span>'}
+                    </td>
+                    <td><span class="break-word" style="font-size: 12.5px; color: var(--text-secondary);">${cust.email || '-'}</span></td>
+                    <td>${cust.nationalId ? `<span style="font-size: 13px; font-weight: 700; color: #a5b4fc;">${cust.nationalId}</span>` : `<span style="color: var(--text-muted); font-size: 11.5px;">غير مطلوب (عميل)</span>`}</td>
+                    <td><span class="badge-status approved" style="font-size: 11px;">${cust.nationality || 'أردني 🇯🇴'}</span></td>
+                    <td>${formatDate(cust.createdAt)}</td>
+                    <td>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="btn-table-action view" onclick="openCustomerDetails('${cust.id}')">التفاصيل 🔍</button>
+                            <button class="btn-table-action reject" style="background: rgba(239,68,68,0.2); color:#fca5a5; border-color:rgba(239,68,68,0.4);" onclick="deleteCustomerRecord('${cust.id}', '${(cust.name || 'هذا العميل').replace(/'/g, "\\'")}')" title="حذف العميل من قاعدة البيانات">حذف 🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+
+                // Mobile Card
+                const card = document.createElement('div');
+                card.className = 'mobile-req-card';
+                card.innerHTML = `
+                    <div class="mobile-req-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; font-weight: 800; overflow: hidden;">
+                                ${cust.imageUrl ? `<img src="${cust.imageUrl}" style="width:100%; height:100%; object-fit:cover;" />` : avatarLetter}
+                            </div>
+                            <span class="mobile-req-name break-word">${cust.name || 'عميل مسجل'}</span>
+                        </div>
+                        <span class="badge-status approved">👤 عميل</span>
+                    </div>
+                    <div class="mobile-req-info-grid">
+                        <span>الهاتف: <strong>${cust.phone || '-'}</strong></span>
+                        <span>البريد: <strong class="break-word">${cust.email || '-'}</strong></span>
+                        <span>الرقم الوطني: <strong>${cust.nationalId || 'غير مطلوب (عميل)'}</strong></span>
+                        <span>تاريخ التسجيل: <strong>${formatDate(cust.createdAt)}</strong></span>
+                    </div>
+                    <div class="mobile-req-actions">
+                        <button class="btn-table-action view" style="flex: 1; padding: 10px;" onclick="openCustomerDetails('${cust.id}')">التفاصيل الكاملة 🔍</button>
+                        <button class="btn-table-action reject" style="padding: 10px 14px; background: rgba(239,68,68,0.2); color:#fca5a5;" onclick="deleteCustomerRecord('${cust.id}', '${(cust.name || 'هذا العميل').replace(/'/g, "\\'")}')">حذف 🗑️</button>
+                    </div>
+                `;
+                cardView.appendChild(card);
+            });
+        }
+
+        window.openCustomerDetails = function(custId) {
+            const cust = allCustomers.find(c => c.id === custId);
+            if (!cust) return;
+
+            activeModalCustomerId = custId;
+
+            document.getElementById('custDetailName').textContent = cust.name || 'عميل بدون اسم';
+            document.getElementById('custDetailPhone').textContent = cust.phone || 'غير مسجل';
+            document.getElementById('custDetailEmail').textContent = cust.email || 'غير مسجل';
+            document.getElementById('custDetailNationalId').textContent = cust.nationalId ? cust.nationalId : 'غير مطلوب (حساب عميل - خاص بالمهنيين)';
+            if (document.getElementById('custDetailUid')) {
+                document.getElementById('custDetailUid').textContent = cust.id || '-';
+            }
+            document.getElementById('custDetailCreatedAt').textContent = formatDate(cust.createdAt);
+            document.getElementById('custDetailNationality').textContent = cust.nationality || 'أردني 🇯🇴';
+            
+            let genderBirth = [];
+            if (cust.gender) genderBirth.push(cust.gender === 'male' ? 'ذكر' : (cust.gender === 'female' ? 'أنثى' : cust.gender));
+            if (cust.birthDate) genderBirth.push(cust.birthDate);
+            document.getElementById('custDetailGenderBirth').textContent = genderBirth.length > 0 ? genderBirth.join(' | ') : 'غير محدد';
+
+            document.getElementById('custDetailBio').textContent = cust.bio || 'لا توجد نبذة شخصية أو ملاحظات مسجلة.';
+
+            // Avatar
+            const avatarBox = document.getElementById('custDetailAvatar');
+            if (cust.imageUrl) {
+                avatarBox.innerHTML = `<img src="${cust.imageUrl}" style="width:100%; height:100%; object-fit:cover;" />`;
+            } else {
+                const letter = (cust.name && cust.name.trim().length > 0) ? cust.name.trim().charAt(0) : 'ع';
+                avatarBox.innerHTML = letter;
+            }
+
+            // Phone direct actions
+            const phoneActions = document.getElementById('custDetailPhoneActions');
+            phoneActions.innerHTML = '';
+            if (cust.phone) {
+                const cleanPhone = cust.phone.replace(/\D/g, '');
+                let waPhone = cleanPhone;
+                if (waPhone.startsWith('07')) waPhone = '962' + waPhone.substring(1);
+                phoneActions.innerHTML = `
+                    <a href="tel:${cleanPhone}" class="btn-quick-contact" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">📞 اتصال</a>
+                    <a href="https://wa.me/${waPhone}" target="_blank" class="btn-quick-contact" style="background: rgba(37, 211, 102, 0.2); color: #4ade80; border: 1px solid rgba(37, 211, 102, 0.3);">💬 واتساب</a>
+                `;
+            }
+
+            document.getElementById('customerDetailModal').style.display = 'flex';
+        };
+
+        window.closeCustomerDetailModal = function() {
+            document.getElementById('customerDetailModal').style.display = 'none';
+            activeModalCustomerId = null;
+        };
+
+        window.confirmDeleteCustomerFromModal = function() {
+            if (!activeModalCustomerId) return;
+            const targetId = activeModalCustomerId;
+            const cust = allCustomers.find(c => c.id === targetId);
+            const name = cust ? cust.name : 'هذا العميل';
+            closeCustomerDetailModal();
+            deleteCustomerRecord(targetId, name);
+        };
+
+        window.deleteCustomerRecord = async function(custId, custName = 'العميل') {
+            if (!custId) {
+                alert("❌ تعذر تحديد معرّف العميل المطلوب حذفه!");
+                return;
+            }
+
+            const cust = allCustomers.find(c => c.id === custId) || {};
+            const custEmail = (cust.email || '').trim();
+            const custPhone = (cust.phone || '').trim();
+
+            const confirmMsg = `⚠️ تأكيد حذف حساب العميل نهائياً:\n\n` +
+                `الاسم: ${custName}\n` +
+                `البريد الإلكتروني: ${custEmail || 'غير مسجل'}\n` +
+                `رقم الهاتف: ${custPhone || 'غير مسجل'}\n\n` +
+                `📌 ماذا سيحدث عند تأكيد الحذف:\n` +
+                `1️⃣ سيتم حذف الحساب بالكامل من Firebase Authentication.\n` +
+                `2️⃣ سيتم تحرير البريد الإلكتروني ورقم الهاتف تماماً، ليتمكن العميل من إنشاء حساب جديد بهما في أي وقت.\n` +
+                `3️⃣ سيتم مسح كافة سجلات العميل، مشاركاته المجتمعية، محادثاته، حجوزاته، وتقييماته لتفريغ مساحة التخزين السحابي.\n\n` +
+                `هل أنت متأكد من الحذف النهائي؟`;
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                showLoading(true);
+
+                // 1. Delete user from Firebase Auth by UID and Email lookup
+                try {
+                    await deleteAuthUserAccount(custId, custEmail);
+                } catch (authErr) {
+                    console.warn("Firebase Auth deletion notice for customer:", authErr);
+                }
+
+                const deletePromises = [
+                    deleteDoc(doc(db, "customers", custId)),
+                    deleteDoc(doc(db, "users", custId))
+                ];
+
+                // Delete any duplicate customer docs by email or phone
+                if (custEmail) {
+                    try {
+                        const emailSnap = await getDocs(query(collection(db, "customers"), where("email", "==", custEmail)));
+                        emailSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    } catch (e) {}
+                }
+                if (custPhone) {
+                    try {
+                        const phoneSnap = await getDocs(query(collection(db, "customers"), where("phone", "==", custPhone)));
+                        phoneSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    } catch (e) {}
+                }
+
+                // 2. Cascade delete community posts & their subcollection comments
+                try {
+                    const postsSnap = await getDocs(query(collection(db, "community_posts"), where("authorId", "==", custId)));
+                    for (const pDoc of postsSnap.docs) {
+                        try {
+                            const commSnap = await getDocs(collection(db, "community_posts", pDoc.id, "comments"));
+                            commSnap.forEach(c => deletePromises.push(deleteDoc(c.ref)));
+                        } catch (ce) {}
+                        deletePromises.push(deleteDoc(pDoc.ref));
+                    }
+                } catch (pe) { console.warn("Clean posts error:", pe); }
+
+                // 3. Cascade delete chats & their messages subcollection
+                try {
+                    const chatsSnap = await getDocs(query(collection(db, "chats"), where("users", "array-contains", custId)));
+                    for (const chDoc of chatsSnap.docs) {
+                        try {
+                            const msgSnap = await getDocs(collection(db, "chats", chDoc.id, "messages"));
+                            msgSnap.forEach(m => deletePromises.push(deleteDoc(m.ref)));
+                        } catch (me) {}
+                        deletePromises.push(deleteDoc(chDoc.ref));
+                    }
+                } catch (che) { console.warn("Clean chats error:", che); }
+
+                // 4. Cascade delete bookings, reviews, favorites, feedbacks, reports, notifications
+                const cleanCollections = [
+                    { col: "bookings", field: "customerId" },
+                    { col: "reviews", field: "customerId" },
+                    { col: "favorites", field: "userId" },
+                    { col: "feedbacks", field: "userId" },
+                    { col: "reports", field: "reporterId" },
+                    { col: "notifications", field: "userId" }
+                ];
+                for (const item of cleanCollections) {
+                    try {
+                        const snap = await getDocs(query(collection(db, item.col), where(item.field, "==", custId)));
+                        snap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    } catch (e) {}
+                }
+
+                await Promise.allSettled(deletePromises);
+
+                // 5. Refresh local data & UI
+                await loadAllData();
+                alert(`✅ تم حذف حساب العميل (${custName}) وكافة سجلاته بنجاح من النظام.\nتم تحرير البريد الإلكتروني ورقم الهاتف، وبإمكانه الآن إنشاء حساب جديد تماماً بنفس البيانات دون أي تعارض.`);
+
+            } catch (err) {
+                console.error("Error deleting customer:", err);
+                alert("❌ فشل حذف العميل من قاعدة البيانات: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        };
 
         // --- Feedback (Complaints/Suggestions) Management ---
         function filterFeedback() {
@@ -3496,19 +4751,46 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
         };
 
-        // Delete Request Record (تنظيف وحذف شامل من الفايربيس لتوفير المساحة وإتاحة إعادة التقديم)
-        window.deleteRequestRecord = async function(nationalId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذا المهني نهائياً من قاعدة البيانات والفايربيس؟\nسيتم مسح كافة سجلاته وبياناته لتفريغ المساحة، وسيكون بإمكانه التقديم من جديد بنفس البريد والرقم الوطني.')) return;
+        // Delete Request Record (تنظيف وحذف شامل وتحرير الرقم الوطني والإيميل والهاتف للتقديم الجديد)
+        window.deleteRequestRecord = async function(identifier) {
+            if (!identifier) {
+                alert("❌ تعذر تحديد معرّف المهني المطلوب حذفه!");
+                return;
+            }
+
+            const req = allRequests.find(r => r.id === identifier || r.nationalId === identifier) || {};
+            const cleanNatId = (req.nationalId || identifier || '').toString().trim();
+            const reqDocId = (req.id || identifier || '').toString().trim();
+            const reqEmail = (req.email || '').toString().trim();
+            const reqPhone = (req.phone || '').toString().trim();
+            const reqName = req.name || req.fullName || 'هذا المهني';
+
+            const confirmMsg = `⚠️ تأكيد حذف حساب المهني نهائياً من المنصة والفايربيس:\n\n` +
+                `الاسم: ${reqName}\n` +
+                `الرقم الوطني: ${cleanNatId || 'غير متوفر'}\n` +
+                `البريد الإلكتروني: ${reqEmail || 'غير متوفر'}\n` +
+                `رقم الهاتف: ${reqPhone || 'غير متوفر'}\n\n` +
+                `📌 ماذا سيحدث عند الحذف:\n` +
+                `1️⃣ سيتم حذف الحساب بالكامل من Firebase Authentication وتحرير البريد ورقم الهاتف.\n` +
+                `2️⃣ سيتم مسح السجلات من (approvedUsers، pendingUsers، rejectedUsers، pendingRequests).\n` +
+                `3️⃣ سيتم تحرير (الرقم الوطني) فوراً ليتمكن المهني من تقديم طلب انضمام جديد بنفس الرقم الوطني والإيميل ورقم الهاتف كحساب جديد تماماً.\n` +
+                `4️⃣ سيتم مسح كافة قصصه، مراجعاته، حجوزاته، ومحادثاته لتوفير مساحة التخزين السحابي.\n\n` +
+                `هل أنت متأكد من الحذف النهائي؟`;
+
+            if (!confirm(confirmMsg)) return;
 
             try {
                 showLoading(true);
-                const req = allRequests.find(r => r.id === nationalId || r.nationalId === nationalId);
-                const cleanNatId = (req && req.nationalId) ? req.nationalId.trim() : nationalId.toString().trim();
-                const reqDocId = (req && req.id) ? req.id.trim() : nationalId.toString().trim();
-                const reqEmail = (req && req.email) ? req.email.trim() : '';
+
+                // 1. Delete user from Firebase Auth by UID and Email lookup
+                try {
+                    await deleteAuthUserAccount(reqDocId, reqEmail);
+                } catch (authErr) {
+                    console.warn("Firebase Auth deletion notice for professional:", authErr);
+                }
 
                 const deletePromises = [
-                    // 1. مسح الوثائق الأساسية من كل الجداول
+                    // Base document IDs
                     deleteDoc(doc(db, "pendingUsers", reqDocId)),
                     deleteDoc(doc(db, "pendingUsers", cleanNatId)),
                     deleteDoc(doc(db, "pendingRequests", reqDocId)),
@@ -3516,56 +4798,102 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     deleteDoc(doc(db, "approvedUsers", reqDocId)),
                     deleteDoc(doc(db, "approvedUsers", cleanNatId)),
                     deleteDoc(doc(db, "rejectedUsers", reqDocId)),
-                    deleteDoc(doc(db, "rejectedUsers", cleanNatId)),
+                    deleteDoc(doc(db, "rejectedUsers", cleanNatId))
                 ];
 
-                // 2. مسح أي سجلات متفرقة مطابقة للرقم الوطني أو الإيميل في pendingUsers و rejectedUsers و approvedUsers
-                const collectionsToClean = ["pendingUsers", "rejectedUsers", "approvedUsers", "pendingRequests"];
-                for (const colName of collectionsToClean) {
+                // 2. Wipe any matching documents across all 4 collections by nationalId, email, and phone
+                const proCols = ["pendingUsers", "rejectedUsers", "approvedUsers", "pendingRequests"];
+                for (const colName of proCols) {
                     if (cleanNatId) {
                         try {
                             const qNat = query(collection(db, colName), where("nationalId", "==", cleanNatId));
                             const snapNat = await getDocs(qNat);
                             snapNat.forEach(d => deletePromises.push(deleteDoc(d.ref)));
-                        } catch (e) { /* ignore */ }
+                        } catch (e) {}
                     }
                     if (reqEmail) {
                         try {
                             const qMail = query(collection(db, colName), where("email", "==", reqEmail));
                             const snapMail = await getDocs(qMail);
                             snapMail.forEach(d => deletePromises.push(deleteDoc(d.ref)));
-                        } catch (e) { /* ignore */ }
+                        } catch (e) {}
+                    }
+                    if (reqPhone) {
+                        try {
+                            const qPhone = query(collection(db, colName), where("phone", "==", reqPhone));
+                            const snapPhone = await getDocs(qPhone);
+                            snapPhone.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                        } catch (e) {}
                     }
                 }
 
-                // 3. مسح القصص (Stories) والمراجعات (Reviews) والإشعارات المتبقية للمهني لتوفير مساحة التخزين
-                try {
-                    const idsToMatch = [reqDocId, cleanNatId].filter(Boolean);
-                    for (const uid of idsToMatch) {
-                        const storiesQuery = query(collection(db, "stories"), where("professionalId", "==", uid));
-                        const storiesSnap = await getDocs(storiesQuery);
-                        storiesSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                // 3. Cascade clean stories (+ comments), reviews, community posts (+ comments), chats (+ messages), bookings, notifications
+                const proIds = Array.from(new Set([reqDocId, cleanNatId])).filter(Boolean);
+                for (const pid of proIds) {
+                    // Stories
+                    try {
+                        const stSnap = await getDocs(query(collection(db, "stories"), where("professionalId", "==", pid)));
+                        for (const sDoc of stSnap.docs) {
+                            try {
+                                const cSnap = await getDocs(collection(db, "stories", sDoc.id, "comments"));
+                                cSnap.forEach(c => deletePromises.push(deleteDoc(c.ref)));
+                            } catch(e) {}
+                            deletePromises.push(deleteDoc(sDoc.ref));
+                        }
+                    } catch (e) {}
 
-                        const reviewsQuery = query(collection(db, "reviews"), where("professionalId", "==", uid));
-                        const reviewsSnap = await getDocs(reviewsQuery);
-                        reviewsSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    // Community posts
+                    try {
+                        const pSnap = await getDocs(query(collection(db, "community_posts"), where("authorId", "==", pid)));
+                        for (const pDoc of pSnap.docs) {
+                            try {
+                                const cSnap = await getDocs(collection(db, "community_posts", pDoc.id, "comments"));
+                                cSnap.forEach(c => deletePromises.push(deleteDoc(c.ref)));
+                            } catch(e) {}
+                            deletePromises.push(deleteDoc(pDoc.ref));
+                        }
+                    } catch (e) {}
 
-                        const notifQuery = query(collection(db, "notifications"), where("userId", "==", uid));
-                        const notifSnap = await getDocs(notifQuery);
-                        notifSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
-                    }
-                } catch (e) {
-                    console.warn("Error cleaning stories/reviews:", e);
+                    // Chats
+                    try {
+                        const chSnap = await getDocs(query(collection(db, "chats"), where("users", "array-contains", pid)));
+                        for (const chDoc of chSnap.docs) {
+                            try {
+                                const mSnap = await getDocs(collection(db, "chats", chDoc.id, "messages"));
+                                mSnap.forEach(m => deletePromises.push(deleteDoc(m.ref)));
+                            } catch(e) {}
+                            deletePromises.push(deleteDoc(chDoc.ref));
+                        }
+                    } catch (e) {}
+
+                    // Bookings
+                    try {
+                        const bSnap = await getDocs(query(collection(db, "bookings"), where("professionalId", "==", pid)));
+                        bSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    } catch (e) {}
+
+                    // Reviews
+                    try {
+                        const rSnap = await getDocs(query(collection(db, "reviews"), where("professionalId", "==", pid)));
+                        rSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    } catch (e) {}
+
+                    // Notifications
+                    try {
+                        const nSnap = await getDocs(query(collection(db, "notifications"), where("userId", "==", pid)));
+                        nSnap.forEach(d => deletePromises.push(deleteDoc(d.ref)));
+                    } catch (e) {}
                 }
 
                 await Promise.allSettled(deletePromises);
 
-                closeDetailModal();
+                if (typeof closeDetailModal === 'function') closeDetailModal();
                 await loadAllData();
-                alert('🗑️ تم حذف كامل بيانات المهني من النظام وقواعد البيانات بنجاح لتوفير المساحة، ويمكنه الآن التسجيل من جديد كحساب جديد تماماً.');
+                alert(`✅ تم حذف حساب وبيانات المهني (${reqName}) بنجاح من النظام والفايربيس.\nتم تحرير الرقم الوطني (${cleanNatId}) والبريد ورقم الهاتف بالكامل، وبإمكانه الآن التقديم مجدداً كحساب جديد تماماً.`);
+
             } catch (err) {
                 console.error("Delete error:", err);
-                alert("حدث خطأ أثناء الحذف: " + err.message);
+                alert("❌ حدث خطأ أثناء حذف المهني: " + err.message);
             } finally {
                 showLoading(false);
             }
