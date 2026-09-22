@@ -2360,7 +2360,9 @@
         import { 
             getAuth, 
             onAuthStateChanged, 
-            signOut 
+            signOut,
+            setPersistence,
+            browserLocalPersistence
         } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
         import { 
             getFirestore, 
@@ -3146,35 +3148,79 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+
+        // ضمان تثبيت الجلسة في الذاكرة المحلية الدائمة على مستوى المتصفح والآيفون PWA
+        try {
+            setPersistence(auth, browserLocalPersistence).catch(e => console.warn("Persistence set warning:", e));
+        } catch (e) {
+            console.warn("Persistence init warning:", e);
+        }
+
         let currentAdminUser = null;
         let hasInitialDataLoaded = false;
+        let authGraceTimer = null;
 
-        // --- نظام حماية ومصادقة Google Firebase Auth الرسمي ---
+        // --- نظام حماية ومصادقة Google Firebase Auth الرسمي مع دعم استقرار جلسات الآيفون ---
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
+                const wasLoggedIn = localStorage.getItem("adminLoggedIn") === "true" || sessionStorage.getItem("adminLoggedIn") === "true";
+                
+                // في هواتف الآيفون وتطبيقات الشاشة الرئيسية PWA، قد يتأخر استرجاع الجلسة من IndexedDB لبضع ثوانٍ بعد قفل الشاشة
+                if (wasLoggedIn) {
+                    if (!authGraceTimer) {
+                        authGraceTimer = setTimeout(() => {
+                            if (!auth.currentUser) {
+                                console.log("⏳ انتهت مهلة استرجاع الجلسة، جاري التحويل لصفحة الدخول...");
+                                sessionStorage.removeItem("adminLoggedIn");
+                                localStorage.removeItem("adminLoggedIn");
+                                window.location.href = "admin-login.html";
+                            }
+                        }, 2500);
+                    }
+                    return;
+                }
+
                 sessionStorage.removeItem("adminLoggedIn");
                 localStorage.removeItem("adminLoggedIn");
                 window.location.href = "admin-login.html";
                 return;
             }
 
+            // تم استرجاع أو وجود جلسة المستخدم بنجاح - إلغاء أي مؤقت تحويل
+            if (authGraceTimer) {
+                clearTimeout(authGraceTimer);
+                authGraceTimer = null;
+            }
+
             try {
                 // التحقق من أن المستخدم مسجل في وثائق الأدمن أو يحمل بريد الإدارة الرسمي
-                const adminDoc = await getDoc(doc(db, "admins", user.uid));
                 const userEmail = (user.email || "").toLowerCase();
-                const isAuthorized = adminDoc.exists() || userEmail.includes("admin") || userEmail.includes("khedmtek");
+                let isAuthorized = userEmail.includes("admin") || userEmail.includes("khedmtek");
+                
+                if (!isAuthorized) {
+                    try {
+                        const adminDoc = await getDoc(doc(db, "admins", user.uid));
+                        isAuthorized = adminDoc.exists();
+                    } catch (netErr) {
+                        console.warn("تعذر فحص وثيقة الأدمن بسبب الشبكة، الاعتماد على الجلسة النشطة:", netErr);
+                        isAuthorized = localStorage.getItem("adminLoggedIn") === "true";
+                    }
+                }
 
                 if (!isAuthorized) {
                     alert("⛔ تنبيه أمني: هذا الحساب غير مصرح له بالدخول كمسؤول!");
                     await signOut(auth);
                     sessionStorage.removeItem("adminLoggedIn");
                     localStorage.removeItem("adminLoggedIn");
+                    localStorage.removeItem("adminRememberSaved");
                     window.location.href = "admin-login.html";
                     return;
                 }
 
                 currentAdminUser = user;
                 sessionStorage.setItem("adminLoggedIn", "true");
+                localStorage.setItem("adminLoggedIn", "true");
+                localStorage.setItem("adminRememberSaved", "true");
 
                 // تحديث بادج اسم/إيميل الأدمن في الشريط العلوي
                 const adminBadge = document.getElementById("adminUserEmailBadge");

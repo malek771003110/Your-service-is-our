@@ -348,16 +348,22 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let rememberAdmin = false;
+    let rememberAdmin = true;
 
     // Auto-check existing session
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          const adminDoc = await getDoc(doc(db, "admins", user.uid));
-          if (adminDoc.exists() || (user.email && user.email.toLowerCase().includes("admin"))) {
+          const userEmail = (user.email || "").toLowerCase();
+          let isAuthorized = userEmail.includes("admin") || userEmail.includes("khedmtek");
+          if (!isAuthorized) {
+            const adminDoc = await getDoc(doc(db, "admins", user.uid));
+            isAuthorized = adminDoc.exists();
+          }
+          if (isAuthorized) {
             sessionStorage.setItem("adminLoggedIn", "true");
             localStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminRememberSaved", "true");
             window.location.href = "requests.html";
           }
         } catch (e) {
@@ -367,12 +373,13 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('adminRememberSaved') === 'true') {
-        rememberAdmin = true;
-        const cb = document.getElementById('adminRememberCheckbox');
+      rememberAdmin = true;
+      const cb = document.getElementById('adminRememberCheckbox');
+      if (cb) {
         cb.classList.add('checked');
         cb.textContent = '✓';
       }
+      localStorage.setItem('adminRememberSaved', 'true');
     });
 
     window.toggleRememberAdmin = function() {
@@ -423,8 +430,8 @@
       loginBtn.textContent = "جاري التحقق الآمن...";
 
       try {
-        const persistenceMode = rememberAdmin ? browserLocalPersistence : browserSessionPersistence;
-        await setPersistence(auth, persistenceMode);
+        // نستخدم دائماً الحفظ المحلي الدائم على الهاتف حتى لا يسجل خروج عند قفل الشاشة
+        await setPersistence(auth, browserLocalPersistence);
 
         // 🔐 تسجيل الدخول المشفر حصراً عبر Google Firebase Auth
         const cred = await signInWithEmailAndPassword(auth, email, pass);
