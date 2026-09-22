@@ -588,11 +588,85 @@
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
         }
 
+        /* 🗂️ 3x2 Neat Box Cards for Navigation Tabs */
         .admin-tabs-nav {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
+        }
+
+        .admin-tabs-nav .btn-admin-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px 8px;
+            min-height: 72px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 4px;
+            line-height: 1.3;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .admin-tabs-nav .btn-admin-tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .admin-tabs-nav .btn-admin-tab.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(79, 70, 229, 0.95));
+            border-color: #818cf8;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .admin-tabs-nav .btn-admin-tab .tab-icon {
+            font-size: 20px;
+            line-height: 1;
+            margin-bottom: 2px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .admin-tabs-nav .btn-admin-tab .tab-text {
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        .admin-tabs-nav .btn-admin-tab .tab-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 18px;
+            padding: 0 6px;
+            font-size: 10.5px;
+            font-weight: 800;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+            margin-top: 1px;
+        }
+
+        .admin-tabs-nav .btn-admin-tab.active .tab-badge-pill {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            font-weight: 900;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         /* ✂️ Text Truncation & Clean Display */
@@ -672,26 +746,39 @@
                 border-radius: 8px;
             }
 
-            /* Swipeable Pill Tabs on Mobile */
+            /* 🗂️ 3x2 Compact Boxes for Tabs on Mobile (3 top, 3 bottom) */
             .admin-tabs-nav {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                gap: 8px;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
                 margin-bottom: 14px;
-                padding-bottom: 4px;
-                scrollbar-width: none;
+                padding-bottom: 0;
+                overflow-x: visible;
             }
             .admin-tabs-nav::-webkit-scrollbar {
                 display: none;
             }
-            .btn-admin-tab {
-                flex-shrink: 0;
-                padding: 9px 15px;
-                font-size: 12.5px;
-                border-radius: var(--radius-pill);
-                white-space: nowrap;
+            .admin-tabs-nav .btn-admin-tab {
+                min-height: 58px;
+                padding: 6px 3px;
+                border-radius: 11px;
+                flex-shrink: initial;
+                white-space: normal;
+                gap: 2px;
+            }
+            .admin-tabs-nav .btn-admin-tab .tab-icon {
+                font-size: 16px;
+                margin-bottom: 1px;
+            }
+            .admin-tabs-nav .btn-admin-tab .tab-text {
+                font-size: 10px;
+                line-height: 1.2;
+            }
+            .admin-tabs-nav .btn-admin-tab .tab-badge-pill {
+                min-width: 17px;
+                height: 15px;
+                padding: 0 4px;
+                font-size: 9px;
             }
 
             /* Balanced 2x2 Stats Grid on Mobile */
@@ -1251,25 +1338,37 @@
             </div>
         </div>
 
-        <!-- Top Navigation Tabs -->
+        <!-- Top Navigation Tabs (3 on top, 3 on bottom) -->
         <div class="admin-tabs-nav">
             <button class="btn-admin-tab active" id="tabBtnRequests" onclick="switchAdminTab('requests')">
-                📋 طلبات انضمام المهنيين (<span id="tabBadgeRequests">0</span>)
+                <span class="tab-icon">📋</span>
+                <span class="tab-text">طلبات المهنيين</span>
+                <span class="tab-badge-pill">(<span id="tabBadgeRequests">0</span>)</span>
             </button>
             <button class="btn-admin-tab" id="tabBtnCustomers" onclick="switchAdminTab('customers')">
-                👥 العملاء المسجلين (<span id="tabBadgeCustomers">0</span>)
+                <span class="tab-icon">👥</span>
+                <span class="tab-text">العملاء المسجلين</span>
+                <span class="tab-badge-pill">(<span id="tabBadgeCustomers">0</span>)</span>
             </button>
             <button class="btn-admin-tab" id="tabBtnFeedback" onclick="switchAdminTab('feedback')">
-                📬 الشكاوى والاستفسارات والاقتراحات (<span id="tabBadgeFeedback">0</span>)
+                <span class="tab-icon">📬</span>
+                <span class="tab-text">الشكاوى والاستفسارات</span>
+                <span class="tab-badge-pill">(<span id="tabBadgeFeedback">0</span>)</span>
             </button>
             <button class="btn-admin-tab" id="tabBtnReports" onclick="switchAdminTab('reports')">
-                🚨 البلاغات والمحتوى المسيء (<span id="tabBadgeReports">0</span>)
+                <span class="tab-icon">🚨</span>
+                <span class="tab-text">البلاغات والمحتوى</span>
+                <span class="tab-badge-pill">(<span id="tabBadgeReports">0</span>)</span>
             </button>
             <button class="btn-admin-tab" id="tabBtnBroadcast" onclick="switchAdminTab('broadcast')">
-                📢 تنبيه المستخدمين والتذكيرات
+                <span class="tab-icon">📢</span>
+                <span class="tab-text">تنبيهات وتذكيرات</span>
+                <span class="tab-badge-pill" style="color: #fbbf24;">✨</span>
             </button>
             <button class="btn-admin-tab" id="tabBtnArrivals" onclick="switchAdminTab('arrivals')">
-                📍 متابعة وصول الفنيين ومطابقة الموقع (<span id="tabBadgeArrivals">0</span>)
+                <span class="tab-icon">📍</span>
+                <span class="tab-text">متابعة الفنيين</span>
+                <span class="tab-badge-pill">(<span id="tabBadgeArrivals">0</span>)</span>
             </button>
         </div>
 
@@ -2449,6 +2548,29 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
         // --- 🔔 Sound & Push Notification Engine ---
         let audioCtx = null;
+
+        // تفعيل الصوت فور أي لمسة أو نقرة على الشاشة (ضروري لمتصفح Safari والآيفون)
+        function unlockAudioOnFirstInteraction() {
+            const unlock = () => {
+                try {
+                    if (!audioCtx) {
+                        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                        if (AudioContextClass) audioCtx = new AudioContextClass();
+                    }
+                    if (audioCtx && audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                } catch (e) {
+                    console.warn("Audio unlock notice:", e);
+                }
+                window.removeEventListener('click', unlock);
+                window.removeEventListener('touchstart', unlock);
+            };
+            window.addEventListener('click', unlock, { once: true });
+            window.addEventListener('touchstart', unlock, { once: true });
+        }
+        unlockAudioOnFirstInteraction();
+
         function playNotificationChime() {
             try {
                 if (!audioCtx) {
@@ -2470,14 +2592,14 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
 
                 gain.gain.setValueAtTime(0.001, now);
-                gain.gain.linearRampToValueAtTime(0.35, now + 0.04);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+                gain.gain.linearRampToValueAtTime(0.4, now + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
 
                 osc.start(now);
-                osc.stop(now + 0.65);
+                osc.stop(now + 0.7);
             } catch (e) {
                 console.warn("Audio chime error:", e);
             }
@@ -2513,7 +2635,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         // --- 🚨 High-Visibility Square Alert Box Logic (مربع التنبيه البارز) ---
         let pendingAlertTargetTab = 'requests';
 
-        function showUrgentAlertBox({ title, body, icon = '🔔', tab = 'requests', badge = 'تنبيه إداري فوري' }) {
+        function showUrgentAlertBox({ title, body, icon = '🔔', tab = 'requests', badge = 'تنبيه إداري فوري', timeText = null }) {
             pendingAlertTargetTab = tab;
             const backdrop = document.getElementById('urgentAlertCardBackdrop');
             if (!backdrop) return;
@@ -2530,9 +2652,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             if (iconEl) iconEl.textContent = icon;
             if (badgeEl) badgeEl.textContent = badge;
             if (timeEl) {
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('ar-JO', { hour: '2-digit', minute: '2-digit' });
-                timeEl.textContent = `الساعة ${timeStr} - الآن`;
+                if (timeText) {
+                    timeEl.textContent = timeText;
+                } else {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('ar-JO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                    timeEl.textContent = `الساعة ${timeStr} - الآن`;
+                }
             }
 
             const tabActionNames = {
@@ -2610,17 +2736,22 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
         }
 
-        async function showAdminAlert({ title, body, icon = '🔔', tab = 'requests', badge = 'نشاط جديد بالمنصة', tag = 'admin_alert_' + Date.now() }) {
+        async function showAdminAlert({ title, body, icon = '🔔', tab = 'requests', badge = 'نشاط جديد بالمنصة', tag = 'admin_alert_' + Date.now(), timeText = null }) {
             // 1. Audible Sound Chime (رنة واضحة للأذن)
             playNotificationChime();
 
-            // 2. High-Visibility Square Alert Box (المربع المنبثق البارز)
-            showUrgentAlertBox({ title, body, icon, tab, badge });
+            // 2. Vibration for phones
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate([300, 150, 300]); } catch (vErr) {}
+            }
 
-            // 3. In-App Floating Toast
+            // 3. High-Visibility Square Alert Box (المربع المنبثق البارز)
+            showUrgentAlertBox({ title, body, icon, tab, badge, timeText });
+
+            // 4. In-App Floating Toast
             showFloatingToast(title, body, icon);
 
-            // 4. System Push / Native Notification
+            // 5. System Push / Native Notification
             if ('Notification' in window && Notification.permission === 'granted') {
                 try {
                     if ('serviceWorker' in navigator) {
@@ -3274,10 +3405,20 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 else if (currentAdminTab === 'reports') renderReports();
                 else if (currentAdminTab === 'arrivals') renderArrivals();
 
-                setTimeout(() => {
-                    isRealtimeNotificationsReady = true;
-                    console.log("🔔 [Notifications Engine] جاهز لبث التنبيهات الصوتية والشاشية الحية.");
-                }, 2000);
+                // تسجيل المعرفات المحملة مسبقاً لمنع التنبيهات المكررة القديمة
+                customersSnap.forEach(d => knownCustomerIds.add(d.id));
+                pendingSnap.forEach(d => knownPendingUserIds.add(d.id));
+                approvedSnap.forEach(d => knownApprovedUserIds.add(d.id));
+                rejectedSnap.forEach(d => knownRejectedUserIds.add(d.id));
+                feedbackSnap.forEach(d => knownFeedbackIds.add(d.id));
+                reportsSnap.forEach(d => knownReportIds.add(d.id));
+                bookingsSnap.forEach(d => knownBookingIds.add(d.id));
+
+                isInitialSyncDone = true;
+                console.log("🔔 [Notifications Engine] جاهز لبث التنبيهات الصوتية والشاشية الحية.");
+
+                // فحص أي تسجيل جديد حدث أثناء إغلاق الصفحة أو غياب المشرف
+                checkOfflineNewRegistrations();
 
             } catch (err) {
                 console.error("Error loading data:", err);
@@ -3287,8 +3428,85 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
         }
 
+        // مجموعات المعرفات المعروفة لمنع الخلط بين البيانات السابقة والجديدة
+        const knownCustomerIds = new Set();
+        const knownPendingUserIds = new Set();
+        const knownApprovedUserIds = new Set();
+        const knownRejectedUserIds = new Set();
+        const knownFeedbackIds = new Set();
+        const knownReportIds = new Set();
+        const knownBookingIds = new Set();
+        let isInitialSyncDone = false;
         let realtimeListenersAttached = false;
-        let isRealtimeNotificationsReady = false;
+
+        // فحص التسجيلات والنشاطات الجديدة أثناء غياب المشرف عن الموقع
+        function checkOfflineNewRegistrations() {
+            try {
+                const lastChecked = parseInt(localStorage.getItem('admin_last_checked_time') || '0', 10);
+                const nowMs = Date.now();
+
+                // 1. فحص أحدث عميل مسجل
+                if (allCustomers.length > 0) {
+                    const latestCust = allCustomers[0];
+                    const custTime = latestCust.createdAt?.seconds 
+                        ? (latestCust.createdAt.seconds * 1000) 
+                        : (latestCust.createdAt ? new Date(latestCust.createdAt).getTime() : 0);
+
+                    const isNewSinceLastVisit = lastChecked > 0 ? (custTime > lastChecked) : ((nowMs - custTime) < 12 * 3600 * 1000);
+                    if (custTime > 0 && isNewSinceLastVisit) {
+                        const dt = formatDateTime(latestCust.createdAt);
+                        setTimeout(() => {
+                            showAdminAlert({
+                                title: '👥 عميل جديد انضم للمنصة!',
+                                body: `سجل العميل (${latestCust.name || 'عميل مسجل'}) في التطبيق بتاريخ ${dt.date} (الساعة ${dt.time})!`,
+                                icon: '👥',
+                                tab: 'customers',
+                                badge: 'عميل مسجل جديد (أثناء غيابك)',
+                                timeText: `سجل في: ${dt.date} | الساعة ${dt.time}`
+                            });
+                        }, 900);
+                    }
+                }
+
+                // 2. فحص أحدث طلب مهني معلق
+                const pendingList = allRequests.filter(r => r.status === 'pending');
+                if (pendingList.length > 0) {
+                    const latestReq = pendingList[0];
+                    const reqTime = latestReq.createdAt?.seconds 
+                        ? (latestReq.createdAt.seconds * 1000) 
+                        : (latestReq.createdAt ? new Date(latestReq.createdAt).getTime() : 0);
+
+                    const isNewSinceLastVisit = lastChecked > 0 ? (reqTime > lastChecked) : ((nowMs - reqTime) < 12 * 3600 * 1000);
+                    if (reqTime > 0 && isNewSinceLastVisit) {
+                        const dt = formatDateTime(latestReq.createdAt);
+                        setTimeout(() => {
+                            showAdminAlert({
+                                title: '📋 طلب انضمام مهني جديد!',
+                                body: `ورد طلب انضمام من المهني (${latestReq.name || 'مهني'}) لمهنة (${latestReq.job || 'خدمة'}) بتاريخ ${dt.date} (الساعة ${dt.time})!`,
+                                icon: '📋',
+                                tab: 'requests',
+                                badge: 'طلب مهني جديد (أثناء غيابك)',
+                                timeText: `قُدّم في: ${dt.date} | الساعة ${dt.time}`
+                            });
+                        }, 1400);
+                    }
+                }
+
+                localStorage.setItem('admin_last_checked_time', nowMs.toString());
+            } catch (err) {
+                console.warn("Offline check notice:", err);
+            }
+        }
+
+        // استئناف وفحص فوري عند العودة إلى المتصفح من قفل الشاشة (خاص بالآيفون Safari)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().catch(() => {});
+                }
+                checkOfflineNewRegistrations();
+            }
+        });
 
         function initRealtimeListeners() {
             if (realtimeListenersAttached) return;
@@ -3299,27 +3517,37 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             try {
                 onSnapshot(collection(db, "customers"), (snapshot) => {
                     snapshot.docChanges().forEach(change => {
+                        const docId = change.doc.id;
                         if (change.type === 'added') {
                             const c = change.doc.data();
-                            // إرسال رد ترحيبي تلقائي للمستخدم الجديد إن لم يسبق إرساله
-                            if (c.autoReplied !== true && (c.id || change.doc.id)) {
+
+                            // تنبيه فوري ورد تلقائي فقط إذا كان عميلاً جديداً انضم بعد التحميل الأولي
+                            if (isInitialSyncDone && !knownCustomerIds.has(docId)) {
+                                knownCustomerIds.add(docId);
+
+                                // 1. إرسال رد ترحيبي تلقائي للمستخدم الجديد
                                 sendInstantAutoReply({
-                                    userId: c.id || change.doc.id,
+                                    userId: c.id || docId,
                                     type: 'welcome_receipt',
                                     documentRef: change.doc.ref,
                                     title: '🎉 أهلاً بك في منصة خدمتك 🇯🇴',
                                     body: `مرحباً بك ${c.name || ''}! تم إنشاء وتفعيل حسابك بنجاح. يمكنك الآن تصفح أفضل المهنيين والخدمات المنزلية بكل راحة وأمان.`
                                 });
-                            }
 
-                            if (isRealtimeNotificationsReady) {
+                                // 2. إطلاق التنبيه الإداري الفوري مع الساعة والدقيقة
+                                const dt = formatDateTime(c.createdAt || new Date());
                                 showAdminAlert({
                                     title: '👥 عميل جديد انضم للمنصة!',
-                                    body: `قام العميل (${c.name || 'مستخدم جديد'}) بإنشاء حساب في التطبيق الآن.`,
+                                    body: `قام العميل (${c.name || 'مستخدم جديد'}) بإنشاء حساب في التطبيق الآن بتاريخ ${dt.date} (الساعة ${dt.time}).`,
                                     icon: '👥',
                                     tab: 'customers',
-                                    badge: 'عميل مسجل جديد'
+                                    badge: 'عميل مسجل جديد الآن',
+                                    timeText: `سجل الآن: الساعة ${dt.time}`
                                 });
+
+                                localStorage.setItem('admin_last_checked_time', Date.now().toString());
+                            } else {
+                                knownCustomerIds.add(docId);
                             }
                         }
                     });
@@ -3367,27 +3595,34 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             try {
                 onSnapshot(collection(db, "pendingUsers"), (snap) => {
                     snap.docChanges().forEach(change => {
+                        const docId = change.doc.id;
                         if (change.type === 'added') {
                             const p = change.doc.data();
-                            // إرسال رد تلقائي فوري للمهني بوصول طلبه
-                            if (p.autoReplied !== true && (p.id || change.doc.id)) {
+
+                            if (isInitialSyncDone && !knownPendingUserIds.has(docId)) {
+                                knownPendingUserIds.add(docId);
+
                                 sendInstantAutoReply({
-                                    userId: p.id || change.doc.id,
+                                    userId: p.id || docId,
                                     type: 'pro_request_receipt',
                                     documentRef: change.doc.ref,
                                     title: '🛠️ تم استلام طلب انضمامك بنجاح',
                                     body: `أهلاً بك يا ${p.name || 'مهني'} كشريك نجاح في منصة خدمتك 🇯🇴! تم استلام طلبك لمهنة (${p.job || 'الخدمات'}) ووثائقك بنجاح، وطلبك الآن قيد التدقيق لدى الإدارة وسيصلك إشعار فور اعتماده.`
                                 });
-                            }
 
-                            if (isRealtimeNotificationsReady) {
+                                const dt = formatDateTime(p.createdAt || new Date());
                                 showAdminAlert({
                                     title: '📋 طلب انضمام مهني جديد!',
-                                    body: `ورد طلب جديد من المهني (${p.name || 'مهني'}) لمهنة (${p.job || 'خدمة'}) في (${p.city || 'الأردن'}) بانتظار موافقتك.`,
+                                    body: `ورد طلب جديد من المهني (${p.name || 'مهني'}) لمهنة (${p.job || 'خدمة'}) في (${p.city || 'الأردن'}) بتاريخ ${dt.date} (الساعة ${dt.time}).`,
                                     icon: '📋',
                                     tab: 'requests',
-                                    badge: 'طلب مهني جديد'
+                                    badge: 'طلب مهني جديد الآن',
+                                    timeText: `قُدّم الآن: الساعة ${dt.time}`
                                 });
+
+                                localStorage.setItem('admin_last_checked_time', Date.now().toString());
+                            } else {
+                                knownPendingUserIds.add(docId);
                             }
                         }
                     });
@@ -3414,10 +3649,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             try {
                 onSnapshot(collection(db, "feedbacks"), (snap) => {
                     snap.docChanges().forEach(change => {
+                        const docId = change.doc.id;
                         if (change.type === 'added') {
                             const f = change.doc.data();
-                            // إرسال رد تلقائي فوري لصاحب الشكوى/الاقتراح
-                            if (f.autoReplied !== true && f.userId) {
+
+                            if (isInitialSyncDone && !knownFeedbackIds.has(docId)) {
+                                knownFeedbackIds.add(docId);
+
                                 const typeLabel = f.type === 'complaint' ? 'شكواك' : (f.type === 'suggestion' ? 'اقتراحك' : 'رسالتك واستفسارك');
                                 const autoReplyText = `أهلاً بك في منصة خدمتك 🇯🇴، تم استلام ${typeLabel} بنجاح من قِبل النظام الآلي. طلبك حالياً قيد المتابعة والتدقيق لدى فريق الإدارة، وسيقوم المشرف بالرد عليك هنا في أقرب وقت ممكن. شكراً لتعاونك!`;
 
@@ -3428,17 +3666,21 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                                     title: `📩 تم استلام ${typeLabel} بنجاح`,
                                     body: autoReplyText
                                 });
-                            }
 
-                            if (isRealtimeNotificationsReady) {
                                 const isComplaint = f.type === 'complaint';
+                                const dt = formatDateTime(f.createdAt || new Date());
                                 showAdminAlert({
                                     title: isComplaint ? '⚠️ شكوى جديدة وردت الآن!' : '📬 رسالة / اقتراح جديد ورد الآن!',
-                                    body: `قام (${f.userName || 'مستخدم'}) بتقديم ${isComplaint ? 'شكوى' : 'رسالة'}: "${f.title || f.subject || f.description || 'تفاصيل جديدة'}"`,
+                                    body: `قام (${f.userName || 'مستخدم'}) بتقديم ${isComplaint ? 'شكوى' : 'رسالة'}: "${f.title || f.subject || f.description || 'تفاصيل جديدة'}" بتاريخ ${dt.date} (الساعة ${dt.time})!`,
                                     icon: isComplaint ? '⚠️' : '📬',
                                     tab: 'feedback',
-                                    badge: isComplaint ? 'شكوى عاجلة' : 'رسالة جديدة'
+                                    badge: isComplaint ? 'شكوى عاجلة' : 'رسالة جديدة',
+                                    timeText: `وردت: الساعة ${dt.time}`
                                 });
+
+                                localStorage.setItem('admin_last_checked_time', Date.now().toString());
+                            } else {
+                                knownFeedbackIds.add(docId);
                             }
                         }
                     });
@@ -3456,10 +3698,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             try {
                 onSnapshot(collection(db, "reports"), (snap) => {
                     snap.docChanges().forEach(change => {
+                        const docId = change.doc.id;
                         if (change.type === 'added') {
                             const r = change.doc.data();
-                            // إرسال رد تلقائي فوري للمُبلّغ
-                            if (r.autoReplied !== true && r.reporterId) {
+
+                            if (isInitialSyncDone && !knownReportIds.has(docId)) {
+                                knownReportIds.add(docId);
+
                                 sendInstantAutoReply({
                                     userId: r.reporterId,
                                     type: 'report_receipt',
@@ -3467,16 +3712,20 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                                     title: '🚨 تم استلام بلاغك بنجاح',
                                     body: 'شكراً لحرصك على مجتمع خدمتك وأمانه. تم استلام بلاغك وجاري مراجعته والتحقق منه من قِبل الإدارة لاتخاذ الإجراء الصارم المناسب.'
                                 });
-                            }
 
-                            if (isRealtimeNotificationsReady) {
+                                const dt = formatDateTime(r.createdAt || new Date());
                                 showAdminAlert({
                                     title: '🚨 بلاغ طارئ عن مخالفة سلوك!',
-                                    body: `قام (${r.reporterName || 'مستخدم'}) بتقديم بلاغ: "${r.reason || 'مخالفة سلوك أو محتوى'}" بانتظار فحصك.`,
+                                    body: `قام (${r.reporterName || 'مستخدم'}) بتقديم بلاغ: "${r.reason || 'مخالفة سلوك أو محتوى'}" بتاريخ ${dt.date} (الساعة ${dt.time})!`,
                                     icon: '🚨',
                                     tab: 'reports',
-                                    badge: 'بلاغ طارئ'
+                                    badge: 'بلاغ طارئ',
+                                    timeText: `قُدّم: الساعة ${dt.time}`
                                 });
+
+                                localStorage.setItem('admin_last_checked_time', Date.now().toString());
+                            } else {
+                                knownReportIds.add(docId);
                             }
                         }
                     });
@@ -3494,17 +3743,17 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             try {
                 onSnapshot(collection(db, "bookings"), (snap) => {
                     snap.docChanges().forEach(change => {
-                        if (isRealtimeNotificationsReady) {
-                            const b = change.doc.data();
-                            if (change.type === 'modified' && b.status === 'arrived') {
-                                showAdminAlert({
-                                    title: '📍 وصول ميداني لفني!',
-                                    body: `أكد الفني (${b.professionalName || 'المهني'}) وصوله لموقع العميل بنجاح.`,
-                                    icon: '📍',
-                                    tab: 'arrivals',
-                                    badge: 'إثبات وصول'
-                                });
-                            }
+                        const b = change.doc.data();
+                        if (isInitialSyncDone && change.type === 'modified' && b.status === 'arrived') {
+                            const dt = formatDateTime(b.arrivedAt || new Date());
+                            showAdminAlert({
+                                title: '📍 وصول ميداني لفني!',
+                                body: `أكد الفني (${b.professionalName || 'المهني'}) وصوله لموقع العميل بنجاح (الساعة ${dt.time}).`,
+                                icon: '📍',
+                                tab: 'arrivals',
+                                badge: 'إثبات وصول',
+                                timeText: `وصل: الساعة ${dt.time}`
+                            });
                         }
                     });
 
@@ -3604,7 +3853,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 <th>المحافظة</th>
                 <th>رقم الهاتف</th>
                 <th>الرقم الوطني</th>
-                <th>تاريخ التقديم</th>
+                <th>تاريخ ووقت التقديم ⏰</th>
                 <th>الحالة</th>
                 <th>الإجراءات</th>
             `;
@@ -3630,7 +3879,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     <td>${req.city || 'غير محدد'}</td>
                     <td dir="ltr" style="text-align: right;">${req.phone || 'غير محدد'}</td>
                     <td>${nationalId}</td>
-                    <td>${formatDate(req.createdAt)}</td>
+                    <td>${formatDateTime(req.createdAt).html}</td>
                     <td>${statusBadge}</td>
                     <td>
                         <div style="display: flex; gap: 6px;">
@@ -3658,6 +3907,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                         <span>المحافظة: <strong>${req.city || '-'}</strong></span>
                         <span>الهاتف: <strong>${req.phone || '-'}</strong></span>
                         <span>الرقم الوطني: <strong>${nationalId}</strong></span>
+                        <span>تاريخ ووقت التقديم: <strong style="color: #93c5fd;">${formatDate(req.createdAt)}</strong></span>
                     </div>
                     <div class="mobile-req-actions">
                         <button class="btn-table-action view" style="flex: 1; padding: 10px;" onclick="openRequestDetails('${req.id}')">التفاصيل الكاملة 🔍</button>
@@ -3723,7 +3973,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 <th>البريد الإلكتروني</th>
                 <th>الرقم الوطني</th>
                 <th>الجنسية</th>
-                <th>تاريخ التسجيل</th>
+                <th>تاريخ ووقت التسجيل ⏰</th>
                 <th>الإجراءات</th>
             `;
 
@@ -3769,7 +4019,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     <td><span class="break-word" style="font-size: 12.5px; color: var(--text-secondary);">${cust.email || '-'}</span></td>
                     <td>${cust.nationalId ? `<span style="font-size: 13px; font-weight: 700; color: #a5b4fc;">${cust.nationalId}</span>` : `<span style="color: var(--text-muted); font-size: 11.5px;">غير مطلوب (عميل)</span>`}</td>
                     <td><span class="badge-status approved" style="font-size: 11px;">${cust.nationality || 'أردني 🇯🇴'}</span></td>
-                    <td>${formatDate(cust.createdAt)}</td>
+                    <td>${formatDateTime(cust.createdAt).html}</td>
                     <td>
                         <div style="display: flex; gap: 6px;">
                             <button class="btn-table-action view" onclick="openCustomerDetails('${cust.id}')">التفاصيل 🔍</button>
@@ -3796,7 +4046,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                         <span>الهاتف: <strong>${cust.phone || '-'}</strong></span>
                         <span>البريد: <strong class="break-word">${cust.email || '-'}</strong></span>
                         <span>الرقم الوطني: <strong>${cust.nationalId || 'غير مطلوب (عميل)'}</strong></span>
-                        <span>تاريخ التسجيل: <strong>${formatDate(cust.createdAt)}</strong></span>
+                        <span>تاريخ ووقت التسجيل: <strong style="color: #93c5fd;">${formatDate(cust.createdAt)}</strong></span>
                     </div>
                     <div class="mobile-req-actions">
                         <button class="btn-table-action view" style="flex: 1; padding: 10px;" onclick="openCustomerDetails('${cust.id}')">التفاصيل الكاملة 🔍</button>
@@ -4007,7 +4257,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 <th>المستخدم</th>
                 <th>رقم الهاتف</th>
                 <th>العنوان</th>
-                <th>التاريخ</th>
+                <th>تاريخ ووقت الإرسال ⏰</th>
                 <th>الحالة</th>
                 <th>الرد المسجل</th>
                 <th>الإجراءات</th>
@@ -4052,7 +4302,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                             </div>
                         ` : ''}
                     </td>
-                    <td>${formatDate(fb.createdAt)}</td>
+                    <td>${formatDateTime(fb.createdAt).html}</td>
                     <td>${statusBadge}</td>
                     <td style="max-width: 180px;">
                         <div class="clamp-2 break-word" style="font-size: 12px; color: #a5b4fc;">${fb.adminReply || '<span style="color:var(--text-muted);">لم يتم الرد بعد</span>'}</div>
@@ -4357,7 +4607,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 <th>السبب</th>
                 <th>تفاصيل البلاغ والمحتوى</th>
                 <th>حالة الإجراء</th>
-                <th>التاريخ</th>
+                <th>تاريخ ووقت البلاغ ⏰</th>
                 <th>الإجراءات</th>
             `;
 
@@ -4390,7 +4640,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                         ${rep.adminActionNotes ? `<div class="clamp-1 break-word" style="font-size: 11px; color: #a5b4fc; margin-top: 4px;">ملاحظة: ${rep.adminActionNotes}</div>` : ''}
                     </td>
                     <td>${actionBadge}</td>
-                    <td>${formatDate(rep.createdAt)}</td>
+                    <td>${formatDateTime(rep.createdAt).html}</td>
                     <td>
                         <div style="display:flex; gap:5px; flex-wrap:wrap;">
                             <button class="btn-table-action view" onclick="openReportDetails('${rep.id}')">التفاصيل 🔍</button>
@@ -4819,18 +5069,41 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             return status;
         }
 
-        function formatDate(timestamp) {
-            if (!timestamp) return 'غير محدد';
+        function formatDateTime(timestamp) {
+            if (!timestamp) return { date: 'غير محدد', time: '', full: 'غير محدد', html: 'غير محدد' };
             let date;
             if (timestamp.toDate) date = timestamp.toDate();
             else if (timestamp instanceof Date) date = timestamp;
+            else if (typeof timestamp === 'number') date = new Date(timestamp);
+            else if (timestamp.seconds) date = new Date(timestamp.seconds * 1000);
             else date = new Date(timestamp);
 
-            return date.toLocaleDateString('ar-JO', {
+            if (isNaN(date.getTime())) return { date: 'غير محدد', time: '', full: 'غير محدد', html: 'غير محدد' };
+
+            const dateStr = date.toLocaleDateString('ar-JO', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric'
             });
+
+            const timeStr = date.toLocaleTimeString('ar-JO', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+
+            return {
+                date: dateStr,
+                time: timeStr,
+                full: `${dateStr} | الساعة ${timeStr}`,
+                html: `<div><strong style="color:var(--text-pure);">${dateStr}</strong><div style="font-size: 11px; color: #93c5fd; font-weight: 800; margin-top: 2px;">⏰ ${timeStr}</div></div>`
+            };
+        }
+
+        function formatDate(timestamp) {
+            const dt = formatDateTime(timestamp);
+            return dt.full;
         }
 
         function showLoading(show) {
