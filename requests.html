@@ -2347,6 +2347,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
         import { 
+            getMessaging, 
+            getToken, 
+            onMessage 
+        } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-messaging.js";
+        import { 
             getAuth, 
             onAuthStateChanged, 
             signOut 
@@ -2366,6 +2371,10 @@
             where,
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+        // المفتاح العام الرسمي لـ Web Push الخاص بمشروع الفايربيس (متوافق مع أبل والآيفون PWA)
+        const VAPID_KEY = "BLYG3ZcUi_Tf9t6cH7dRkAOJE-KEUk2bXL7AE4rta-4lTr_U5UfEr_eS0MAjvAHlqs_3ni0KALoRspUyRdN0aVE";
+
         // --- محرك إرسال الإشعارات Google FCM v1 المباشر مدمج بالكامل ---
         const SERVICE_ACCOUNT = {
             project_id: "home-services-app-a9c5e",
@@ -2779,6 +2788,55 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
         }
 
+        // --- 📲 FCM Web Push Token Registration for iPhone PWA & Admin Browser ---
+        let fcmMessagingInstance = null;
+
+        async function registerAndSaveAdminFcmToken() {
+            try {
+                if (!('serviceWorker' in navigator) || !('Notification' in window)) return null;
+                if (Notification.permission !== 'granted') return null;
+
+                const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
+                await new Promise((resolve) => {
+                    if (reg.active) return resolve();
+                    const sw = reg.installing || reg.waiting;
+                    if (sw) {
+                        sw.addEventListener('statechange', (e) => {
+                            if (e.target.state === 'activated') resolve();
+                        });
+                    } else {
+                        resolve();
+                    }
+                });
+
+                if (!fcmMessagingInstance) {
+                    fcmMessagingInstance = getMessaging(app);
+                }
+
+                const token = await getToken(fcmMessagingInstance, {
+                    vapidKey: VAPID_KEY,
+                    serviceWorkerRegistration: reg
+                });
+
+                if (token) {
+                    console.log("📲 FCM Web Push Token registered for Admin:", token);
+                    await setDoc(doc(db, "admin_fcm_tokens", token), {
+                        token: token,
+                        platform: /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'ios_pwa' : 'web_admin',
+                        userAgent: navigator.userAgent,
+                        lastSeen: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+
+                    localStorage.setItem("admin_fcm_token", token);
+                    return token;
+                }
+            } catch (err) {
+                console.warn("FCM Web Push token registration error:", err);
+            }
+            return null;
+        }
+
         // Check & Init Push Notification State
         function initPushNotificationState() {
             const banner = document.getElementById('pushNotificationBanner');
@@ -2794,6 +2852,9 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
             if ('Notification' in window) {
                 if (Notification.permission === 'granted') {
+                    // Auto-sync FCM Web Push token in background for lock screen alerts
+                    registerAndSaveAdminFcmToken();
+
                     banner.classList.add('granted');
                     const titleEl = document.getElementById('notifBannerTitle');
                     const descEl = document.getElementById('notifBannerDesc');
@@ -2801,8 +2862,8 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     const btnText = document.getElementById('btnEnableNotifText');
                     const btn = document.getElementById('btnEnableNotifications');
 
-                    if (titleEl) titleEl.textContent = '✅ الإشعارات الفورية مفعلة بنجاح على هذا الجهاز!';
-                    if (descEl) descEl.textContent = 'ستصلك تنبيهات حية فور حدوث أي نشاط في المنصة (تسجيل عميل، طلب مهني، شكوى، أو بلاغ).';
+                    if (titleEl) titleEl.textContent = '✅ إشعارات الآيفون الفورية مفعلة بنجاح على هذا الجهاز!';
+                    if (descEl) descEl.textContent = 'ستصلك تنبيهات حية فور حدوث أي نشاط في المنصة حتى لو كان هاتفك مقفلاً والموقع مغلقاً.';
                     if (iconEl) iconEl.textContent = '✅';
                     if (btnText) btnText.textContent = 'اختبار صوت الإشعار 🔔';
                     if (btn) btn.onclick = () => {
@@ -2838,25 +2899,22 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
                 const perm = await Notification.requestPermission();
                 if (perm === 'granted') {
-                    // Register service worker if not already registered
-                    if ('serviceWorker' in navigator) {
-                        try {
-                            const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-                            console.log("Service worker registered:", reg.scope);
-                        } catch (swErr) {
-                            console.warn("SW register warning:", swErr);
-                        }
-                    }
+                    showLoading(true);
+                    const token = await registerAndSaveAdminFcmToken();
+                    showLoading(false);
 
                     showAdminAlert({
-                        title: '🎉 تم تفعيل الإشعارات بنجاح!',
-                        body: 'ستصلك الآن تنبيهات صوتية وشاشية لكل حركة بالمنصة.'
+                        title: '🎉 تم تفعيل إشعارات الآيفون بنجاح!',
+                        body: token 
+                            ? 'تم ربط هاتفك الآيفون رسمياً بخوادم الإشعارات الفورية (APNs/FCM) لتصلك التنبيهات حتى والموقع مغلق والشاشة طافية.' 
+                            : 'تم تفعيل التنبيهات المباشرة بنجاح على هاتفك.'
                     });
                     initPushNotificationState();
                 } else if (perm === 'denied') {
                     alert("تم رفض إذن الإشعارات من إعدادات المتصفح. يرجى تفعيلها يدوياً من إعدادات الموقع.");
                 }
             } catch (err) {
+                showLoading(false);
                 console.error("Error requesting notifications:", err);
             }
         };
