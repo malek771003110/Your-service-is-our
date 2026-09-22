@@ -1325,11 +1325,17 @@
                 <div class="notif-banner-text">
                     <h4 id="notifBannerTitle">تفعيل إشعارات الآيفون والهاتف الفورية 📲</h4>
                     <p id="notifBannerDesc">لتصلك تنبيهات فورية بصوت على هاتفك عند تسجيل عميل جديد، طلب مهني، أو بلاغ حتى لو كان هاتفك مغلقاً.</p>
+                    <div id="adminPushTokenStatusBadge" style="margin-top: 6px; font-size: 11.5px; font-weight: 700; color: #a5b4fc; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; display: inline-block;">
+                        حالة اتصال الهاتف: جاري الفحص...
+                    </div>
                 </div>
             </div>
             <div class="notif-banner-actions">
                 <button class="btn-enable-notif" id="btnEnableNotifications" onclick="enablePushNotifications()">
                     <span>🔔</span> <span id="btnEnableNotifText">تفعيل الإشعارات الآن</span>
+                </button>
+                <button class="btn-enable-notif" id="btnTestLockScreenNotif" onclick="testRealPhonePushNotification()" style="background: linear-gradient(135deg, #10b981, #059669); display: none;">
+                    <span>📲</span> <span>تجربة إشعار قفل الشاشة (5 ثوانٍ)</span>
                 </button>
                 <button class="btn-ios-guide" id="btnIosGuide" onclick="openIosGuideModal()" title="دليل تثبيت الآيفون" style="display: none;">
                     <span>📱</span> <span>خطوات الآيفون</span>
@@ -2792,22 +2798,23 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         let fcmMessagingInstance = null;
 
         async function registerAndSaveAdminFcmToken() {
+            const statusEl = document.getElementById("adminPushTokenStatusBadge");
+            const testBtn = document.getElementById("btnTestLockScreenNotif");
+
             try {
-                if (!('serviceWorker' in navigator) || !('Notification' in window)) return null;
-                if (Notification.permission !== 'granted') return null;
+                if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+                    if (statusEl) statusEl.textContent = '❌ هذا المتصفح لا يدعم Service Worker أو إشعارات الويب.';
+                    return null;
+                }
+                if (Notification.permission !== 'granted') {
+                    if (statusEl) statusEl.textContent = '⚠️ يرجى الضغط على زر "تفعيل الإشعارات" بالأعلى أولاً.';
+                    return null;
+                }
+
+                if (statusEl) statusEl.textContent = '🔄 جاري تسجيل وربط الآيفون بخوادم الإشعارات (APNs)...';
 
                 const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
-                await new Promise((resolve) => {
-                    if (reg.active) return resolve();
-                    const sw = reg.installing || reg.waiting;
-                    if (sw) {
-                        sw.addEventListener('statechange', (e) => {
-                            if (e.target.state === 'activated') resolve();
-                        });
-                    } else {
-                        resolve();
-                    }
-                });
+                await navigator.serviceWorker.ready;
 
                 if (!fcmMessagingInstance) {
                     fcmMessagingInstance = getMessaging(app);
@@ -2829,10 +2836,25 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     }, { merge: true });
 
                     localStorage.setItem("admin_fcm_token", token);
+
+                    if (statusEl) {
+                        statusEl.style.color = '#34d399';
+                        statusEl.textContent = '🟢 هاتف الآيفون مسجل ومتصل بنجاح بالسيرفر لاستقبال إشعارات قفل الشاشة!';
+                    }
+                    if (testBtn) testBtn.style.display = 'inline-flex';
                     return token;
+                } else {
+                    if (statusEl) {
+                        statusEl.style.color = '#fbbf24';
+                        statusEl.textContent = '⚠️ لم يتم استخراج توكن الهاتف. تأكد من فتح الموقع كـ PWA عبر شاشة الآيفون الرئيسية.';
+                    }
                 }
             } catch (err) {
-                console.warn("FCM Web Push token registration error:", err);
+                console.error("FCM Web Push token registration error:", err);
+                if (statusEl) {
+                    statusEl.style.color = '#f87171';
+                    statusEl.textContent = '❌ خطأ أثناء استخراج التوكن: ' + (err.message || err);
+                }
             }
             return null;
         }
@@ -2845,9 +2867,15 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
             const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
             const btnIosGuide = document.getElementById('btnIosGuide');
+            const testBtn = document.getElementById('btnTestLockScreenNotif');
+            const savedToken = localStorage.getItem("admin_fcm_token");
 
             if (isIos && btnIosGuide) {
                 btnIosGuide.style.display = 'inline-flex';
+            }
+
+            if (savedToken && testBtn) {
+                testBtn.style.display = 'inline-flex';
             }
 
             if ('Notification' in window) {
@@ -2952,6 +2980,37 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                         default_vibrate_timings: true
                     }
                 },
+                apns: {
+                    headers: {
+                        "apns-priority": "10"
+                    },
+                    payload: {
+                        aps: {
+                            alert: {
+                                title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
+                                body: body || ''
+                            },
+                            sound: "default",
+                            badge: 1
+                        }
+                    }
+                },
+                webpush: {
+                    headers: {
+                        "Urgency": "high"
+                    },
+                    notification: {
+                        title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
+                        body: body || '',
+                        icon: './logo.png',
+                        badge: './logo.png',
+                        requireInteraction: true,
+                        vibrate: [300, 100, 300]
+                    },
+                    fcm_options: {
+                        link: './requests.html'
+                    }
+                },
                 data: {
                     click_action: "FLUTTER_NOTIFICATION_CLICK",
                     title: title || '',
@@ -2978,6 +3037,37 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             const result = await res.json();
             return { ok: res.ok, status: res.status, result };
         }
+
+        window.testRealPhonePushNotification = async function() {
+            let token = localStorage.getItem("admin_fcm_token");
+            if (!token) {
+                token = await registerAndSaveAdminFcmToken();
+            }
+            if (!token) {
+                alert("⚠️ لم يتم العثور على توكن مسجل لهاتفك حتى الآن.\nيرجى التأكد من الضغط على زر 'تفعيل الإشعارات الآن' والسماح بالأذونات، وتأكد أنك فاتح الصفحة عبر الرابط الرسمي https://khedmtek.netlify.app/requests.html.");
+                return;
+            }
+
+            alert("⏳ سيتم إرسال إشعار قفل الشاشة لهاتفك خلال 5 ثوانٍ!\n\n📲 قم الآن فوراً بالضغط على زر الباور لقفل شاشة الآيفون، وضع الهاتف جانباً لتشاهد وتسمع وصول الإشعار على شاشة القفل!");
+
+            setTimeout(async () => {
+                try {
+                    const r = await sendFcmPushSingle({
+                        title: '🔔 إشعار تجريبي - منصة خدمتك 🇯🇴',
+                        body: 'إشعارات الآيفون الفورية وقفل الشاشة تعمل بنجاح وبصوت! 🚀',
+                        token: token,
+                        data: { type: 'test_lock_screen', url: './requests.html' }
+                    });
+                    console.log("Test push result:", r);
+                    if (!r.ok) {
+                        alert("⚠️ تنبيه من سيرفر جوجل FCM: " + JSON.stringify(r.result));
+                    }
+                } catch (err) {
+                    console.error("Test push error:", err);
+                    alert("❌ خطأ أثناء إرسال الإشعار: " + err.message);
+                }
+            }, 5000);
+        };
 
         async function sendFcmPushToAllDevices({ title, body, db, data = {} }) {
             try {
@@ -4575,7 +4665,8 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 await updateDoc(doc(db, "feedbacks", activeFeedbackId), {
                     adminReply: replyText,
                     status: newStatus,
-                    repliedAt: serverTimestamp()
+                    repliedAt: serverTimestamp(),
+                    userSeen: false
                 });
 
                 // 2. إرسال إشعار فوري وتنبيه للمستخدم صاحب الشكوى في التطبيق
