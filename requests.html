@@ -3606,7 +3606,16 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 rejectedSnap.forEach(d => knownRejectedUserIds.add(d.id));
                 feedbackSnap.forEach(d => knownFeedbackIds.add(d.id));
                 reportsSnap.forEach(d => knownReportIds.add(d.id));
-                bookingsSnap.forEach(d => knownBookingIds.add(d.id));
+                bookingsSnap.forEach(d => {
+                    knownBookingIds.add(d.id);
+                    const b = d.data();
+                    knownBookingStates.set(d.id, {
+                        status: b.status,
+                        hasProof: !!b.arrivalProofImage,
+                        confirmed: b.customerConfirmedArrival,
+                        isTracking: !!b.isTrackingActive
+                    });
+                });
 
                 isInitialSyncDone = true;
                 console.log("🔔 [Notifications Engine] جاهز لبث التنبيهات الصوتية والشاشية الحية.");
@@ -3630,6 +3639,7 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
         const knownFeedbackIds = new Set();
         const knownReportIds = new Set();
         const knownBookingIds = new Set();
+        const knownBookingStates = new Map();
         let isInitialSyncDone = false;
         let realtimeListenersAttached = false;
 
@@ -3683,6 +3693,41 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                                 timeText: `قُدّم في: ${dt.date} | الساعة ${dt.time}`
                             });
                         }, 1400);
+                    }
+                }
+
+                // 3. فحص أحدث العمليات الميدانية ومتابعة الفنيين (أثناء غياب المشرف)
+                if (allBookings.length > 0) {
+                    const latestBooking = allBookings[0];
+                    const bTime = latestBooking.arrivedAt?.seconds 
+                        ? (latestBooking.arrivedAt.seconds * 1000) 
+                        : (latestBooking.customerConfirmedAt?.seconds 
+                            ? (latestBooking.customerConfirmedAt.seconds * 1000)
+                            : (latestBooking.createdAt?.seconds 
+                                ? (latestBooking.createdAt.seconds * 1000) 
+                                : (latestBooking.createdAt ? new Date(latestBooking.createdAt).getTime() : 0)));
+
+                    const isNewSinceLastVisit = lastChecked > 0 ? (bTime > lastChecked) : ((nowMs - bTime) < 12 * 3600 * 1000);
+                    if (bTime > 0 && isNewSinceLastVisit) {
+                        const dt = formatDateTime(latestBooking.arrivedAt || latestBooking.customerConfirmedAt || latestBooking.createdAt);
+                        const statusLabels = {
+                            'on_the_way': 'في الطريق إلى العميل 🚗',
+                            'arrived': 'وصل إلى موقع العميل 📍',
+                            'in_progress': 'جاري تنفيذ العمل 🛠️',
+                            'completed': 'أنجز الخدمة بنجاح ✅'
+                        };
+                        const currentStatusText = statusLabels[latestBooking.status] || 'حجز ومهمة جديدة 📋';
+
+                        setTimeout(() => {
+                            showAdminAlert({
+                                title: '📍 تحديث ميداني لفني (أثناء غيابك)!',
+                                body: `الفني (${latestBooking.professionalName || 'المهني'}) لدى العميل (${latestBooking.customerName || 'عميل'}): ${currentStatusText} بتاريخ ${dt.date} (الساعة ${dt.time}).`,
+                                icon: '📍',
+                                tab: 'arrivals',
+                                badge: 'متابعة فنيين (أثناء غيابك)',
+                                timeText: `سُجّل في: ${dt.date} | الساعة ${dt.time}`
+                            });
+                        }, 1900);
                     }
                 }
 
@@ -3933,21 +3978,147 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 }, (err) => console.warn("Real-time reports sync warning:", err));
             } catch (e) { console.warn(e); }
 
-            // 5. مزامنة الحجوزات وإثباتات الوصول الميداني في الوقت الفعلي
+            // 5. مزامنة الحجوزات وإثباتات الوصول الميداني ومتابعة الفنيين في الوقت الفعلي
             try {
                 onSnapshot(collection(db, "bookings"), (snap) => {
                     snap.docChanges().forEach(change => {
+                        const docId = change.doc.id;
                         const b = change.doc.data();
-                        if (isInitialSyncDone && change.type === 'modified' && b.status === 'arrived') {
-                            const dt = formatDateTime(b.arrivedAt || new Date());
-                            showAdminAlert({
-                                title: '📍 وصول ميداني لفني!',
-                                body: `أكد الفني (${b.professionalName || 'المهني'}) وصوله لموقع العميل بنجاح (الساعة ${dt.time}).`,
-                                icon: '📍',
-                                tab: 'arrivals',
-                                badge: 'إثبات وصول',
-                                timeText: `وصل: الساعة ${dt.time}`
-                            });
+                        const dt = formatDateTime(b.arrivedAt || b.customerConfirmedAt || b.createdAt || new Date());
+
+                        if (change.type === 'added') {
+                            if (isInitialSyncDone && !knownBookingIds.has(docId)) {
+                                knownBookingIds.add(docId);
+                                knownBookingStates.set(docId, {
+                                    status: b.status,
+                                    hasProof: !!b.arrivalProofImage,
+                                    confirmed: b.customerConfirmedArrival,
+                                    isTracking: !!b.isTrackingActive
+                                });
+
+                                showAdminAlert({
+                                    title: '📍 طلب خدمة ومهمة فني جديدة!',
+                                    body: `طلب العميل (${b.customerName || 'عميل'}) الفني (${b.professionalName || 'المهني'}) لخدمة (${b.serviceTitle || b.notes || 'خدمة صيانة'}) بتاريخ ${dt.date} (الساعة ${dt.time}).`,
+                                    icon: '📍',
+                                    tab: 'arrivals',
+                                    badge: 'مهمة ميدانية جديدة',
+                                    timeText: `طُلب الآن: الساعة ${dt.time}`
+                                });
+                                localStorage.setItem('admin_last_checked_time', Date.now().toString());
+                            } else {
+                                knownBookingIds.add(docId);
+                                knownBookingStates.set(docId, {
+                                    status: b.status,
+                                    hasProof: !!b.arrivalProofImage,
+                                    confirmed: b.customerConfirmedArrival,
+                                    isTracking: !!b.isTrackingActive
+                                });
+                            }
+                        } else if (change.type === 'modified') {
+                            if (isInitialSyncDone) {
+                                const prevState = knownBookingStates.get(docId) || {};
+                                const newStatus = b.status;
+                                const newProof = !!b.arrivalProofImage;
+                                const newConfirmed = b.customerConfirmedArrival;
+                                const newTracking = !!b.isTrackingActive;
+
+                                // 1. انطلاق الفني في الطريق وبدء التتبع
+                                if (newStatus === 'on_the_way' && prevState.status !== 'on_the_way') {
+                                    showAdminAlert({
+                                        title: '🚗 الفني انطلق وفي الطريق إلى العميل!',
+                                        body: `انطلق الفني (${b.professionalName || 'المهني'}) إلى موقع العميل (${b.customerName || 'العميل'})، وبدأ مسار التتبع المباشر (الساعة ${dt.time}).`,
+                                        icon: '🚗',
+                                        tab: 'arrivals',
+                                        badge: 'الفني في الطريق',
+                                        timeText: `انطلق الآن: الساعة ${dt.time}`
+                                    });
+                                }
+                                // 2. بدء جلسة تتبع GPS حي من الشاشة
+                                else if (newTracking && prevState.isTracking !== true) {
+                                    showAdminAlert({
+                                        title: '📡 بدء تتبع مباشر لفني على الخريطة!',
+                                        body: `بدأ تتبع المسار الحي للفني (${b.professionalName || 'المهني'}) المتوجه للعميل (${b.customerName || 'العميل'}).`,
+                                        icon: '📡',
+                                        tab: 'arrivals',
+                                        badge: 'تتبع حي مباشر',
+                                        timeText: `نشط الآن: الساعة ${dt.time}`
+                                    });
+                                }
+                                // 3. وصول الفني مع رفع صورة إثبات مصور
+                                else if (newProof && prevState.hasProof !== true) {
+                                    showAdminAlert({
+                                        title: '📸 إثبات وصول مصور لفني!',
+                                        body: `وصل الفني (${b.professionalName || 'المهني'}) لموقع (${b.customerName || 'العميل'}) وأرفق صورة الإثبات بانتظار الاعتماد (الساعة ${dt.time}).`,
+                                        icon: '📸',
+                                        tab: 'arrivals',
+                                        badge: 'إثبات مصور',
+                                        timeText: `وصل الآن: الساعة ${dt.time}`
+                                    });
+                                }
+                                // 4. وصول الفني إلى الموقع
+                                else if (newStatus === 'arrived' && prevState.status !== 'arrived') {
+                                    showAdminAlert({
+                                        title: '📍 وصول الفني لموقع العميل!',
+                                        body: `أكد الفني (${b.professionalName || 'المهني'}) وصوله لموقع العميل (${b.customerName || 'العميل'}) بنجاح (الساعة ${dt.time}).`,
+                                        icon: '📍',
+                                        tab: 'arrivals',
+                                        badge: 'إثبات وصول',
+                                        timeText: `وصل: الساعة ${dt.time}`
+                                    });
+                                }
+                                // 5. تأكيد العميل على وصول الفني
+                                else if (newConfirmed === true && prevState.confirmed !== true) {
+                                    showAdminAlert({
+                                        title: '🤝 العميل أكد وصول الفني!',
+                                        body: `أكد العميل (${b.customerName || 'العميل'}) رسمياً لقاء الفني (${b.professionalName || 'المهني'}) في الموقع وبدء العمل (الساعة ${dt.time}).`,
+                                        icon: '🤝',
+                                        tab: 'arrivals',
+                                        badge: 'تأكيد العميل',
+                                        timeText: `تأكيد: الساعة ${dt.time}`
+                                    });
+                                }
+                                // 6. إنكار العميل لوصول الفني (نزاع طارئ)
+                                else if (newConfirmed === false && prevState.confirmed !== false) {
+                                    showAdminAlert({
+                                        title: '🚨 تنبيه: العميل ينكر وصول الفني!',
+                                        body: `أفاد العميل (${b.customerName || 'العميل'}) بأن الفني (${b.professionalName || 'المهني'}) لم يحضر للموقع! يرجى التدقيق الإداري (الساعة ${dt.time}).`,
+                                        icon: '🚨',
+                                        tab: 'arrivals',
+                                        badge: 'نزاع ميداني طارئ',
+                                        timeText: `إنكار: الساعة ${dt.time}`
+                                    });
+                                }
+                                // 7. بدء تنفيذ العمل
+                                else if (newStatus === 'in_progress' && prevState.status !== 'in_progress') {
+                                    showAdminAlert({
+                                        title: '🛠️ بدأ الفني تنفيذ العمل!',
+                                        body: `بدأ الفني (${b.professionalName || 'المهني'}) أعمال الصيانة والإصلاح لدى العميل (${b.customerName || 'العميل'}) (الساعة ${dt.time}).`,
+                                        icon: '🛠️',
+                                        tab: 'arrivals',
+                                        badge: 'قيد التنفيذ',
+                                        timeText: `بدأ الآن: الساعة ${dt.time}`
+                                    });
+                                }
+                                // 8. إنجاز الخدمة
+                                else if (newStatus === 'completed' && prevState.status !== 'completed') {
+                                    showAdminAlert({
+                                        title: '🎉 إنجاز الخدمة الميدانية!',
+                                        body: `أنهى الفني (${b.professionalName || 'المهني'}) تقديم الخدمة للعميل (${b.customerName || 'العميل'}) بنجاح (الساعة ${dt.time}).`,
+                                        icon: '✅',
+                                        tab: 'arrivals',
+                                        badge: 'خدمة مكتملة',
+                                        timeText: `منجز: الساعة ${dt.time}`
+                                    });
+                                }
+
+                                knownBookingStates.set(docId, {
+                                    status: newStatus,
+                                    hasProof: newProof,
+                                    confirmed: newConfirmed,
+                                    isTracking: newTracking
+                                });
+                                localStorage.setItem('admin_last_checked_time', Date.now().toString());
+                            }
                         }
                     });
 
@@ -4005,12 +4176,13 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             const confirmedCust = allBookings.filter(b => b.customerConfirmedArrival === true).length;
             const judged = allBookings.filter(b => b.adminArrivalVerdict).length;
             const unjudgedWithProof = allBookings.filter(b => b.arrivalProofImage && !b.adminArrivalVerdict).length;
+            const activeOrPendingArrivals = allBookings.filter(b => (b.arrivalProofImage && !b.adminArrivalVerdict) || b.status === 'on_the_way' || b.status === 'arrived' || b.isTrackingActive).length;
 
             if (elements.arrivalsTotalCount) elements.arrivalsTotalCount.textContent = totalField;
             if (elements.arrivalsWithProofCount) elements.arrivalsWithProofCount.textContent = withProof;
             if (elements.arrivalsCustomerConfirmedCount) elements.arrivalsCustomerConfirmedCount.textContent = confirmedCust;
             if (elements.arrivalsJudgedCount) elements.arrivalsJudgedCount.textContent = judged;
-            if (elements.tabBadgeArrivals) elements.tabBadgeArrivals.textContent = unjudgedWithProof;
+            if (elements.tabBadgeArrivals) elements.tabBadgeArrivals.textContent = activeOrPendingArrivals;
         }
 
         function filterRequests() {
