@@ -3073,38 +3073,38 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
         async function sendFcmPushToAllDevices({ title, body, db, data = {} }) {
             try {
-                console.log("🚀 جاري بدء إرسال الـ Push لجميع الهواتف...");
-                const accessToken = await getGoogleAccessToken();
+                console.log("🚀 جاري إرسال التنبيه العام عبر القناة الرسمية الموحدة all_users...");
+                // 1. إرسال واحد موحد عبر قناة all_users - خوادم قوقل تقوم بتسليمه لكافة الأجهزة (Android و iOS) مرة واحدة فقط بدون أي تكرار
+                const topicResult = await sendFcmPushSingle({
+                    title: title,
+                    body: body,
+                    topic: "all_users",
+                    data: { ...data, broadcast: "true" }
+                });
 
-                let tokens = [];
+                // 2. إرسال لمتصفحات الويب التي لا تدعم Topics بشكل تلقائي
+                let webDelivered = 0;
                 try {
                     const snap = await getDocs(collection(db, "fcm_tokens"));
+                    const webTokens = [];
                     snap.forEach(docSnap => {
-                        const t = docSnap.data().token || docSnap.id;
-                        if (t && !tokens.includes(t)) tokens.push(t);
+                        const d = docSnap.data();
+                        if (d && d.platform === 'web' && d.token && !webTokens.includes(d.token)) {
+                            webTokens.push(d.token);
+                        }
                     });
-                    console.log(`📱 تم العثور على ${tokens.length} هاتف مسجل مباشرة في fcm_tokens.`);
-                } catch (te) {
-                    console.warn("تعذر جلب توكنات الأجهزة مباشرة:", te);
-                }
-
-                let successTokensCount = 0;
-                for (const token of tokens) {
-                    try {
-                        const r = await sendFcmPushSingle({ title, body, token, data });
-                        if (r.ok) successTokensCount++;
-                    } catch (err) {
-                        console.warn("خطأ إرسال لتوكن:", token, err);
+                    for (const wToken of webTokens) {
+                        try {
+                            await sendFcmPushSingle({ title, body, token: wToken, data });
+                            webDelivered++;
+                        } catch (e) { /* ignore web token error */ }
                     }
+                } catch (we) {
+                    console.warn("ملاحظة توكنات الويب:", we);
                 }
 
-                try {
-                    await sendFcmPushSingle({ title, body, topic: "all_users", data });
-                } catch (err) {
-                    console.warn("خطأ إرسال للقناة العامة:", err);
-                }
-
-                return { success: true, count: tokens.length, delivered: successTokensCount };
+                console.log(`🎉 تم إرسال الإشعار الموحد بنجاح!`);
+                return { success: topicResult.ok, delivered: topicResult.ok ? 1 : 0, webDelivered: webDelivered };
             } catch (err) {
                 console.error("❌ فشل إرسال الإشعارات الجماعية:", err);
                 return { success: false, error: err.message };
@@ -3126,10 +3126,12 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     } catch (e) { console.log(e); }
                 }
 
+                // إرسال للتوكن فقط إذا توفر، وإلا للقناة الخاصة - واحد فقط لمنع وصول إشعار مكرر للشخص نفسه!
                 if (userToken) {
                     await sendFcmPushSingle({ title, body, token: userToken, data });
+                } else if (userId) {
+                    await sendFcmPushSingle({ title, body, topic: `user_${userId}`, data });
                 }
-                await sendFcmPushSingle({ title, body, topic: `user_${userId}`, data });
                 return { success: true };
             } catch (err) {
                 return { success: false, error: err.message };
