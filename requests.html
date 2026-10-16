@@ -3520,6 +3520,25 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
         };
 
+        // Deduplicate requests list helper
+        function deduplicateRequestsList(list) {
+            const seen = new Set();
+            const result = [];
+            for (const item of list) {
+                const nat = (item.nationalId || '').toString().trim();
+                const phone = (item.phone || '').toString().trim();
+                const email = (item.email || '').toString().toLowerCase().trim();
+                const docId = (item.id || '').toString().trim();
+
+                const key = nat ? `nat_${nat}` : (phone ? `phone_${phone}` : (email ? `email_${email}` : `id_${docId}`));
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    result.push(item);
+                }
+            }
+            return result;
+        }
+
         async function loadAllData() {
             try {
                 showLoading(true);
@@ -3533,16 +3552,43 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     getDocs(collection(db, "customers"))
                 ]);
 
-                allRequests = [];
+                const rawRequests = [];
                 pendingSnap.forEach((d) => {
-                    allRequests.push({ id: d.id, ...d.data(), status: 'pending' });
+                    rawRequests.push({ id: d.id, ...d.data(), status: 'pending' });
                 });
                 approvedSnap.forEach((d) => {
-                    allRequests.push({ id: d.id, ...d.data(), status: 'approved' });
+                    rawRequests.push({ id: d.id, ...d.data(), status: 'approved' });
                 });
                 rejectedSnap.forEach((d) => {
-                    allRequests.push({ id: d.id, ...d.data(), status: 'rejected' });
+                    rawRequests.push({ id: d.id, ...d.data(), status: 'rejected' });
                 });
+
+                allRequests = deduplicateRequestsList(rawRequests);
+
+                // Auto-heal duplicate approvedUsers in Firestore
+                try {
+                    const approvedMap = new Map();
+                    approvedSnap.forEach((d) => {
+                        const data = d.data();
+                        const nat = (data.nationalId || '').toString().trim();
+                        if (nat) {
+                            if (!approvedMap.has(nat)) approvedMap.set(nat, []);
+                            approvedMap.get(nat).push({ docId: d.id, data });
+                        }
+                    });
+                    for (const [nat, docs] of approvedMap.entries()) {
+                        if (docs.length > 1) {
+                            const primary = docs.find(doc => doc.docId === doc.data.id) || docs[0];
+                            for (const docItem of docs) {
+                                if (docItem.docId !== primary.docId) {
+                                    deleteDoc(doc(db, "approvedUsers", docItem.docId)).catch(() => {});
+                                }
+                            }
+                        }
+                    }
+                } catch (cleanupErr) {
+                    console.warn("Auto-clean duplicates error:", cleanupErr);
+                }
 
                 allFeedbacks = [];
                 feedbackSnap.forEach((d) => {
@@ -3814,16 +3860,17 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             let cacheRejected = [];
 
             const syncRequestsRealtime = () => {
-                allRequests = [
+                const rawRequests = [
                     ...cachePending.map(d => ({ ...d, status: 'pending' })),
                     ...cacheApproved.map(d => ({ ...d, status: 'approved' })),
                     ...cacheRejected.map(d => ({ ...d, status: 'rejected' }))
                 ];
-                allRequests.sort((a, b) => {
+                rawRequests.sort((a, b) => {
                     const tA = a.createdAt?.seconds || (a.createdAt ? new Date(a.createdAt).getTime() / 1000 : 0);
                     const tB = b.createdAt?.seconds || (b.createdAt ? new Date(b.createdAt).getTime() / 1000 : 0);
                     return tB - tA;
                 });
+                allRequests = deduplicateRequestsList(rawRequests);
                 filteredRequests = [...allRequests];
                 updateStats();
                 if (currentAdminTab === 'requests') {
@@ -5693,10 +5740,19 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     deleteDoc(doc(db, "rejectedUsers", cleanNatId)),
                 ]);
 
-                // Write into approvedUsers
-                await setDoc(doc(db, "approvedUsers", cleanNatId), approvedPayload);
-                if (reqDocId !== cleanNatId) {
-                    await setDoc(doc(db, "approvedUsers", reqDocId), approvedPayload);
+                // Write into approvedUsers - exactly ONE document
+                const primaryDocId = reqDocId || cleanNatId;
+                approvedPayload.id = primaryDocId;
+                if (cleanNatId) approvedPayload.nationalId = cleanNatId;
+
+                await setDoc(doc(db, "approvedUsers", primaryDocId), approvedPayload);
+
+                // Clean up any duplicate doc under the other ID
+                if (cleanNatId && cleanNatId !== primaryDocId) {
+                    try { await deleteDoc(doc(db, "approvedUsers", cleanNatId)); } catch (_) {}
+                }
+                if (reqDocId && reqDocId !== primaryDocId) {
+                    try { await deleteDoc(doc(db, "approvedUsers", reqDocId)); } catch (_) {}
                 }
 
                 if (fromModal) closeDetailModal();
