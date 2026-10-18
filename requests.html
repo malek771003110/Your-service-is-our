@@ -2383,118 +2383,12 @@
         // المفتاح العام الرسمي لـ Web Push الخاص بمشروع الفايربيس (متوافق مع أبل والآيفون PWA)
         const VAPID_KEY = "BLYG3ZcUi_Tf9t6cH7dRkAOJE-KEUk2bXL7AE4rta-4lTr_U5UfEr_eS0MAjvAHlqs_3ni0KALoRspUyRdN0aVE";
 
-        // --- محرك إرسال الإشعارات Google FCM v1 المباشر مدمج بالكامل ---
-        const SERVICE_ACCOUNT = {
-            project_id: "home-services-app-a9c5e",
-            private_key_id: "27dd64e4133a08da7e1986f4b249d6e1c71be8cd",
-            client_email: "firebase-adminsdk-fbsvc@home-services-app-a9c5e.iam.gserviceaccount.com",
-            private_key: `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC9noGHYoprD3YQ
-KUkKqDr7znvzuxL7OpzDdcQubLnMqFoHwl2AmLM2tIdGqxcTiR5w0zhzVXKZ/y4d
-d6Okv6ykqDBQSKEflD5/5VsLO82wnShPH2AteGuepYKcvGMGnXqO4LLr5GCvvgB7
-lyEECA2DimUWvMnELLPcTjZcvTThtVHETjQbk/ZblBzUDx8jJZu4WBHyy/HyJycA
-VOrh3c+UFVHrGwWnrOJq0s+GVWRNY4WeY/WayfhlnSbLTMX3802Zs096F64XAkvd
-R+IFgygVyOqcENpvGuAAIHKoDy65o/1kbnPTBts9udmb51rjIZL6GPJzC2iLTTok
-VEWOLcWVAgMBAAECggEAAZvSpX9khTwAWGrBP+HlfjVmP88afh8lLVNWcr5hZScY
-fHBdsrWY76Hgc+0HqRbEt1hTZkcXTc8oaP+W19L4d/0lS8kR9N6hGRytBQ9g01rB
-+MnfWwNmhlYJIaNHg8raO1QUsIOjfloyTtodYZdf5fnKmcLIQ23NqNTRCUBhrniD
-l+72PEwPLlPTZXPBS5D72siRnqkA0GZTZg3+6FvbDJvJvzut2ad67DQPR1toM9sE
-qtDK6E81uMn6I3FF+4gAGfsGt7Z1fsmNWpnXS0uVDB/yqojDUTnqUGMT1zHSz6cM
-nS+rudll0gUI1PCYqdQAcuX93TWT1BMoI6Lp1TWCAQKBgQDfrKS3Pr7KBaEm4Q4E
-N1+5S5i7h/9IRvPlzy4Ia0avJAoWXTjwZ4OfJS6ikFKrNaI69bdptlH5s2nZHK//
-5rrVKusnvUd/fXKYpYxk3KeFiTCbx0pam8gRaZknplQcD0KEO5q7QuoOZrVkCIdZ
-RpIKgcMYUXtc4KIKtMDtKqxF4QKBgQDZBejzEwcj3rG05oDC1J95jbQZ/sWJtqWI
-2BtkJEg0e6ErberK97im3vkiLd4XXEH4x0+qscRphEu9X7BgZt5lGnbMO1nBXTkS
-6sAkO8rm0/bK7PsOkHQrdLyZJ6QMdfSwTYfKR8SMpdFrdT/1ceULvTKCGJx1ud6n
-tCfZQNEONQKBgQDJakadOGRHuVAHmausgkyxp/BuFqX76OCiNbFnJWruNc7bmrC2
-UxCEU9At1TaMM+zVmQTDrckdyMDtIFcgYh4l7NL64wgqNsXlzVWiUcyMhCCAdrJu
-60761xNyT+X3qookVyQbssLfmv+Gh+ORsem6imUrVdx3o1RnvaLpLn8ZIQKBgQCa
-qj2UTjE+fQ0EsWl+cG2fAUAjbpB1Tre2SN1shvb2gE0iWFmGgPkV476Ff07SMyvJ
-ErJSIhKqaGBZ/AIFEgrY3v1fG8Uhq0BrnOWGbR5zVwiBIlbh0E0aUz29oKSnRME3
-jGmD3ZXT7rDK9mq4j4z+yr1ePg/zTp3BwwDLMghLKQKBgChxRgmJ/BGZKYw59KRY
-z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
-5WDLdczvKdGiVDc6v2FLTUryNlgwMkUVQZIkIpRtH0ig+YXmeVvVh2I37R5gbYUS
-3KRQht5j/zjDWcuE6ztmsM2h
------END PRIVATE KEY-----`
-        };
-
-        let cachedGoogleToken = null;
-        let tokenExpiresAt = 0;
-
-        function b64url(str) {
-            return btoa(str).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-        }
-
-        async function getGoogleAccessToken() {
-            const now = Math.floor(Date.now() / 1000);
-            if (cachedGoogleToken && now < (tokenExpiresAt - 120)) {
-                return cachedGoogleToken;
-            }
-
-            const cleanKey = SERVICE_ACCOUNT.private_key
-                .replace(/-----BEGIN PRIVATE KEY-----/g, '')
-                .replace(/-----END PRIVATE KEY-----/g, '')
-                .replace(/\s+/g, '');
-
-            const binaryDerString = window.atob(cleanKey);
-            const binaryDer = new Uint8Array(binaryDerString.length);
-            for (let i = 0; i < binaryDerString.length; i++) {
-                binaryDer[i] = binaryDerString.charCodeAt(i);
-            }
-
-            const key = await window.crypto.subtle.importKey(
-                "pkcs8",
-                binaryDer.buffer,
-                { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-                false,
-                ["sign"]
-            );
-
-            const header = { alg: "RS256", typ: "JWT" };
-            const claimSet = {
-                iss: SERVICE_ACCOUNT.client_email,
-                scope: "https://www.googleapis.com/auth/firebase.messaging https://www.googleapis.com/auth/identitytoolkit https://www.googleapis.com/auth/cloud-platform",
-                aud: "https://oauth2.googleapis.com/token",
-                exp: now + 3600,
-                iat: now
-            };
-
-            const unsignedToken = b64url(JSON.stringify(header)) + "." + b64url(JSON.stringify(claimSet));
-            const signature = await window.crypto.subtle.sign(
-                "RSASSA-PKCS1-v1_5",
-                key,
-                new TextEncoder().encode(unsignedToken)
-            );
-
-            let binary = '';
-            const bytes = new Uint8Array(signature);
-            for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            const signatureB64 = btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-            const jwt = unsignedToken + "." + signatureB64;
-
-            const res = await fetch("https://oauth2.googleapis.com/token", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`
-            });
-
-            const data = await res.json();
-            if (!data.access_token) {
-                throw new Error("فشل الحصول على توكن جوجل OAuth2: " + JSON.stringify(data));
-            }
-
-            cachedGoogleToken = data.access_token;
-            tokenExpiresAt = now + (data.expires_in || 3600);
-            return cachedGoogleToken;
-        }
-
+        // --- 🔐 محرك إرسال الإشعارات وحذف الحسابات الآمن عبر السيرفر المحمي (Zero-Trust) ---
         async function deleteAuthUserAccount(uid, email = null) {
             if (!uid && !email) return { success: false, error: 'No UID or Email provided' };
-            console.log("Attempting to delete user from Firebase Auth:", { uid, email });
+            console.log("Attempting to delete user from Firebase Auth via secure backend:", { uid, email });
 
-            // 1. Try Netlify Serverless Function (Server-side execution with service account)
+            // 1. Try Netlify Functions first
             try {
                 const netlifyRes = await fetch('/.netlify/functions/delete-auth-user', {
                     method: 'POST',
@@ -2503,64 +2397,27 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 });
                 if (netlifyRes.ok) {
                     const resJson = await netlifyRes.json();
-                    console.log("✅ User deleted from Firebase Auth via Netlify:", resJson);
                     return resJson;
                 }
             } catch (netErr) {
-                console.warn("Netlify function call error (running local file?):", netErr);
+                console.warn("Netlify function call error:", netErr);
             }
 
-            // 2. Direct Google Identity Toolkit API fallback
+            // 2. Try Node.js server endpoint fallback
             try {
-                const accessToken = await getGoogleAccessToken();
-                const uidsToDelete = new Set();
-                if (uid) uidsToDelete.add(uid);
-
-                // If email provided, lookup UID via accounts:lookup
-                if (email) {
-                    try {
-                        const lookupUrl = `https://identitytoolkit.googleapis.com/v1/projects/${SERVICE_ACCOUNT.project_id}/accounts:lookup`;
-                        const lookupRes = await fetch(lookupUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${accessToken}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ email: [email.trim()] })
-                        });
-                        if (lookupRes.ok) {
-                            const lookupData = await lookupRes.json();
-                            if (lookupData.users && Array.isArray(lookupData.users)) {
-                                lookupData.users.forEach(u => {
-                                    if (u.localId) uidsToDelete.add(u.localId);
-                                });
-                            }
-                        }
-                    } catch (lErr) {
-                        console.warn("Direct lookup by email failed:", lErr);
-                    }
+                const serverRes = await fetch('/api/delete-auth-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid, email })
+                });
+                if (serverRes.ok) {
+                    return await serverRes.json();
                 }
-
-                const deleteResults = [];
-                const authUrl = `https://identitytoolkit.googleapis.com/v1/projects/${SERVICE_ACCOUNT.project_id}/accounts:delete`;
-                for (const targetUid of uidsToDelete) {
-                    const gRes = await fetch(authUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ localId: targetUid })
-                    });
-                    const gData = await gRes.json();
-                    deleteResults.push({ uid: targetUid, success: gRes.ok, result: gData });
-                }
-                console.log("✅ User deleted from Firebase Auth via Identity Toolkit:", deleteResults);
-                return { success: deleteResults.some(r => r.success) || uidsToDelete.size === 0, results: deleteResults };
-            } catch (gErr) {
-                console.error("Direct Google Identity Toolkit delete error:", gErr);
-                return { success: false, error: gErr.message };
+            } catch (sErr) {
+                console.warn("Server delete-auth-user error:", sErr);
             }
+
+            return { success: false, error: 'تعذر الاتصال بخدمة مسح المستخدم في السيرفر' };
         }
 
         // --- 🔔 Sound & Push Notification Engine ---
@@ -2966,78 +2823,45 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
 
 
         async function sendFcmPushSingle({ title, body, token = null, topic = null, data = {} }) {
-            const accessToken = await getGoogleAccessToken();
-            const messagePayload = {
-                notification: {
-                    title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
-                    body: body || ''
-                },
-                android: {
-                    priority: "HIGH",
-                    notification: {
-                        channel_id: "khedmtek_channel",
-                        sound: "default",
-                        notification_priority: "PRIORITY_HIGH",
-                        default_sound: true,
-                        default_vibrate_timings: true
-                    }
-                },
-                apns: {
-                    headers: {
-                        "apns-priority": "10"
-                    },
-                    payload: {
-                        aps: {
-                            alert: {
-                                title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
-                                body: body || ''
-                            },
-                            sound: "default",
-                            badge: 1
-                        }
-                    }
-                },
-                webpush: {
-                    headers: {
-                        "Urgency": "high"
-                    },
-                    notification: {
-                        title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
-                        body: body || '',
-                        icon: './logo.png',
-                        badge: './logo.png',
-                        requireInteraction: true,
-                        vibrate: [300, 100, 300]
-                    },
-                    fcm_options: {
-                        link: './requests.html'
-                    }
-                },
-                data: {
-                    click_action: "FLUTTER_NOTIFICATION_CLICK",
-                    title: title || '',
-                    body: body || '',
-                    ...data
-                }
+            const payload = {
+                title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
+                body: body || '',
+                token: token || undefined,
+                topic: !token ? (topic || 'all_users') : undefined,
+                data: data
             };
 
-            if (token) {
-                messagePayload.token = token;
-            } else {
-                messagePayload.topic = topic || "all_users";
+            // 1. Send via Netlify Serverless Function
+            try {
+                const netlifyRes = await fetch('/.netlify/functions/send-fcm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (netlifyRes.ok) {
+                    const result = await netlifyRes.json();
+                    return { ok: true, result };
+                }
+            } catch (netErr) {
+                console.warn("Netlify send-fcm notice:", netErr);
             }
 
-            const res = await fetch(`https://fcm.googleapis.com/v1/projects/${SERVICE_ACCOUNT.project_id}/messages:send`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${accessToken}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ message: messagePayload })
-            });
+            // 2. Send via Local/VPS Server API fallback
+            try {
+                const serverRes = await fetch('/api/send-fcm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (serverRes.ok) {
+                    const result = await serverRes.json();
+                    return { ok: true, result };
+                }
+            } catch (sErr) {
+                console.warn("Server send-fcm notice:", sErr);
+            }
 
-            const result = await res.json();
-            return { ok: res.ok, status: res.status, result };
+            return { ok: false, error: 'تعذر إرسال الإشعار عبر خادم الإرسال الآمن' };
         }
 
         window.testRealPhonePushNotification = async function() {
@@ -3195,24 +3019,24 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
             }
 
             try {
-                // التحقق من أن المستخدم مسجل في وثائق الأدمن أو يحمل بريد الإدارة الرسمي
-                const userEmail = (user.email || "").toLowerCase();
-                let isAuthorized = userEmail.includes("admin") || userEmail.includes("khedmtek");
-                
-                if (!isAuthorized) {
-                    try {
-                        const adminDoc = await getDoc(doc(db, "admins", user.uid));
-                        isAuthorized = adminDoc.exists();
-                    } catch (netErr) {
-                        console.warn("تعذر فحص وثيقة الأدمن بسبب الشبكة، الاعتماد على الجلسة النشطة:", netErr);
-                        isAuthorized = localStorage.getItem("adminLoggedIn") === "true";
-                    }
+                // 🛡️ 1. التحقق الإلزامي من اجتياز التحقق بخطوتين (2FA Verification Check)
+                const is2FaVerified = sessionStorage.getItem("admin2FaVerified") === "true";
+                const twoFaTime = parseInt(sessionStorage.getItem("admin2FaTimestamp") || "0", 10);
+                const isSessionFresh = (Date.now() - twoFaTime) < (12 * 3600 * 1000); // صلاحية الجلسة القصوى 12 ساعة
+
+                if (!is2FaVerified || !isSessionFresh) {
+                    console.warn("⛔ 2FA Verification missing or expired. Redirecting to 2FA login...");
+                    sessionStorage.removeItem("admin2FaVerified");
+                    window.location.href = "admin-login.html";
+                    return;
                 }
 
-                if (!isAuthorized) {
-                    alert("⛔ تنبيه أمني: هذا الحساب غير مصرح له بالدخول كمسؤول!");
+                // 🛡️ 2. التحقق الصارم من وجود الحساب الحقيقي في جدول المدراء المعتمدين في Firestore حصراً
+                const adminDoc = await getDoc(doc(db, "admins", user.uid));
+                if (!adminDoc.exists()) {
+                    alert("⛔ تنبيه أمني: هذا الحساب غير مصرح له كمسؤول في قاعدة البيانات!");
                     await signOut(auth);
-                    sessionStorage.removeItem("adminLoggedIn");
+                    sessionStorage.clear();
                     localStorage.removeItem("adminLoggedIn");
                     localStorage.removeItem("adminRememberSaved");
                     window.location.href = "admin-login.html";
@@ -3222,7 +3046,6 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                 currentAdminUser = user;
                 sessionStorage.setItem("adminLoggedIn", "true");
                 localStorage.setItem("adminLoggedIn", "true");
-                localStorage.setItem("adminRememberSaved", "true");
 
                 // تحديث بادج اسم/إيميل الأدمن في الشريط العلوي
                 const adminBadge = document.getElementById("adminUserEmailBadge");
@@ -3230,19 +3053,33 @@ z1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw
                     adminBadge.textContent = user.email || "حساب الإدارة";
                 }
 
-                // تحميل البيانات فقط بعد التحقق التام من الهوية
+                // 🛡️ 3. نظام الخروج التلقائي عند الخمول لمدة 15 دقيقة (Auto-Logout on Idle)
+                let idleTimer = null;
+                const resetIdleTimer = () => {
+                    if (idleTimer) clearTimeout(idleTimer);
+                    idleTimer = setTimeout(async () => {
+                        alert("⏱️ انتهت جلستك بسبب عدم النشاط لمدة 15 دقيقة. تم تسجيل الخروج تلقائياً لحماية لوحة التحكم.");
+                        sessionStorage.clear();
+                        try { await signOut(auth); } catch (e) {}
+                        window.location.href = "admin-login.html";
+                    }, 15 * 60 * 1000);
+                };
+
+                ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+                    window.addEventListener(evt, resetIdleTimer, { passive: true });
+                });
+                resetIdleTimer();
+
+                // تحميل البيانات فقط بعد استيفاء جميع شروط الأمان
                 if (!hasInitialDataLoaded) {
                     hasInitialDataLoaded = true;
                     await loadAllData();
                     initRealtimeListeners();
                 }
             } catch (err) {
-                console.error("خطأ أثناء التحقق من صلاحيات الأدمن:", err);
-                if (!hasInitialDataLoaded) {
-                    hasInitialDataLoaded = true;
-                    await loadAllData();
-                    initRealtimeListeners();
-                }
+                console.error("خطأ أمني أثناء التحقق من صلاحيات الأدمن:", err);
+                alert("حدث خطأ أثناء التحقق الأمني: " + err.message);
+                window.location.href = "admin-login.html";
             }
         });
 
