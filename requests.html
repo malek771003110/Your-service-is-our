@@ -2999,7 +2999,7 @@
                                 console.log("⏳ انتهت مهلة استرجاع الجلسة، جاري التحويل لصفحة الدخول...");
                                 sessionStorage.removeItem("adminLoggedIn");
                                 localStorage.removeItem("adminLoggedIn");
-                                window.location.href = "admin-login.html";
+                                window.location.replace("admin-login.html");
                             }
                         }, 2500);
                     }
@@ -3008,7 +3008,7 @@
 
                 sessionStorage.removeItem("adminLoggedIn");
                 localStorage.removeItem("adminLoggedIn");
-                window.location.href = "admin-login.html";
+                window.location.replace("admin-login.html");
                 return;
             }
 
@@ -3027,7 +3027,7 @@
                 if (!is2FaVerified || !isSessionFresh) {
                     console.warn("⛔ 2FA Verification missing or expired. Redirecting to 2FA login...");
                     sessionStorage.removeItem("admin2FaVerified");
-                    window.location.href = "admin-login.html";
+                    window.location.replace("admin-login.html");
                     return;
                 }
 

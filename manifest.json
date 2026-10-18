@@ -1,0 +1,29 @@
+{
+  "name": "لوحة تحكم خدمتك الإدارية",
+  "short_name": "خدمتك أدمن",
+  "description": "لوحة تحكم إدارة الطلبات، المهنيين، والعملاء لمنصة خدمتك 🇯🇴",
+  "id": "./",
+  "start_url": "./requests.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a091c",
+  "theme_color": "#0a091c",
+  "icons": [
+    {
+      "src": "./favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "./images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

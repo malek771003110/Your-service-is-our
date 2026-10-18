@@ -701,13 +701,13 @@
           showMessage(responseMsg, "success");
 
           setTimeout(() => {
-            window.location.href = "requests.html";
+            window.location.replace("requests.html");
           }, 600);
         } catch (e) {
           console.error("Save 2FA session error:", e);
           sessionStorage.setItem("admin2FaVerified", "true");
           sessionStorage.setItem("admin2FaTimestamp", Date.now().toString());
-          window.location.href = "requests.html";
+          window.location.replace("requests.html");
         }
       } else {
         verifyBtn.disabled = false;
