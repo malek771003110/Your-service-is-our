@@ -558,6 +558,61 @@
       }
     };
 
+    // 🔐 خوارزمية فحص كود Microsoft Authenticator المباشرة (RFC 6238 TOTP)
+    async function verifyTotpDirectly(inputCode, secret = 'MALEKBIGBOSSKHED') {
+      try {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        let bits = '';
+        for (let i = 0; i < secret.length; i++) {
+          const val = alphabet.indexOf(secret[i].toUpperCase());
+          if (val === -1) continue;
+          bits += val.toString(2).padStart(5, '0');
+        }
+        const keyBytes = new Uint8Array(Math.floor(bits.length / 8));
+        for (let i = 0; i < keyBytes.length; i++) {
+          keyBytes[i] = parseInt(bits.substr(i * 8, 8), 2);
+        }
+
+        const epoch = Math.floor(Date.now() / 1000);
+        const timeStep = Math.floor(epoch / 30);
+
+        const cryptoKey = await window.crypto.subtle.importKey(
+          "raw",
+          keyBytes,
+          { name: "HMAC", hash: { name: "SHA-1" } },
+          false,
+          ["sign"]
+        );
+
+        // فحص النافذة اللحظية الحالية والسابقة واللاحقة (لتفادي أي فارق زمني طفيف بين الساعة والهاتف)
+        for (let offset of [0, -1, 1]) {
+          const step = timeStep + offset;
+          const timeBuffer = new ArrayBuffer(8);
+          const timeView = new DataView(timeBuffer);
+          timeView.setUint32(4, step, false);
+
+          const signature = await window.crypto.subtle.sign("HMAC", cryptoKey, timeBuffer);
+          const hmac = new Uint8Array(signature);
+          const hmacOffset = hmac[hmac.length - 1] & 0x0f;
+
+          const code = (
+            ((hmac[hmacOffset] & 0x7f) << 24) |
+            ((hmac[hmacOffset + 1] & 0xff) << 16) |
+            ((hmac[hmacOffset + 2] & 0xff) << 8) |
+            (hmac[hmacOffset + 3] & 0xff)
+          ) % 1000000;
+
+          if (code.toString().padStart(6, '0') === inputCode) {
+            return true;
+          }
+        }
+        return false;
+      } catch (e) {
+        console.warn("Direct TOTP calculation error:", e);
+        return false;
+      }
+    }
+
     // 🔐 تنفيذ الخطوة 2: فحص كود التحقق الثنائي (2FA Verification)
     window.verify2FaCode = async function() {
       const codeInput = document.getElementById("twoFaInput").value.trim();
@@ -572,34 +627,43 @@
       verifyBtn.textContent = "جاري مطابقة الرمز مع هاتفك...";
 
       let isSuccess = false;
-      let responseMsg = "✅ تم تأكيد المصادقة الثنائية بنجاح! جاري التوجيه للوحة التحكم...";
+      let responseMsg = "✅ مرحباً بك يا MALEK Big Boss! تم التحقق بنجاح وتأكيد هويتك كمسؤول معتمد.";
 
-      // 1. محاولة التحقق عبر خادم السيرفر الرسمي (TOTP RFC 6238 المباشر لهاتف MALEK Big Boss)
-      try {
-        const verifyRes = await fetch('/api/admin/verify-2fa', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: codeInput,
-            userUid: pendingAdminUser ? pendingAdminUser.uid : null
-          })
-        });
-
-        if (verifyRes.ok) {
-          const resData = await verifyRes.json();
-          if (resData.success) {
-            isSuccess = true;
-            if (resData.deviceToken) {
-              localStorage.setItem("khedmtek_admin_device_token", resData.deviceToken);
-            }
-            if (resData.message) responseMsg = resData.message;
-          }
-        }
-      } catch (netErr) {
-        console.warn("Server 2FA endpoint error, trying fallback local check:", netErr);
+      // 1. الفحص الفوري المباشر لخوارزمية TOTP (RFC 6238) الخاصة بحساب MALEK Big Boss
+      const isDirectTotpValid = await verifyTotpDirectly(codeInput);
+      if (isDirectTotpValid) {
+        isSuccess = true;
       }
 
-      // 2. الفحص الاحتياطي لرموز الطوارئ أو في حال تعذر الاتصال بالسيرفر
+      // 2. محاولة التحقق عبر السيرفر (سواء Netlify Function أو Node.js server)
+      if (!isSuccess) {
+        try {
+          const verifyEndpoints = ['/api/admin/verify-2fa', '/.netlify/functions/verify-2fa'];
+          for (const ep of verifyEndpoints) {
+            try {
+              const verifyRes = await fetch(ep, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  code: codeInput,
+                  userUid: pendingAdminUser ? pendingAdminUser.uid : null
+                })
+              });
+              if (verifyRes.ok) {
+                const resData = await verifyRes.json();
+                if (resData.success) {
+                  isSuccess = true;
+                  break;
+                }
+              }
+            } catch (err) {}
+          }
+        } catch (netErr) {
+          console.warn("Server 2FA check skipped:", netErr);
+        }
+      }
+
+      // 3. الفحص الاحتياطي لرموز الأمان الثابتة والطوارئ
       if (!isSuccess) {
         if (codeInput === expectedAdmin2FaCode || codeInput === "789012" || codeInput === "202688") {
           isSuccess = true;
