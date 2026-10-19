@@ -1491,6 +1491,8 @@
                     <option value="oldest">⏳ الأقدم تسجيلاً</option>
                     <option value="name_asc">🔤 الترتيب الأبجدي (أ - ي)</option>
                     <option value="with_phone">📱 العملاء الذين لديهم هواتف فقط</option>
+                    <option value="google">🌐 المسجلين عبر Google فقط</option>
+                    <option value="email">✉️ المسجلين بالبريد المعتاد فقط</option>
                 </select>
             </div>
         </div>
@@ -2321,6 +2323,11 @@
                 <div class="detail-box-single">
                     <span class="detail-box-label">📅 تاريخ التسجيل في المنصة</span>
                     <span class="detail-box-value" id="custDetailCreatedAt">-</span>
+                </div>
+
+                <div class="detail-box-single">
+                    <span class="detail-box-label">🔐 طريقة التسجيل والحساب</span>
+                    <span class="detail-box-value" id="custDetailAuthMethod">-</span>
                 </div>
 
                 <div class="detail-box-single">
@@ -4188,9 +4195,15 @@
                     (cust.id && cust.id.toLowerCase().includes(query)) ||
                     (cust.bio && cust.bio.toLowerCase().includes(query));
 
-                const matchesPhone = sort !== 'with_phone' || (cust.phone && cust.phone.trim().length > 0);
+                const isGoogleCust = cust.authProvider === 'google' || 
+                                     cust.registrationMethod === 'google' || 
+                                     cust.isGoogleUser === true || 
+                                     (cust.imageUrl && cust.imageUrl.includes('googleusercontent.com'));
 
-                return matchesQuery && matchesPhone;
+                const matchesPhone = sort !== 'with_phone' || (cust.phone && cust.phone.trim().length > 0);
+                const matchesMethod = sort === 'google' ? isGoogleCust : (sort === 'email' ? !isGoogleCust : true);
+
+                return matchesQuery && matchesPhone && matchesMethod;
             });
 
             // Sorting
@@ -4220,7 +4233,7 @@
 
             // Table headers for customers
             document.querySelector('#requestsTable thead tr').innerHTML = `
-                <th>العميل</th>
+                <th>العميل وطريقة التسجيل</th>
                 <th>رقم الهاتف</th>
                 <th>البريد الإلكتروني</th>
                 <th>الرقم الوطني</th>
@@ -4245,6 +4258,19 @@
 
                 const avatarLetter = (cust.name && cust.name.trim().length > 0) ? cust.name.trim().charAt(0) : 'ع';
 
+                const isGoogle = cust.authProvider === 'google' || 
+                                 cust.registrationMethod === 'google' || 
+                                 cust.isGoogleUser === true || 
+                                 (cust.imageUrl && cust.imageUrl.includes('googleusercontent.com'));
+
+                const methodBadge = isGoogle ?
+                    `<span style="background: rgba(66, 133, 244, 0.15); color: #60a5fa; border: 1px solid rgba(66, 133, 244, 0.35); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/24px-Google_%22G%22_logo.svg.png" style="width:11px; height:11px;" /> Google
+                    </span>` :
+                    `<span style="background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                        ✉️ بريد عادي
+                    </span>`;
+
                 // Table Row
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -4255,7 +4281,10 @@
                             </div>
                             <div>
                                 <strong class="break-word">${cust.name || 'عميل مسجل'}</strong>
-                                <div style="font-size: 11px; color: #10b981; font-weight: 700;">🟢 حساب نشط</div>
+                                <div style="display: flex; align-items: center; gap: 5px; margin-top: 3px;">
+                                    ${methodBadge}
+                                    <span style="font-size: 10.5px; color: #10b981; font-weight: 700;">🟢 نشط</span>
+                                </div>
                             </div>
                         </div>
                     </td>
@@ -4290,7 +4319,10 @@
                             <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; font-weight: 800; overflow: hidden;">
                                 ${cust.imageUrl ? `<img src="${cust.imageUrl}" style="width:100%; height:100%; object-fit:cover;" />` : avatarLetter}
                             </div>
-                            <span class="mobile-req-name break-word">${cust.name || 'عميل مسجل'}</span>
+                            <div>
+                                <span class="mobile-req-name break-word">${cust.name || 'عميل مسجل'}</span>
+                                <div style="margin-top: 2px;">${methodBadge}</div>
+                            </div>
                         </div>
                         <span class="badge-status approved">👤 عميل</span>
                     </div>
@@ -4323,6 +4355,18 @@
                 document.getElementById('custDetailUid').textContent = cust.id || '-';
             }
             document.getElementById('custDetailCreatedAt').textContent = formatDate(cust.createdAt);
+            
+            const isGoogleCust = cust.authProvider === 'google' || 
+                                 cust.registrationMethod === 'google' || 
+                                 cust.isGoogleUser === true || 
+                                 (cust.imageUrl && cust.imageUrl.includes('googleusercontent.com'));
+            const authMethodElem = document.getElementById('custDetailAuthMethod');
+            if (authMethodElem) {
+                authMethodElem.innerHTML = isGoogleCust ? 
+                    '<span style="color: #60a5fa; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;"><img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/24px-Google_%22G%22_logo.svg.png\" style=\"width:14px; height:14px;\" /> تسجيل الدخول عبر Google</span>' :
+                    '<span style="color: #94a3b8; font-weight: 700;">✉️ البريد الإلكتروني وكلمة المرور</span>';
+            }
+
             document.getElementById('custDetailNationality').textContent = cust.nationality || 'أردني 🇯🇴';
             
             let genderBirth = [];
