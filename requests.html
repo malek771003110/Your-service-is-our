@@ -2838,6 +2838,8 @@
                 data: data
             };
 
+            let lastError = 'تعذر إرسال الإشعار عبر خادم الإرسال الآمن';
+
             // 1. Send via Netlify Serverless Function
             try {
                 const netlifyRes = await fetch('/.netlify/functions/send-fcm', {
@@ -2845,9 +2847,12 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (netlifyRes.ok) {
-                    const result = await netlifyRes.json();
+                const result = await netlifyRes.json().catch(() => ({}));
+                if (netlifyRes.ok && result.success !== false) {
                     return { ok: true, result };
+                }
+                if (result.error) {
+                    lastError = typeof result.error === 'object' ? JSON.stringify(result.error) : result.error;
                 }
             } catch (netErr) {
                 console.warn("Netlify send-fcm notice:", netErr);
@@ -2860,15 +2865,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (serverRes.ok) {
-                    const result = await serverRes.json();
+                const result = await serverRes.json().catch(() => ({}));
+                if (serverRes.ok && result.success !== false) {
                     return { ok: true, result };
+                }
+                if (result.error) {
+                    lastError = typeof result.error === 'object' ? JSON.stringify(result.error) : result.error;
                 }
             } catch (sErr) {
                 console.warn("Server send-fcm notice:", sErr);
             }
 
-            return { ok: false, error: 'تعذر إرسال الإشعار عبر خادم الإرسال الآمن' };
+            return { ok: false, error: lastError };
         }
 
         window.testRealPhonePushNotification = async function() {
@@ -2935,7 +2943,8 @@
                 }
 
                 console.log(`🎉 تم إرسال الإشعار الموحد بنجاح!`);
-                return { success: topicResult.ok, delivered: topicResult.ok ? 1 : 0, webDelivered: webDelivered };
+                const errDetail = topicResult.ok ? null : (topicResult.error || (topicResult.result ? JSON.stringify(topicResult.result) : 'فشل الاتصال بخادم الإشعارات'));
+                return { success: topicResult.ok, delivered: topicResult.ok ? 1 : 0, webDelivered: webDelivered, error: errDetail };
             } catch (err) {
                 console.error("❌ فشل إرسال الإشعارات الجماعية:", err);
                 return { success: false, error: err.message };
