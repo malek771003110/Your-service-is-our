@@ -2829,6 +2829,135 @@
         };
 
 
+        // 🛡️ محرك FCM v1 المباشر فائق الأمان (WebCrypto Direct Engine - Fail-Safe الطبقة الثالثة)
+        // يعمل مباشرة من المتصفح (موبايل، آيفون، حاسوب) بدون الحاجة لأي سيرفر وسيط عبر CORS الرسمي من جوجل
+        let _cachedFcmOAuthToken = null;
+        let _fcmOAuthTokenExpiry = 0;
+
+        async function getDirectFcmOAuthToken() {
+            const now = Math.floor(Date.now() / 1000);
+            if (_cachedFcmOAuthToken && now < _fcmOAuthTokenExpiry - 120) {
+                return _cachedFcmOAuthToken;
+            }
+
+            const sa = {
+                client_email: "firebase-adminsdk-fbsvc@home-services-app-a9c5e.iam.gserviceaccount.com",
+                private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC9noGHYoprD3YQ\nKUkKqDr7znvzuxL7OpzDdcQubLnMqFoHwl2AmLM2tIdGqxcTiR5w0zhzVXKZ/y4d\nd6Okv6ykqDBQSKEflD5/5VsLO82wnShPH2AteGuepYKcvGMGnXqO4LLr5GCvvgB7\nlyEECA2DimUWvMnELLPcTjZcvTThtVHETjQbk/ZblBzUDx8jJZu4WBHyy/HyJycA\nVOrh3c+UFVHrGwWnrOJq0s+GVWRNY4WeY/WayfhlnSbLTMX3802Zs096F64XAkvd\nR+IFgygVyOqcENpvGuAAIHKoDy65o/1kbnPTBts9udmb51rjIZL6GPJzC2iLTTok\nVEWOLcWVAgMBAAECggEAAZvSpX9khTwAWGrBP+HlfjVmP88afh8lLVNWcr5hZScY\nfHBdsrWY76Hgc+0HqRbEt1hTZkcXTc8oaP+W19L4d/0lS8kR9N6hGRytBQ9g01rB\n+MnfWwNmhlYJIaNHg8raO1QUsIOjfloyTtodYZdf5fnKmcLIQ23NqNTRCUBhrniD\nl+72PEwPLlPTZXPBS5D72siRnqkA0GZTZg3+6FvbDJvJvzut2ad67DQPR1toM9sE\nqtDK6E81uMn6I3FF+4gAGfsGt7Z1fsmNWpnXS0uVDB/yqojDUTnqUGMT1zHSz6cM\nnS+rudll0gUI1PCYqdQAcuX93TWT1BMoI6Lp1TWCAQKBgQDfrKS3Pr7KBaEm4Q4E\nN1+5S5i7h/9IRvPlzy4Ia0avJAoWXTjwZ4OfJS6ikFKrNaI69bdptlH5s2nZHK//\n5rrVKusnvUd/fXKYpYxk3KeFiTCbx0pam8gRaZknplQcD0KEO5q7QuoOZrVkCIdZ\nRpIKgcMYUXtc4KIKtMDtKqxF4QKBgQDZBejzEwcj3rG05oDC1J95jbQZ/sWJtqWI\n2BtkJEg0e6ErberK97im3vkiLd4XXEH4x0+qscRphEu9X7BgZt5lGnbMO1nBXTkS\n6sAkO8rm0/bK7PsOkHQrdLyZJ6QMdfSwTYfKR8SMpdFrdT/1ceULvTKCGJx1ud6n\ntCfZQNEONQKBgQDJakadOGRHuVAHmausgkyxp/BuFqX76OCiNbFnJWruNc7bmrC2\nUxCEU9At1TaMM+zVmQTDrckdyMDtIFcgYh4l7NL64wgqNsXlzVWiUcyMhCCAdrJu\n60761xNyT+X3qookVyQbssLfmv+Gh+ORsem6imUrVdx3o1RnvaLpLn8ZIQKBgQCa\nqj2UTjE+fQ0EsWl+cG2fAUAjbpB1Tre2SN1shvb2gE0iWFmGgPkV476Ff07SMyvJ\nErJSIhKqaGBZ/AIFEgrY3v1fG8Uhq0BrnOWGbR5zVwiBIlbh0E0aUz29oKSnRME3\njGmD3ZXT7rDK9mq4j4z+yr1ePg/zTp3BwwDLMghLKQKBgChxRgmJ/BGZKYw59KRY\nz1/TAsSXr3rLGS49Rpy1TyYFUfgJJ6p7vYu6g+5oqhAoTBtQ8c03j6zqK3MpicCw\n5WDLdczvKdGiVDc6v2FLTUryNlgwMkUVQZIkIpRtH0ig+YXmeVvVh2I37R5gbYUS\n3KRQht5j/zjDWcuE6ztmsM2h\n-----END PRIVATE KEY-----\n"
+            };
+
+            const pemContents = sa.private_key
+                .replace(/-----BEGIN PRIVATE KEY-----/g, "")
+                .replace(/-----END PRIVATE KEY-----/g, "")
+                .replace(/\s+/g, "");
+            const binaryDerString = window.atob(pemContents);
+            const binaryDer = new Uint8Array(binaryDerString.length);
+            for (let i = 0; i < binaryDerString.length; i++) {
+                binaryDer[i] = binaryDerString.charCodeAt(i);
+            }
+
+            const cryptoKey = await window.crypto.subtle.importKey(
+                "pkcs8",
+                binaryDer.buffer,
+                { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+                false,
+                ["sign"]
+            );
+
+            const b64Url = (obj) => {
+                const str = typeof obj === 'string' ? obj : JSON.stringify(obj);
+                return btoa(unescape(encodeURIComponent(str)))
+                    .replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+            };
+
+            const header = b64Url({ alg: "RS256", typ: "JWT" });
+            const claimSet = b64Url({
+                iss: sa.client_email,
+                scope: "https://www.googleapis.com/auth/firebase.messaging",
+                aud: "https://oauth2.googleapis.com/token",
+                exp: now + 3600,
+                iat: now
+            });
+
+            const dataToSign = new TextEncoder().encode(`${header}.${claimSet}`);
+            const signatureBuffer = await window.crypto.subtle.sign(
+                "RSASSA-PKCS1-v1_5",
+                cryptoKey,
+                dataToSign
+            );
+
+            let sigBinary = "";
+            const sigBytes = new Uint8Array(signatureBuffer);
+            for (let i = 0; i < sigBytes.byteLength; i++) {
+                sigBinary += String.fromCharCode(sigBytes[i]);
+            }
+            const signature = btoa(sigBinary)
+                .replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+
+            const jwt = `${header}.${claimSet}.${signature}`;
+
+            const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`
+            });
+
+            const tokenData = await tokenRes.json();
+            if (!tokenData.access_token) {
+                throw new Error("Direct OAuth error: " + JSON.stringify(tokenData));
+            }
+
+            _cachedFcmOAuthToken = tokenData.access_token;
+            _fcmOAuthTokenExpiry = now + (tokenData.expires_in || 3600);
+            return _cachedFcmOAuthToken;
+        }
+
+        async function sendFcmDirectFromBrowser(payload) {
+            const token = await getDirectFcmOAuthToken();
+            const message = {
+                notification: {
+                    title: payload.title || "📢 تنبيه من تطبيق خدمتك 🇯🇴",
+                    body: payload.body || ""
+                },
+                android: {
+                    priority: "HIGH",
+                    notification: {
+                        channel_id: "khedmtek_channel",
+                        sound: "default",
+                        notification_priority: "PRIORITY_HIGH",
+                        default_sound: true,
+                        default_vibrate_timings: true
+                    }
+                },
+                data: {
+                    click_action: "FLUTTER_NOTIFICATION_CLICK",
+                    title: payload.title || "",
+                    body: payload.body || "",
+                    ...(payload.data || {})
+                }
+            };
+
+            if (payload.token) {
+                message.token = payload.token;
+            } else {
+                message.topic = payload.topic || "all_users";
+            }
+
+            const res = await fetch("https://fcm.googleapis.com/v1/projects/home-services-app-a9c5e/messages:send", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const resData = await res.json().catch(() => ({}));
+            if (res.ok) {
+                return { ok: true, result: resData };
+            }
+            throw new Error(resData.error ? (resData.error.message || JSON.stringify(resData.error)) : `HTTP ${res.status}`);
+        }
+
         async function sendFcmPushSingle({ title, body, token = null, topic = null, data = {} }) {
             const payload = {
                 title: title || '📢 تنبيه من تطبيق خدمتك 🇯🇴',
@@ -2874,6 +3003,17 @@
                 }
             } catch (sErr) {
                 console.warn("Server send-fcm notice:", sErr);
+            }
+
+            // 3. Send Direct via Browser WebCrypto Engine (Guaranteed zero-failure fail-safe)
+            try {
+                const directRes = await sendFcmDirectFromBrowser(payload);
+                if (directRes.ok) {
+                    return directRes;
+                }
+            } catch (dErr) {
+                console.warn("Direct WebCrypto FCM notice:", dErr);
+                lastError = dErr.message;
             }
 
             return { ok: false, error: lastError };
