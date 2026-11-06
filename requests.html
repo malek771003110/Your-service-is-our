@@ -2347,11 +2347,64 @@
             </div>
 
             <!-- Modal Action Buttons -->
-            <div class="modal-action-buttons">
-                <button class="btn-modal-action reject" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4);" onclick="confirmDeleteCustomerFromModal()">
-                    <span>🗑️</span> <span>حذف العميل من قاعدة البيانات نهائياً</span>
+            <div class="modal-action-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="btn-admin-action" style="background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; padding: 12px 20px; font-weight: bold; border-radius: 12px; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; flex: 1;" onclick="openAdminCustomerChatModal()">
+                    <span>💬</span> <span>شات التطبيق المباشر</span>
+                </button>
+                <button class="btn-modal-action reject" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 12px 16px;" onclick="confirmDeleteCustomerFromModal()">
+                    <span>🗑️</span> <span>حذف العميل</span>
                 </button>
                 <button class="btn-admin-action" style="padding: 12px 20px; justify-content: center;" onclick="closeCustomerDetailModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 💬 Admin Direct Chat with Customer Modal -->
+    <div class="modal-overlay-drawer" id="adminCustomerChatModal" style="display: none; z-index: 10050;">
+        <div class="modal-card-drawer" style="max-width: 540px; height: 85vh; display: flex; flex-direction: column;">
+            <!-- Chat Header -->
+            <div class="modal-header-drawer" style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.6);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div id="adminChatCustAvatar" style="width: 44px; height: 44px; border-radius: 50%; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; font-weight: 800; overflow: hidden; flex-shrink: 0; border: 2px solid var(--border-color);">
+                        👤
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <h3 id="adminChatCustName" style="color: var(--text-pure); margin: 0; font-size: 16px; font-weight: 800;">اسم العميل</h3>
+                            <span id="adminChatDevBadge" style="display: none; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">👑 مطور</span>
+                        </div>
+                        <span style="font-size: 11.5px; color: #10b981; display: flex; align-items: center; gap: 4px;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                            محادثة فورية مرتبطة بتطبيق العميل
+                        </span>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeAdminCustomerChatModal()">✕</button>
+            </div>
+
+            <!-- Messages Stream Box -->
+            <div id="adminChatMessagesContainer" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: rgba(15, 23, 42, 0.5);">
+                <div style="text-align: center; color: var(--text-muted); font-size: 13px; margin: auto;">
+                    ⏳ جاري تحميل المحادثة من خوادم التطبيق...
+                </div>
+            </div>
+
+            <!-- Chat Input & Quick Actions -->
+            <div style="padding: 12px 16px; border-top: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.7);">
+                <!-- Quick Presets -->
+                <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 6px;">
+                    <button type="button" class="btn-quick-contact" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc; font-size: 11px; white-space: nowrap; cursor: pointer;" onclick="setAdminChatPreset('مرحباً بك، معك إدارة منصة خدمتك عنا 👑، كيف نقدر نساعدك؟')">👋 ترحيب رسمي</button>
+                    <button type="button" class="btn-quick-contact" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; font-size: 11px; white-space: nowrap; cursor: pointer;" onclick="setAdminChatPreset('تم استلام وتأكيد طلبك بنجاح، وسيتواصل معك الفني في أقرب وقت.')">✅ تأكيد الطلب</button>
+                    <button type="button" class="btn-quick-contact" style="background: rgba(245, 158, 11, 0.15); color: #fde68a; font-size: 11px; white-space: nowrap; cursor: pointer;" onclick="setAdminChatPreset('نود الاطمئنان، هل تمت الصيانة بجودة ممتازة ورضا تام من طرفك؟')">⭐ استبيان الرضا</button>
+                </div>
+
+                <!-- Form -->
+                <form id="adminChatForm" onsubmit="sendAdminChatMessage(event)" style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="adminChatInput" placeholder="اكتب رسالة للعميل تصل لإشعارات هاتفه..." style="flex: 1; padding: 12px 14px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: 12px; color: white; font-size: 13.5px; outline: none;" required />
+                    <button type="submit" id="adminChatSendBtn" style="background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; border: none; border-radius: 12px; padding: 12px 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <span>إرسال</span> <span>🚀</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -2384,6 +2437,7 @@
             serverTimestamp,
             query,
             where,
+            orderBy,
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
@@ -4537,14 +4591,38 @@
             // Phone direct actions
             const phoneActions = document.getElementById('custDetailPhoneActions');
             phoneActions.innerHTML = '';
+            phoneActions.innerHTML = `
+                <button type="button" onclick="openAdminCustomerChatModal()" class="btn-quick-contact" style="background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); cursor: pointer;">💬 شات التطبيق</button>
+            `;
             if (cust.phone) {
                 const cleanPhone = cust.phone.replace(/\D/g, '');
                 let waPhone = cleanPhone;
                 if (waPhone.startsWith('07')) waPhone = '962' + waPhone.substring(1);
-                phoneActions.innerHTML = `
+                phoneActions.innerHTML += `
                     <a href="tel:${cleanPhone}" class="btn-quick-contact" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">📞 اتصال</a>
                     <a href="https://wa.me/${waPhone}" target="_blank" class="btn-quick-contact" style="background: rgba(37, 211, 102, 0.2); color: #4ade80; border: 1px solid rgba(37, 211, 102, 0.3);">💬 واتساب</a>
                 `;
+            }
+
+            // Developer Golden Badge Check
+            const isDev = (cust.email || '').trim().toLowerCase() === 'himour.mk@gmail.com' || 
+                          (cust.email || '').trim().toLowerCase() === 'mh.himour@gmail.com' ||
+                          (cust.name || '').includes('مالك حيمور');
+            const headerBadgeContainer = document.querySelector('#customerDetailModal .modal-header-title .badge-status');
+            if (headerBadgeContainer) {
+                if (isDev) {
+                    headerBadgeContainer.className = 'badge-status';
+                    headerBadgeContainer.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                    headerBadgeContainer.style.color = '#ffffff';
+                    headerBadgeContainer.style.border = '1px solid #fbbf24';
+                    headerBadgeContainer.innerHTML = '👑 مطور ومؤسس المنصة ⭐';
+                } else {
+                    headerBadgeContainer.className = 'badge-status approved';
+                    headerBadgeContainer.style.background = '';
+                    headerBadgeContainer.style.color = '';
+                    headerBadgeContainer.style.border = '';
+                    headerBadgeContainer.innerHTML = '👤 طالب خدمة مسجل';
+                }
             }
 
             document.getElementById('customerDetailModal').style.display = 'flex';
@@ -4553,6 +4631,201 @@
         window.closeCustomerDetailModal = function() {
             document.getElementById('customerDetailModal').style.display = 'none';
             activeModalCustomerId = null;
+        };
+
+        // --- 💬 محرك محادثة الإدارة المباشرة مع العميل داخل التطبيق ---
+        let adminChatUnsubscribe = null;
+        let activeChatCustomerId = null;
+        let activeChatCustomerName = '';
+        let activeChatRoomId = null;
+
+        function getChatRoomId(uid1, uid2) {
+            if (uid1.localeCompare(uid2) > 0) {
+                return `${uid1}_${uid2}`;
+            } else {
+                return `${uid2}_${uid1}`;
+            }
+        }
+
+        window.openAdminCustomerChatModal = function() {
+            if (!activeModalCustomerId) return;
+            const cust = allCustomers.find(c => c.id === activeModalCustomerId);
+            if (!cust) return;
+
+            activeChatCustomerId = cust.id;
+            activeChatCustomerName = cust.name || 'طالب خدمة';
+
+            const adminUid = auth.currentUser ? auth.currentUser.uid : 'admin_support';
+            activeChatRoomId = getChatRoomId(adminUid, activeChatCustomerId);
+
+            // Populate Chat Header
+            document.getElementById('adminChatCustName').textContent = activeChatCustomerName;
+            const isDev = (cust.email || '').trim().toLowerCase() === 'himour.mk@gmail.com' ||
+                          (cust.email || '').trim().toLowerCase() === 'mh.himour@gmail.com' ||
+                          (cust.name || '').includes('مالك حيمور');
+            document.getElementById('adminChatDevBadge').style.display = isDev ? 'inline-block' : 'none';
+
+            const avatarBox = document.getElementById('adminChatCustAvatar');
+            if (cust.imageUrl) {
+                avatarBox.innerHTML = `<img src="${cust.imageUrl}" style="width:100%; height:100%; object-fit:cover;" />`;
+            } else {
+                const letter = (cust.name && cust.name.trim().length > 0) ? cust.name.trim().charAt(0) : 'ط';
+                avatarBox.innerHTML = letter;
+            }
+
+            // Close customer details modal and open chat modal
+            closeCustomerDetailModal();
+            document.getElementById('adminCustomerChatModal').style.display = 'flex';
+
+            // Subscribe to realtime messages
+            loadAdminChatMessages(activeChatRoomId);
+        };
+
+        window.closeAdminCustomerChatModal = function() {
+            document.getElementById('adminCustomerChatModal').style.display = 'none';
+            if (adminChatUnsubscribe) {
+                adminChatUnsubscribe();
+                adminChatUnsubscribe = null;
+            }
+            activeChatCustomerId = null;
+            activeChatRoomId = null;
+        };
+
+        window.setAdminChatPreset = function(text) {
+            const input = document.getElementById('adminChatInput');
+            input.value = text;
+            input.focus();
+        };
+
+        function loadAdminChatMessages(chatRoomId) {
+            if (adminChatUnsubscribe) {
+                adminChatUnsubscribe();
+                adminChatUnsubscribe = null;
+            }
+
+            const container = document.getElementById('adminChatMessagesContainer');
+            container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 13px; margin: auto;">⏳ جاري تحميل الرسائل...</div>';
+
+            const adminUid = auth.currentUser ? auth.currentUser.uid : 'admin_support';
+            const messagesRef = collection(db, "chats", chatRoomId, "messages");
+            const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+            adminChatUnsubscribe = onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); font-size: 13px; margin: auto; padding: 20px;">
+                            <div style="font-size: 32px; margin-bottom: 8px;">💬</div>
+                            <p>لا توجد رسائل سابقة مع ${activeChatCustomerName}.</p>
+                            <p style="font-size: 11.5px; color: #94a3b8;">ابدأ المحادثة الآن وستصل للعميل كإشعار فوري داخل التطبيق!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = '';
+                snapshot.forEach((docSnap) => {
+                    const msg = docSnap.data();
+                    const isMe = msg.senderId === adminUid;
+                    
+                    const timeStr = msg.timestamp && msg.timestamp.toDate ? 
+                        msg.timestamp.toDate().toLocaleTimeString('ar-JO', { hour: '2-digit', minute: '2-digit' }) : '';
+
+                    const bubble = document.createElement('div');
+                    bubble.style.cssText = `
+                        display: flex;
+                        flex-direction: column;
+                        align-self: ${isMe ? 'flex-start' : 'flex-end'};
+                        max-width: 82%;
+                        background: ${isMe ? 'linear-gradient(135deg, #4f46e5, #6366f1)' : '#1e293b'};
+                        color: white;
+                        padding: 10px 14px;
+                        border-radius: ${isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                        border: 1px solid ${isMe ? 'rgba(255,255,255,0.15)' : 'var(--border-color)'};
+                    `;
+
+                    bubble.innerHTML = `
+                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 3px; color: ${isMe ? '#c7d2fe' : '#38bdf8'};">
+                            ${isMe ? '👑 الإدارة (أنت)' : activeChatCustomerName}
+                        </div>
+                        <div style="font-size: 13.5px; line-height: 1.45; word-break: break-word;">
+                            ${msg.content || ''}
+                        </div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.6); align-self: flex-end; margin-top: 4px;">
+                            ${timeStr}
+                        </div>
+                    `;
+                    container.appendChild(bubble);
+                });
+
+                // Auto scroll to bottom
+                container.scrollTop = container.scrollHeight;
+            }, (err) => {
+                console.error("Error in admin chat listener:", err);
+                container.innerHTML = `<div style="text-align: center; color: #ef4444; font-size: 12px; margin: auto;">خطأ في تحميل المحادثة: ${err.message}</div>`;
+            });
+        }
+
+        window.sendAdminChatMessage = async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('adminChatInput');
+            const messageText = input.value.trim();
+            if (!messageText || !activeChatRoomId || !activeChatCustomerId) return;
+
+            const sendBtn = document.getElementById('adminChatSendBtn');
+            sendBtn.disabled = true;
+            input.value = '';
+
+            try {
+                const adminUid = auth.currentUser ? auth.currentUser.uid : 'admin_support';
+                const adminName = 'إدارة منصة خدمتك 👑';
+
+                // 1. Add Message to Subcollection
+                await addDoc(collection(db, "chats", activeChatRoomId, "messages"), {
+                    senderId: adminUid,
+                    senderName: adminName,
+                    receiverId: activeChatCustomerId,
+                    receiverName: activeChatCustomerName,
+                    content: messageText,
+                    timestamp: serverTimestamp(),
+                    type: 'text'
+                });
+
+                // 2. Set/Merge Chat Room Document Metadata
+                await setDoc(doc(db, "chats", activeChatRoomId), {
+                    participants: [adminUid, activeChatCustomerId],
+                    userNames: {
+                        [adminUid]: adminName,
+                        [activeChatCustomerId]: activeChatCustomerName
+                    },
+                    lastMessage: messageText,
+                    lastMessageTime: serverTimestamp(),
+                    lastMessageSenderId: adminUid,
+                    isRead: false,
+                    deletedBy: []
+                }, { merge: true });
+
+                // 3. Create instant In-App Notification for customer
+                await addDoc(collection(db, "notifications"), {
+                    userId: activeChatCustomerId,
+                    title: '💬 رسالة جديدة من إدارة خدمتك',
+                    body: messageText,
+                    type: 'chat_message',
+                    chatRoomId: activeChatRoomId,
+                    senderId: adminUid,
+                    senderName: adminName,
+                    createdAt: serverTimestamp(),
+                    isRead: false
+                });
+
+            } catch (err) {
+                console.error("Error sending admin chat message:", err);
+                alert("❌ تعذر إرسال الرسالة: " + err.message);
+                input.value = messageText;
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+            }
         };
 
         window.confirmDeleteCustomerFromModal = function() {
