@@ -4640,7 +4640,7 @@
         let activeChatRoomId = null;
 
         function getChatRoomId(uid1, uid2) {
-            if (uid1.localeCompare(uid2) > 0) {
+            if (uid1 > uid2) {
                 return `${uid1}_${uid2}`;
             } else {
                 return `${uid2}_${uid1}`;
@@ -4725,7 +4725,10 @@
                 container.innerHTML = '';
                 snapshot.forEach((docSnap) => {
                     const msg = docSnap.data();
-                    const isMe = msg.senderId === adminUid;
+                    const isFromAdmin = msg.senderId === adminUid || 
+                                        msg.senderId === 'admin_support' || 
+                                        msg.isDeveloper === true ||
+                                        (msg.senderName && (msg.senderName.includes('إدارة') || msg.senderName.includes('خدمتك') || msg.senderName.includes('👑') || msg.senderName.includes('مالك')));
                     
                     const timeStr = msg.timestamp && msg.timestamp.toDate ? 
                         msg.timestamp.toDate().toLocaleTimeString('ar-JO', { hour: '2-digit', minute: '2-digit' }) : '';
@@ -4734,24 +4737,25 @@
                     bubble.style.cssText = `
                         display: flex;
                         flex-direction: column;
-                        align-self: ${isMe ? 'flex-start' : 'flex-end'};
+                        align-self: ${isFromAdmin ? 'flex-start' : 'flex-end'};
                         max-width: 82%;
-                        background: ${isMe ? 'linear-gradient(135deg, #4f46e5, #6366f1)' : '#1e293b'};
+                        background: ${isFromAdmin ? 'linear-gradient(135deg, #78350f, #b45309, #d97706)' : '#1e293b'};
                         color: white;
                         padding: 10px 14px;
-                        border-radius: ${isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-                        border: 1px solid ${isMe ? 'rgba(255,255,255,0.15)' : 'var(--border-color)'};
+                        border-radius: ${isFromAdmin ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
+                        box-shadow: ${isFromAdmin ? '0 4px 14px rgba(245, 158, 11, 0.35)' : '0 2px 6px rgba(0,0,0,0.15)'};
+                        border: 1.8px solid ${isFromAdmin ? '#fbbf24' : 'var(--border-color)'};
                     `;
 
                     bubble.innerHTML = `
-                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 3px; color: ${isMe ? '#c7d2fe' : '#38bdf8'};">
-                            ${isMe ? '👑 الإدارة (أنت)' : activeChatCustomerName}
+                        <div style="font-size: 11px; font-weight: 800; margin-bottom: 4px; color: ${isFromAdmin ? '#fef08a' : '#38bdf8'}; display: flex; align-items: center; gap: 5px;">
+                            ${isFromAdmin ? '👑 إدارة المنصة ومطور التطبيق' : (msg.senderName || activeChatCustomerName)}
+                            ${isFromAdmin ? '<span style="background: rgba(254, 240, 138, 0.25); color: #fef08a; padding: 1px 7px; border-radius: 6px; font-size: 9.5px; border: 1px solid #fbbf24; font-weight: 900;">موثق ذهبي ⭐</span>' : ''}
                         </div>
-                        <div style="font-size: 13.5px; line-height: 1.45; word-break: break-word;">
+                        <div style="font-size: 13.5px; line-height: 1.45; word-break: break-word; font-weight: ${isFromAdmin ? 'bold' : 'normal'}; color: ${isFromAdmin ? '#ffffff' : '#f8fafc'};">
                             ${msg.content || ''}
                         </div>
-                        <div style="font-size: 10px; color: rgba(255,255,255,0.6); align-self: flex-end; margin-top: 4px;">
+                        <div style="font-size: 10px; color: ${isFromAdmin ? '#fde68a' : 'rgba(255,255,255,0.6)'}; align-self: flex-end; margin-top: 4px; font-weight: bold;">
                             ${timeStr}
                         </div>
                     `;
@@ -4788,7 +4792,9 @@
                     receiverName: activeChatCustomerName,
                     content: messageText,
                     timestamp: serverTimestamp(),
-                    type: 'text'
+                    type: 'text',
+                    isDeveloper: true,
+                    senderRole: 'admin'
                 });
 
                 // 2. Set/Merge Chat Room Document Metadata
@@ -4802,6 +4808,7 @@
                     lastMessageTime: serverTimestamp(),
                     lastMessageSenderId: adminUid,
                     isRead: false,
+                    isDeveloper: true,
                     deletedBy: []
                 }, { merge: true });
 
@@ -4817,6 +4824,43 @@
                     createdAt: serverTimestamp(),
                     isRead: false
                 });
+
+                // 4. Send Real Device Push Notification (FCM) to customer's phone
+                try {
+                    const custObj = allCustomers.find(c => c.id === activeChatCustomerId);
+                    let fcmToken = custObj ? custObj.fcmToken : null;
+                    if (!fcmToken) {
+                        const custDocSnap = await getDoc(doc(db, "customers", activeChatCustomerId));
+                        if (custDocSnap.exists()) {
+                            fcmToken = custDocSnap.data().fcmToken;
+                        }
+                    }
+
+                    if (fcmToken) {
+                        fetch('/.netlify/functions/send-fcm', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                token: fcmToken,
+                                title: '👑 رسالة من إدارة منصة خدمتك',
+                                body: messageText,
+                                data: {
+                                    type: 'chat_message',
+                                    chatRoomId: activeChatRoomId,
+                                    senderId: adminUid,
+                                    senderName: adminName,
+                                    click_action: 'FLUTTER_NOTIFICATION_CLICK'
+                                }
+                            })
+                        }).then(r => r.json()).then(res => {
+                            console.log('✅ FCM Push notification sent to customer phone:', res);
+                        }).catch(e => {
+                            console.warn('FCM Push notification warning:', e);
+                        });
+                    }
+                } catch (pushErr) {
+                    console.warn('Push dispatch error:', pushErr);
+                }
 
             } catch (err) {
                 console.error("Error sending admin chat message:", err);
