@@ -4639,6 +4639,19 @@
         let activeChatCustomerName = '';
         let activeChatRoomId = null;
 
+        function getAdminSenderUid() {
+            // الربط المباشر مع حساب المطور مالك حيمور في تطبيق الفلاتر
+            const malekCust = (typeof allCustomers !== 'undefined' && Array.isArray(allCustomers)) ? allCustomers.find(c => {
+                const em = (c.email || '').trim().toLowerCase();
+                const nm = (c.name || '').trim();
+                return em === 'himour.mk@gmail.com' || em === 'mh.himour@gmail.com' || nm.includes('مالك حيمور');
+            }) : null;
+            if (malekCust && malekCust.id) {
+                return malekCust.id;
+            }
+            return 'BBbHd5FmpqTm6rzqw6In3Gt92kz1';
+        }
+
         function getChatRoomId(uid1, uid2) {
             if (uid1 > uid2) {
                 return `${uid1}_${uid2}`;
@@ -4655,7 +4668,7 @@
             activeChatCustomerId = cust.id;
             activeChatCustomerName = cust.name || 'طالب خدمة';
 
-            const adminUid = auth.currentUser ? auth.currentUser.uid : 'admin_support';
+            const adminUid = getAdminSenderUid();
             activeChatRoomId = getChatRoomId(adminUid, activeChatCustomerId);
 
             // Populate Chat Header
@@ -4706,7 +4719,7 @@
             const container = document.getElementById('adminChatMessagesContainer');
             container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 13px; margin: auto;">⏳ جاري تحميل الرسائل...</div>';
 
-            const adminUid = auth.currentUser ? auth.currentUser.uid : 'admin_support';
+            const adminUid = getAdminSenderUid();
             const messagesRef = collection(db, "chats", chatRoomId, "messages");
             const q = query(messagesRef, orderBy("timestamp", "asc"));
 
@@ -4781,7 +4794,7 @@
             input.value = '';
 
             try {
-                const adminUid = auth.currentUser ? auth.currentUser.uid : 'admin_support';
+                const adminUid = getAdminSenderUid();
                 const adminName = 'إدارة منصة خدمتك 👑';
 
                 // 1. Add Message to Subcollection
